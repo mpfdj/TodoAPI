@@ -1,0 +1,2 @@
+### Get users
+GET http://localhost:8080/users
