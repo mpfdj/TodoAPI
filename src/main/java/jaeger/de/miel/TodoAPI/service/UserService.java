@@ -18,12 +18,12 @@ public class UserService {
     private final UserRepository userRepository;
 
     public List<UserDTO> getUsers() {
-        var userList = new ArrayList<UserDTO>();
-
         Iterable<AppUser> users = userRepository.findAll();
-        users.forEach(u -> userList.add(UserMapper.toDTO(u)));
 
+        var userList = new ArrayList<UserDTO>();
+        users.forEach(u -> userList.add(UserMapper.toDTO(u)));
         userList.sort(Comparator.comparing(UserDTO::getName));
+
         return userList;
     }
 
