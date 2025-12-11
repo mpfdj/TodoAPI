@@ -1,18 +1,15 @@
 package jaeger.de.miel.TodoAPI.service;
 
 import jaeger.de.miel.TodoAPI.dto.ListDTO;
-import jaeger.de.miel.TodoAPI.dto.UserDTO;
 import jaeger.de.miel.TodoAPI.mapper.ListMapper;
 import jaeger.de.miel.TodoAPI.repository.ListRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-@Transactional(readOnly = true)
 @AllArgsConstructor
 @Service
 public class ListService {
