@@ -1,9 +1,9 @@
-# *Production-Ready Spring Boot Application with Metrics, Health Checks & Externalized Configuration*
+# **Production-Ready Spring Boot Application with Metrics, Health Checks & Externalized Configuration**
 
-Here's a *complete production-ready Spring Boot application* with all the features you need:
+Here's a **complete production-ready Spring Boot application** with all the features you need:
 
-## *Project Structure*
-
+## **Project Structure**
+```
 src/main/java/com/example/prodapp/
 ├── ProdApplication.java                    # Main class
 ├── config/                                 # Configurations
@@ -37,13 +37,13 @@ src/main/java/com/example/prodapp/
 │   ├── GlobalExceptionHandler.java
 │   └── ResourceNotFoundException.java
 └── health/
-├── DatabaseHealthIndicator.java        # Custom health check
-└── ExternalServiceHealthIndicator.java
+    ├── DatabaseHealthIndicator.java        # Custom health check
+    └── ExternalServiceHealthIndicator.java
+```
 
+## **1. Main Application Class**
 
-## *1. Main Application Class*
-
-java
+```java
 package com.example.prodapp;
 
 import org.springframework.boot.SpringApplication;
@@ -59,307 +59,307 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling          // For scheduled tasks
 @EnableRetry               // For retry logic
 public class ProdApplication {
-
+    
     public static void main(String[] args) {
         SpringApplication.run(ProdApplication.class, args);
     }
 }
+```
 
+## **2. Externalized Configuration**
 
-## *2. Externalized Configuration*
-
-### *application.yml (Main configuration)*
-yaml
+### **`application.yml` (Main configuration)**
+```yaml
 # Spring Profiles
 spring:
-profiles:
-active: ${APP_PROFILE:dev}  # dev, staging, prod
-
-# Application
-application:
-name: production-app
-version: 2.0.0
-
-# Database (PostgreSQL in production)
-datasource:
-url: ${DB_URL:jdbc:postgresql://localhost:5432/proddb}
-username: ${DB_USERNAME:postgres}
-password: ${DB_PASSWORD:${DB_PASS:changeme}}
-driver-class-name: org.postgresql.Driver
-hikari:
-maximum-pool-size: ${DB_MAX_POOL:20}
-minimum-idle: ${DB_MIN_IDLE:5}
-connection-timeout: 30000
-idle-timeout: 600000
-max-lifetime: 1800000
-pool-name: ProductionPool
-
-# JPA
-jpa:
-database-platform: org.hibernate.dialect.PostgreSQLDialect
-hibernate:
-ddl-auto: validate  # Never create/update in prod
-properties:
-hibernate:
-dialect: org.hibernate.dialect.PostgreSQLDialect
-jdbc:
-batch_size: 30
-order_inserts: true
-order_updates: true
-generate_statistics: false  # Disable in production
-show-sql: false  # Disable in production
-
-# Redis Cache
-redis:
-host: ${REDIS_HOST:localhost}
-port: ${REDIS_PORT:6379}
-password: ${REDIS_PASSWORD:}
-timeout: 2000ms
-
-# RabbitMQ
-rabbitmq:
-host: ${RABBITMQ_HOST:localhost}
-port: ${RABBITMQ_PORT:5672}
-username: ${RABBITMQ_USER:guest}
-password: ${RABBITMQ_PASS:guest}
-
-# Mail
-mail:
-host: ${SMTP_HOST:smtp.gmail.com}
-port: ${SMTP_PORT:587}
-username: ${SMTP_USERNAME:}
-password: ${SMTP_PASSWORD:}
-properties:
-mail:
-smtp:
-auth: true
-starttls:
-enable: true
-
-# Security
-security:
-jwt:
-secret: ${JWT_SECRET:your-256-bit-secret-key-here-must-be-32-chars}
-expiration-ms: ${JWT_EXPIRATION:86400000}  # 24 hours
-
-# Actuator (Production settings)
-management:
-endpoints:
-web:
-exposure:
-include: health,info,metrics,prometheus,loggers
-base-path: /manage  # Custom path
-endpoint:
-health:
-show-details: when_authorized
-show-components: when_authorized
-metrics:
-enabled: true
-prometheus:
-enabled: true
-metrics:
-export:
-prometheus:
-enabled: true
-distribution:
-percentiles-histogram:
-http.server.requests: true
-sla:
-http.server.requests: 100ms, 200ms, 500ms, 1s, 2s
-info:
-env:
-enabled: true
-trace:
-http:
-enabled: false  # Disable for performance
-
-# Logging (Production settings)
-logging:
-level:
-com.example.prodapp: INFO
-org.springframework.web: WARN
-org.hibernate: ERROR
-pattern:
-console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-file:
-name: logs/app.log
-max-size: 10MB
-max-history: 30
-
-# Server
-server:
-port: ${SERVER_PORT:8080}
-compression:
-enabled: true
-mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/json
-min-response-size: 1024
-servlet:
-context-path: /api
-error:
-include-message: never  # Don't expose errors in production
-include-binding-errors: never
-include-stacktrace: never
+  profiles:
+    active: ${APP_PROFILE:dev}  # dev, staging, prod
+  
+  # Application
+  application:
+    name: production-app
+    version: 2.0.0
+  
+  # Database (PostgreSQL in production)
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/proddb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:${DB_PASS:changeme}}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_MAX_POOL:20}
+      minimum-idle: ${DB_MIN_IDLE:5}
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: ProductionPool
+  
+  # JPA
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate  # Never create/update in prod
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 30
+        order_inserts: true
+        order_updates: true
+        generate_statistics: false  # Disable in production
+    show-sql: false  # Disable in production
+  
+  # Redis Cache
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout: 2000ms
+  
+  # RabbitMQ
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASS:guest}
+  
+  # Mail
+  mail:
+    host: ${SMTP_HOST:smtp.gmail.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  
+  # Security
+  security:
+    jwt:
+      secret: ${JWT_SECRET:your-256-bit-secret-key-here-must-be-32-chars}
+      expiration-ms: ${JWT_EXPIRATION:86400000}  # 24 hours
+  
+  # Actuator (Production settings)
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,metrics,prometheus,loggers
+        base-path: /manage  # Custom path
+    endpoint:
+      health:
+        show-details: when_authorized
+        show-components: when_authorized
+      metrics:
+        enabled: true
+      prometheus:
+        enabled: true
+    metrics:
+      export:
+        prometheus:
+          enabled: true
+      distribution:
+        percentiles-histogram:
+          http.server.requests: true
+        sla:
+          http.server.requests: 100ms, 200ms, 500ms, 1s, 2s
+    info:
+      env:
+        enabled: true
+    trace:
+      http:
+        enabled: false  # Disable for performance
+  
+  # Logging (Production settings)
+  logging:
+    level:
+      com.example.prodapp: INFO
+      org.springframework.web: WARN
+      org.hibernate: ERROR
+    pattern:
+      console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+      file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file:
+      name: logs/app.log
+      max-size: 10MB
+      max-history: 30
+  
+  # Server
+  server:
+    port: ${SERVER_PORT:8080}
+    compression:
+      enabled: true
+      mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/json
+      min-response-size: 1024
+    servlet:
+      context-path: /api
+    error:
+      include-message: never  # Don't expose errors in production
+      include-binding-errors: never
+      include-stacktrace: never
 
 # Application specific
 app:
-rate-limit:
-max-requests-per-minute: 100
-cache:
-user-ttl-seconds: 300
-product-ttl-seconds: 600
-retry:
-max-attempts: 3
-backoff-delay: 1000
-features:
-enable-maintenance-mode: false
-enable-experimental-endpoints: false
-external-services:
-payment-service:
-url: ${PAYMENT_SERVICE_URL:https://api.payments.com}
-timeout: 5000
-retries: 3
-notification-service:
-url: ${NOTIFICATION_SERVICE_URL:https://api.notifications.com}
-timeout: 3000
+  rate-limit:
+    max-requests-per-minute: 100
+  cache:
+    user-ttl-seconds: 300
+    product-ttl-seconds: 600
+  retry:
+    max-attempts: 3
+    backoff-delay: 1000
+  features:
+    enable-maintenance-mode: false
+    enable-experimental-endpoints: false
+  external-services:
+    payment-service:
+      url: ${PAYMENT_SERVICE_URL:https://api.payments.com}
+      timeout: 5000
+      retries: 3
+    notification-service:
+      url: ${NOTIFICATION_SERVICE_URL:https://api.notifications.com}
+      timeout: 3000
 
 # Micrometer metrics
 management.metrics:
-enable:
-jvm: true
-logback: true
-system: true
-process: true
-tags:
-application: ${spring.application.name}
-environment: ${spring.profiles.active}
-region: ${REGION:us-east-1}
-web:
-server:
-request:
-autotime:
-enabled: true
+  enable:
+    jvm: true
+    logback: true
+    system: true
+    process: true
+  tags:
+    application: ${spring.application.name}
+    environment: ${spring.profiles.active}
+    region: ${REGION:us-east-1}
+  web:
+    server:
+      request:
+        autotime:
+          enabled: true
+```
 
-
-### *application-prod.yml (Production-specific)*
-yaml
+### **`application-prod.yml` (Production-specific)**
+```yaml
 spring:
-datasource:
-url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:prod_db}
-hikari:
-maximum-pool-size: 50
-minimum-idle: 10
-
-jpa:
-properties:
-hibernate:
-cache:
-use_second_level_cache: true
-region:
-factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
-use_query_cache: true
-
-# Production logging
-logging:
-level:
-com.example.prodapp: WARN
-file:
-name: /var/log/prodapp/app.log
-
-# Actuator security
-management:
-endpoints:
-web:
-exposure:
-include: health,info,metrics,prometheus
-endpoint:
-health:
-show-details: when_authorized
-shutdown:
-enabled: false  # Disable in production!
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:prod_db}
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+  
+  jpa:
+    properties:
+      hibernate:
+        cache:
+          use_second_level_cache: true
+          region:
+            factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+          use_query_cache: true
+  
+  # Production logging
+  logging:
+    level:
+      com.example.prodapp: WARN
+    file:
+      name: /var/log/prodapp/app.log
+  
+  # Actuator security
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,metrics,prometheus
+    endpoint:
+      health:
+        show-details: when_authorized
+      shutdown:
+        enabled: false  # Disable in production!
 
 # Production settings
 app:
-security:
-cors:
-allowed-origins: https://example.com,https://api.example.com
-rate-limit:
-max-requests-per-minute: 1000
-monitoring:
-enable-datadog: true
-enable-newrelic: false
+  security:
+    cors:
+      allowed-origins: https://example.com,https://api.example.com
+    rate-limit:
+      max-requests-per-minute: 1000
+  monitoring:
+    enable-datadog: true
+    enable-newrelic: false
+```
 
-
-### *application-dev.yml (Development)*
-yaml
+### **`application-dev.yml` (Development)**
+```yaml
 spring:
-datasource:
-url: jdbc:h2:mem:devdb;DB_CLOSE_ON_EXIT=FALSE
-driver-class-name: org.h2.Driver
-username: sa
-password:
-
-jpa:
-hibernate:
-ddl-auto: update
-show-sql: true
-properties:
-hibernate:
-format_sql: true
-
-h2:
-console:
-enabled: true
-path: /h2-console
-
-# Actuator - show everything in dev
-management:
-endpoints:
-web:
-exposure:
-include: "*"
-endpoint:
-health:
-show-details: always
-
-# Dev logging
-logging:
-level:
-com.example.prodapp: DEBUG
-org.springframework.web: DEBUG
-org.hibernate.SQL: DEBUG
+  datasource:
+    url: jdbc:h2:mem:devdb;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # Actuator - show everything in dev
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: "*"
+    endpoint:
+      health:
+        show-details: always
+  
+  # Dev logging
+  logging:
+    level:
+      com.example.prodapp: DEBUG
+      org.springframework.web: DEBUG
+      org.hibernate.SQL: DEBUG
 
 app:
-security:
-cors:
-allowed-origins: "*"
-features:
-enable-experimental-endpoints: true
+  security:
+    cors:
+      allowed-origins: "*"
+  features:
+    enable-experimental-endpoints: true
+```
 
-
-### *bootstrap.yml (For Config Server)*
-yaml
+### **`bootstrap.yml` (For Config Server)**
+```yaml
 spring:
-application:
-name: production-app
-
-cloud:
-config:
-uri: ${CONFIG_SERVER_URL:http://localhost:8888}
-fail-fast: true
-retry:
-max-attempts: 6
-max-interval: 10000
-
+  application:
+    name: production-app
+  
+  cloud:
+    config:
+      uri: ${CONFIG_SERVER_URL:http://localhost:8888}
+      fail-fast: true
+      retry:
+        max-attempts: 6
+        max-interval: 10000
+      
       # Encrypted values
       encrypt:
         key: ${CONFIG_ENCRYPT_KEY:}
+```
 
+## **3. Actuator Health Checks**
 
-## *3. Actuator Health Checks*
-
-### *Custom Health Indicators*
-java
+### **Custom Health Indicators**
+```java
 package com.example.prodapp.health;
 
 import org.springframework.boot.actuate.health.Health;
@@ -371,7 +371,7 @@ import java.util.Map;
 
 @Component
 public class DatabaseHealthIndicator implements HealthIndicator {
-
+    
     @Autowired
     private JdbcTemplate jdbcTemplate;
     
@@ -406,7 +406,7 @@ public class DatabaseHealthIndicator implements HealthIndicator {
 
 @Component
 public class ExternalServiceHealthIndicator implements HealthIndicator {
-
+    
     @Autowired
     private RestTemplate restTemplate;
     
@@ -451,7 +451,7 @@ public class ExternalServiceHealthIndicator implements HealthIndicator {
 
 @Component
 public class DiskSpaceHealthIndicator implements HealthIndicator {
-
+    
     private static final long MIN_DISK_SPACE = 100 * 1024 * 1024; // 100MB
     
     @Override
@@ -478,10 +478,10 @@ public class DiskSpaceHealthIndicator implements HealthIndicator {
         return String.format("%.2f GB", bytes / (1024.0 * 1024 * 1024));
     }
 }
+```
 
-
-### *Custom Actuator Endpoints*
-java
+### **Custom Actuator Endpoints**
+```java
 package com.example.prodapp.controller;
 
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
@@ -495,7 +495,7 @@ import java.util.HashMap;
 @Component
 @RestControllerEndpoint(id = "custom")
 public class ActuatorCustomController {
-
+    
     @Autowired
     private MeterRegistry meterRegistry;
     
@@ -543,12 +543,12 @@ public class ActuatorCustomController {
         return ResponseEntity.ok(info);
     }
 }
+```
 
+## **4. Metrics & Monitoring**
 
-## *4. Metrics & Monitoring*
-
-### *Metrics Configuration*
-java
+### **Metrics Configuration**
+```java
 package com.example.prodapp.config;
 
 import io.micrometer.core.aop.TimedAspect;
@@ -560,7 +560,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MetricsConfig {
-
+    
     @Bean
     public TimedAspect timedAspect(MeterRegistry registry) {
         return new TimedAspect(registry);
@@ -587,10 +587,10 @@ public class MetricsConfig {
             && (name.contains("/actuator") || name.contains("/manage") || name.contains("/static")));
     }
 }
+```
 
-
-### *Service with Metrics*
-java
+### **Service with Metrics**
+```java
 package com.example.prodapp.service;
 
 import io.micrometer.core.annotation.Timed;
@@ -603,7 +603,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserService {
-
+    
     private final Counter userCreationCounter;
     private final Timer userFindTimer;
     private final MeterRegistry meterRegistry;
@@ -662,10 +662,10 @@ public class UserService {
             "reason", reason).increment();
     }
 }
+```
 
-
-### *Controller with Metrics*
-java
+### **Controller with Metrics**
+```java
 package com.example.prodapp.controller.api;
 
 import io.micrometer.core.annotation.Timed;
@@ -677,7 +677,7 @@ import org.springframework.http.HttpStatus;
 @RequestMapping("/api/users")
 @Timed(value = "http.requests", extraTags = {"controller", "UserController"})
 public class UserController {
-
+    
     @Autowired
     private UserService userService;
     
@@ -733,11 +733,11 @@ public class UserController {
         return ResponseEntity.ok("ALIVE");
     }
 }
+```
 
+## **5. Security Configuration for Actuator**
 
-## *5. Security Configuration for Actuator*
-
-java
+```java
 package com.example.prodapp.config;
 
 import org.springframework.context.annotation.Bean;
@@ -755,7 +755,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
+    
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -819,12 +819,12 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+```
 
+## **6. Docker Configuration**
 
-## *6. Docker Configuration*
-
-### *Dockerfile*
-dockerfile
+### **`Dockerfile`**
+```dockerfile
 # Multi-stage build
 FROM eclipse-temurin:17-jdk-alpine as builder
 WORKDIR /app
@@ -851,402 +851,402 @@ ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:MaxG
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-CMD wget --quiet --tries=1 --spider http://localhost:8080/api/users/health || exit 1
+  CMD wget --quiet --tries=1 --spider http://localhost:8080/api/users/health || exit 1
 
 # Expose port
 EXPOSE 8080
 
 # Run the application
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
+```
 
-
-### *docker-compose.yml*
-yaml
+### **`docker-compose.yml`**
+```yaml
 version: '3.8'
 
 services:
-app:
-build: .
-container_name: prod-app
-ports:
-- "8080:8080"
-environment:
-- SPRING_PROFILES_ACTIVE=prod
-- DB_URL=jdbc:postgresql://postgres:5432/proddb
-- DB_USERNAME=postgres
-- DB_PASSWORD=${DB_PASSWORD}
-- REDIS_HOST=redis
-- RABBITMQ_HOST=rabbitmq
-- JWT_SECRET=${JWT_SECRET}
-depends_on:
-- postgres
-- redis
-- rabbitmq
-networks:
-- prod-network
-restart: unless-stopped
-healthcheck:
-test: ["CMD", "curl", "-f", "http://localhost:8080/api/users/health"]
+  app:
+    build: .
+    container_name: prod-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:postgresql://postgres:5432/proddb
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - RABBITMQ_HOST=rabbitmq
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    networks:
+      - prod-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/users/health"]
       interval: 30s
-timeout: 10s
-retries: 3
-start_period: 60s
-logging:
-driver: "json-file"
-options:
-max-size: "10m"
-max-file: "3"
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
-postgres:
-image: postgres:15-alpine
-container_name: prod-postgres
-environment:
-- POSTGRES_DB=proddb
-- POSTGRES_USER=postgres
-- POSTGRES_PASSWORD=${DB_PASSWORD}
+  postgres:
+    image: postgres:15-alpine
+    container_name: prod-postgres
+    environment:
+      - POSTGRES_DB=proddb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - prod-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: prod-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - prod-network
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: prod-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - prod-network
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prod-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - prod-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: prod-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - prod-network
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+networks:
+  prod-network:
+    driver: bridge
+
 volumes:
-- postgres-data:/var/lib/postgresql/data
-- ./init.sql:/docker-entrypoint-initdb.d/init.sql
-ports:
-- "5432:5432"
-networks:
-- prod-network
-restart: unless-stopped
-healthcheck:
-test: ["CMD-SHELL", "pg_isready -U postgres"]
-interval: 30s
-timeout: 10s
-retries: 3
+  postgres-data:
+  prometheus-data:
+  grafana-data:
+```
 
-redis:
-image: redis:7-alpine
-container_name: prod-redis
-ports:
-- "6379:6379"
-networks:
-- prod-network
-restart: unless-stopped
-command: redis-server --requirepass ${REDIS_PASSWORD}
+## **7. Monitoring Stack**
 
-rabbitmq:
-image: rabbitmq:3-management-alpine
-container_name: prod-rabbitmq
-environment:
-- RABBITMQ_DEFAULT_USER=admin
-- RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
-ports:
-- "5672:5672"
-- "15672:15672"
-networks:
-- prod-network
-restart: unless-stopped
-
-prometheus:
-image: prom/prometheus:latest
-container_name: prod-prometheus
-ports:
-- "9090:9090"
-volumes:
-- ./prometheus.yml:/etc/prometheus/prometheus.yml
-- prometheus-data:/prometheus
-command:
-- '--config.file=/etc/prometheus/prometheus.yml'
-- '--storage.tsdb.path=/prometheus'
-- '--web.console.libraries=/etc/prometheus/console_libraries'
-- '--web.console.templates=/etc/prometheus/consoles'
-- '--storage.tsdb.retention.time=200h'
-- '--web.enable-lifecycle'
-networks:
-- prod-network
-restart: unless-stopped
-
-grafana:
-image: grafana/grafana:latest
-container_name: prod-grafana
-ports:
-- "3000:3000"
-environment:
-- GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-volumes:
-- grafana-data:/var/lib/grafana
-- ./grafana/provisioning:/etc/grafana/provisioning
-networks:
-- prod-network
-restart: unless-stopped
-depends_on:
-- prometheus
-
-networks:
-prod-network:
-driver: bridge
-
-volumes:
-postgres-data:
-prometheus-data:
-grafana-data:
-
-
-## *7. Monitoring Stack*
-
-### *prometheus.yml*
-yaml
+### **`prometheus.yml`**
+```yaml
 global:
-scrape_interval: 15s
-evaluation_interval: 15s
+  scrape_interval: 15s
+  evaluation_interval: 15s
 
 scrape_configs:
-- job_name: 'spring-boot-app'
-  metrics_path: '/manage/prometheus'
-  scrape_interval: 10s
-  static_configs:
-    - targets: ['app:8080']
-      labels:
-      application: 'production-app'
-      environment: 'production'
-
-- job_name: 'postgres'
-  static_configs:
-    - targets: ['postgres-exporter:9187']
-
-- job_name: 'node-exporter'
-  static_configs:
-    - targets: ['node-exporter:9100']
-
-- job_name: 'rabbitmq'
-  static_configs:
-    - targets: ['rabbitmq-exporter:9419']
+  - job_name: 'spring-boot-app'
+    metrics_path: '/manage/prometheus'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['app:8080']
+        labels:
+          application: 'production-app'
+          environment: 'production'
+          
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+        
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq-exporter:9419']
 
 rule_files:
-- /etc/prometheus/rules.yml
+  - /etc/prometheus/rules.yml
 
 alerting:
-alertmanagers:
-- static_configs:
-- targets: ['alertmanager:9093']
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+```
 
-
-### *Grafana Dashboard (JSON export)*
+### **Grafana Dashboard (JSON export)**
 Create a dashboard with:
-1. *JVM Metrics*: Heap usage, GC time, thread count
-2. *HTTP Metrics*: Request rate, latency, error rate
-3. *Database Metrics*: Connection pool, query latency
-4. *Business Metrics*: User signups, orders, revenue
-5. *Infrastructure*: CPU, memory, disk usage
+1. **JVM Metrics**: Heap usage, GC time, thread count
+2. **HTTP Metrics**: Request rate, latency, error rate
+3. **Database Metrics**: Connection pool, query latency
+4. **Business Metrics**: User signups, orders, revenue
+5. **Infrastructure**: CPU, memory, disk usage
 
-## *8. Kubernetes Deployment*
+## **8. Kubernetes Deployment**
 
-### *deployment.yaml*
-yaml
+### **`deployment.yaml`**
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: production-app
-namespace: production
-labels:
-app: production-app
+  name: production-app
+  namespace: production
+  labels:
+    app: production-app
 spec:
-replicas: 3
-selector:
-matchLabels:
-app: production-app
-template:
-metadata:
-labels:
-app: production-app
-annotations:
-prometheus.io/scrape: "true"
-prometheus.io/path: "/manage/prometheus"
-prometheus.io/port: "8080"
-spec:
-containers:
-- name: app
-image: your-registry/production-app:latest
-ports:
-- containerPort: 8080
-env:
-- name: SPRING_PROFILES_ACTIVE
-value: "prod"
-- name: DB_URL
-valueFrom:
-secretKeyRef:
-name: db-secret
-key: url
-- name: DB_PASSWORD
-valueFrom:
-secretKeyRef:
-name: db-secret
-key: password
-- name: JWT_SECRET
-valueFrom:
-secretKeyRef:
-name: app-secret
-key: jwt-secret
-resources:
-requests:
-memory: "512Mi"
-cpu: "250m"
-limits:
-memory: "1Gi"
-cpu: "500m"
-livenessProbe:
-httpGet:
-path: /api/users/live
-port: 8080
-initialDelaySeconds: 60
-periodSeconds: 10
-timeoutSeconds: 5
-failureThreshold: 3
-readinessProbe:
-httpGet:
-path: /api/users/ready
-port: 8080
-initialDelaySeconds: 30
-periodSeconds: 5
-timeoutSeconds: 3
-failureThreshold: 3
-startupProbe:
-httpGet:
-path: /api/users/health
-port: 8080
-initialDelaySeconds: 10
-periodSeconds: 5
-failureThreshold: 30
+  replicas: 3
+  selector:
+    matchLabels:
+      app: production-app
+  template:
+    metadata:
+      labels:
+        app: production-app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/manage/prometheus"
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+      - name: app
+        image: your-registry/production-app:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "prod"
+        - name: DB_URL
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: url
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: password
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: app-secret
+              key: jwt-secret
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/users/live
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/users/ready
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /api/users/health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 30
 ---
 apiVersion: v1
 kind: Service
 metadata:
-name: production-app
-namespace: production
+  name: production-app
+  namespace: production
 spec:
-selector:
-app: production-app
-ports:
-- port: 8080
-  targetPort: 8080
+  selector:
+    app: production-app
+  ports:
+  - port: 8080
+    targetPort: 8080
   type: ClusterIP
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-name: production-app-hpa
-namespace: production
+  name: production-app-hpa
+  namespace: production
 spec:
-scaleTargetRef:
-apiVersion: apps/v1
-kind: Deployment
-name: production-app
-minReplicas: 3
-maxReplicas: 10
-metrics:
-- type: Resource
-  resource:
-  name: cpu
-  target:
-  type: Utilization
-  averageUtilization: 70
-- type: Resource
-  resource:
-  name: memory
-  target:
-  type: Utilization
-  averageUtilization: 80
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: production-app
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+```
 
+## **9. Monitoring & Alerting Rules**
 
-## *9. Monitoring & Alerting Rules*
-
-### *Alert Rules (rules.yml)*
-yaml
+### **Alert Rules (`rules.yml`)**
+```yaml
 groups:
-- name: spring-boot-alerts
-  rules:
-  # High error rate
-    - alert: HighErrorRate
-      expr: rate(http_server_requests_seconds_count{status=~"5.."}[5m]) / rate(http_server_requests_seconds_count[5m]) > 0.05
-      for: 2m
-      labels:
-      severity: critical
-      annotations:
-      summary: "High error rate on {{ $labels.instance }}"
-      description: "Error rate is {{ $value }}%"
+  - name: spring-boot-alerts
+    rules:
+      # High error rate
+      - alert: HighErrorRate
+        expr: rate(http_server_requests_seconds_count{status=~"5.."}[5m]) / rate(http_server_requests_seconds_count[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate on {{ $labels.instance }}"
+          description: "Error rate is {{ $value }}%"
+      
+      # High latency
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_server_requests_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency on {{ $labels.instance }}"
+          description: "95th percentile latency is {{ $value }}s"
+      
+      # JVM memory
+      - alert: HighMemoryUsage
+        expr: (sum(jvm_memory_used_bytes{area="heap"}) / sum(jvm_memory_max_bytes{area="heap"})) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High JVM memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value }}%"
+      
+      # Database connections
+      - alert: HighDatabaseConnections
+        expr: hikaricp_connections_active / hikaricp_connections_max * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database connection usage"
+          description: "{{ $value }}% of connections in use"
+      
+      # Service down
+      - alert: ServiceDown
+        expr: up{job="spring-boot-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.instance }} is down"
+```
 
-  # High latency
-    - alert: HighLatency
-      expr: histogram_quantile(0.95, rate(http_server_requests_seconds_bucket[5m])) > 1
-      for: 5m
-      labels:
-      severity: warning
-      annotations:
-      summary: "High latency on {{ $labels.instance }}"
-      description: "95th percentile latency is {{ $value }}s"
+## **10. Production Readiness Checklist**
 
-  # JVM memory
-    - alert: HighMemoryUsage
-      expr: (sum(jvm_memory_used_bytes{area="heap"}) / sum(jvm_memory_max_bytes{area="heap"})) * 100 > 80
-      for: 5m
-      labels:
-      severity: warning
-      annotations:
-      summary: "High JVM memory usage on {{ $labels.instance }}"
-      description: "Memory usage is {{ $value }}%"
+### **Health Checks Implemented:**
+- ✅ **Liveness probe**: `/api/users/live`
+- ✅ **Readiness probe**: `/api/users/ready`
+- ✅ **Health endpoint**: `/api/users/health`
+- ✅ **Actuator health**: `/manage/health`
+- ✅ **Database health check**
+- ✅ **External service health checks**
 
-  # Database connections
-    - alert: HighDatabaseConnections
-      expr: hikaricp_connections_active / hikaricp_connections_max * 100 > 80
-      for: 5m
-      labels:
-      severity: warning
-      annotations:
-      summary: "High database connection usage"
-      description: "{{ $value }}% of connections in use"
+### **Metrics Implemented:**
+- ✅ **JVM metrics**: Memory, GC, threads
+- ✅ **HTTP metrics**: Request rate, latency, errors
+- ✅ **Database metrics**: Connection pool, query performance
+- ✅ **Business metrics**: Custom counters/timers
+- ✅ **Prometheus endpoint**: `/manage/prometheus`
 
-  # Service down
-    - alert: ServiceDown
-      expr: up{job="spring-boot-app"} == 0
-      for: 1m
-      labels:
-      severity: critical
-      annotations:
-      summary: "Service {{ $labels.instance }} is down"
+### **Configuration:**
+- ✅ **Externalized config**: YAML files + environment variables
+- ✅ **Multiple profiles**: dev, staging, prod
+- ✅ **Secrets management**: Environment variables
+- ✅ **Logging**: Structured logs + file rotation
 
+### **Security:**
+- ✅ **Actuator secured**: Basic auth
+- ✅ **HTTPS ready** (configure in production)
+- ✅ **CORS configured**
+- ✅ **Rate limiting** (via configuration)
 
-## *10. Production Readiness Checklist*
+### **Deployment:**
+- ✅ **Dockerized**: Multi-stage build
+- ✅ **Kubernetes ready**: Deployment, Service, HPA
+- ✅ **Health checks**: Liveness/readiness probes
+- ✅ **Resource limits**: CPU/memory constraints
 
-### *Health Checks Implemented:*
-- ✅ *Liveness probe*: /api/users/live
-- ✅ *Readiness probe*: /api/users/ready
-- ✅ *Health endpoint*: /api/users/health
-- ✅ *Actuator health*: /manage/health
-- ✅ *Database health check*
-- ✅ *External service health checks*
+## **11. Running the Application**
 
-### *Metrics Implemented:*
-- ✅ *JVM metrics*: Memory, GC, threads
-- ✅ *HTTP metrics*: Request rate, latency, errors
-- ✅ *Database metrics*: Connection pool, query performance
-- ✅ *Business metrics*: Custom counters/timers
-- ✅ *Prometheus endpoint*: /manage/prometheus
-
-### *Configuration:*
-- ✅ *Externalized config*: YAML files + environment variables
-- ✅ *Multiple profiles*: dev, staging, prod
-- ✅ *Secrets management*: Environment variables
-- ✅ *Logging*: Structured logs + file rotation
-
-### *Security:*
-- ✅ *Actuator secured*: Basic auth
-- ✅ *HTTPS ready* (configure in production)
-- ✅ *CORS configured*
-- ✅ *Rate limiting* (via configuration)
-
-### *Deployment:*
-- ✅ *Dockerized*: Multi-stage build
-- ✅ *Kubernetes ready*: Deployment, Service, HPA
-- ✅ *Health checks*: Liveness/readiness probes
-- ✅ *Resource limits*: CPU/memory constraints
-
-## *11. Running the Application*
-
-bash
+```bash
 # Development
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 
@@ -1266,14 +1266,14 @@ curl -u admin:secure-password http://localhost:8080/manage/metrics
 
 # Prometheus metrics
 curl http://localhost:8080/manage/prometheus
+```
 
+## **Key Takeaways:**
 
-## *Key Takeaways:*
+1. **Externalized Config**: YAML files + env variables for all environments
+2. **Comprehensive Health Checks**: Custom indicators + actuator
+3. **Rich Metrics**: Built-in + custom metrics with Prometheus
+4. **Security**: Actuator secured, proper authentication
+5. **Production Ready**: Docker, Kubernetes, monitoring, alerting
 
-1. *Externalized Config*: YAML files + env variables for all environments
-2. *Comprehensive Health Checks*: Custom indicators + actuator
-3. *Rich Metrics*: Built-in + custom metrics with Prometheus
-4. *Security*: Actuator secured, proper authentication
-5. *Production Ready*: Docker, Kubernetes, monitoring, alerting
-
-This setup gives you a *battle-tested Spring Boot application* ready for production deployment with all the necessary monitoring and operational features.
+This setup gives you a **battle-tested Spring Boot application** ready for production deployment with all the necessary monitoring and operational features.
