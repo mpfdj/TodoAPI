@@ -8,17 +8,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Transactional
 @SpringBootTest
 public class ListRepositoryTest {
 
     @Autowired
     private ListRepository listRepository;
 
-    @Transactional(readOnly = true)
     @Test
     public void testWithJoin() {
         Iterable<jaeger.de.miel.TodoAPI.entity.List> lists = listRepository.findAll();
@@ -33,7 +32,6 @@ public class ListRepositoryTest {
         assertEquals("Alice Johnson", name);
     }
 
-    @Transactional(readOnly = true)
     @Test
     public void testFindListsByUserId() {
         List<jaeger.de.miel.TodoAPI.entity.List> lists = listRepository.findListsByUserId(1L);
@@ -41,10 +39,15 @@ public class ListRepositoryTest {
         assertEquals(2, lists.size());
     }
 
-    @Transactional(readOnly = true)
     @Test
     public void testFindListsByUserIdNotFound() {
         List<jaeger.de.miel.TodoAPI.entity.List> lists = listRepository.findListsByUserId(-1L);
         assertEquals(0, lists.size());
     }
+
+    @Test
+    public void testWithDeleteCascade() {
+        listRepository.deleteById(3L);
+    }
+
 }

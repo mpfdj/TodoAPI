@@ -33,7 +33,7 @@ public class List {
     private String name;
 
     @Column(name = "DESCRIPTION", columnDefinition = "CHARACTER LARGE OBJECT")
-    private Object description;
+    private String description;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "CREATED_AT", nullable = false)

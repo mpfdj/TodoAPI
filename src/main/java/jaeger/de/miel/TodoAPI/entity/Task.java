@@ -43,7 +43,7 @@ public class Task {
     private String title;
 
     @Column(name = "DESCRIPTION", columnDefinition = "CHARACTER LARGE OBJECT")
-    private Object description;
+    private String description;
 
     @Column(name = "STATUS", nullable = false, length = 20)
     private String status;
