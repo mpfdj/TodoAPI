@@ -1,8 +1,12 @@
 package jaeger.de.miel.TodoAPI.mapper;
 
+import jaeger.de.miel.TodoAPI.dto.CreateUserRequestDTO;
 import jaeger.de.miel.TodoAPI.dto.UserDTO;
 import jaeger.de.miel.TodoAPI.entity.AppUser;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 @Service
 public class UserMapper {
@@ -15,4 +19,15 @@ public class UserMapper {
         return userDTO;
     }
 
+    public static AppUser toEntity(CreateUserRequestDTO createUserRequestDTO, PasswordEncoder passwordEncoder) {
+        String hash = passwordEncoder.encode(createUserRequestDTO.getPassword());
+
+        var appUser = new AppUser();
+        appUser.setName(createUserRequestDTO.getName());
+        appUser.setEmail(createUserRequestDTO.getEmail());
+        appUser.setPasswordHash(hash);
+        appUser.setCreatedAt(Instant.now());
+        appUser.setUpdatedAt(Instant.now());
+        return appUser;
+    }
 }

@@ -1,10 +1,12 @@
 package jaeger.de.miel.TodoAPI.service;
 
+import jaeger.de.miel.TodoAPI.dto.CreateUserRequestDTO;
 import jaeger.de.miel.TodoAPI.dto.UserDTO;
 import jaeger.de.miel.TodoAPI.entity.AppUser;
 import jaeger.de.miel.TodoAPI.mapper.UserMapper;
 import jaeger.de.miel.TodoAPI.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
+
 
     public List<UserDTO> getUsers() {
         Iterable<AppUser> users = userRepository.findAll();
@@ -25,6 +29,24 @@ public class UserService {
         userList.sort(Comparator.comparing(UserDTO::getName));
 
         return userList;
+    }
+
+    public UserDTO createUser(CreateUserRequestDTO createUserRequestDTO) {
+        AppUser appUser = UserMapper.toEntity(createUserRequestDTO, passwordEncoder);
+        String email = createUserRequestDTO.getEmail();
+
+        if (userRepository.existsByEmail(email)) {
+            throw new DuplicateEmailException("Email already in use: " + email);
+        }
+
+        AppUser appUserCreated = userRepository.save(appUser);
+        return UserMapper.toDTO(appUserCreated);
+    }
+
+
+
+    public static class DuplicateEmailException extends RuntimeException {
+        public DuplicateEmailException(String message) { super(message); }
     }
 
 }

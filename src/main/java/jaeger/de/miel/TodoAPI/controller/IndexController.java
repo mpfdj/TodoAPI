@@ -1,19 +1,20 @@
 package jaeger.de.miel.TodoAPI.controller;
 
+import jaeger.de.miel.TodoAPI.dto.CreateUserRequestDTO;
 import jaeger.de.miel.TodoAPI.dto.ListDTO;
 import jaeger.de.miel.TodoAPI.dto.TaskDTO;
 import jaeger.de.miel.TodoAPI.dto.UserDTO;
 import jaeger.de.miel.TodoAPI.service.ListService;
 import jaeger.de.miel.TodoAPI.service.TaskService;
 import jaeger.de.miel.TodoAPI.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @AllArgsConstructor
@@ -52,6 +53,23 @@ public class IndexController {
         List<TaskDTO> tasks = taskService.getTasks(userId, listId);
         if (tasks.isEmpty()) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(tasks);
+    }
+
+
+    @RequestMapping(value = "/user",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody CreateUserRequestDTO request) {
+        UserDTO userDTO = userService.createUser(request);
+
+        URI location = URI.create("/users/" + userDTO.getId());
+        return ResponseEntity.created(location).body(userDTO);
+    }
+
+
+    @ExceptionHandler(UserService.DuplicateEmailException.class)
+    public ResponseEntity<String> handleDuplicateEmail(UserService.DuplicateEmailException ex) {
+        return ResponseEntity.status(409).body(ex.getMessage()); // 409 Conflict
     }
 
 }
