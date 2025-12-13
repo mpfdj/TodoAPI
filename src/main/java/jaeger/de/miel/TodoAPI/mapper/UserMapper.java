@@ -22,13 +22,14 @@ public class UserMapper {
     public static AppUser toEntity(CreateUserRequestDTO createUserRequestDTO, PasswordEncoder passwordEncoder) {
         String email = createUserRequestDTO.getEmail().trim().toLowerCase();
         String hash = passwordEncoder.encode(createUserRequestDTO.getPassword());
+        Instant now = Instant.now();
 
         var appUser = new AppUser();
         appUser.setName(createUserRequestDTO.getName());
         appUser.setEmail(email);
         appUser.setPasswordHash(hash);
-        appUser.setCreatedAt(Instant.now());
-        appUser.setUpdatedAt(Instant.now());
+        appUser.setCreatedAt(now);
+        appUser.setUpdatedAt(now);
         return appUser;
     }
 }

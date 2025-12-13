@@ -2,6 +2,7 @@ package jaeger.de.miel.TodoAPI.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -9,16 +10,18 @@ import lombok.Data;
 public class CreateUserRequestDTO {
 
     @NotBlank
+    @NotNull
     @Email
-    @Size(min = 1, max = 100)
+    @Size(max = 128)
     private String email;
 
     @NotBlank
-    @Size(min = 1, max = 200)
+    @Size(max = 200)
     private String name;
 
     @NotBlank
-    @Size(min = 8, max = 100)
+    @NotNull
+    @Size(max = 128)
     private String password;
 
 }

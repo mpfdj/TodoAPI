@@ -35,9 +35,9 @@ public class UserService {
     }
 
 
-    public UserDTO createUser(CreateUserRequestDTO createUserRequestDTO) {
-        AppUser appUser = UserMapper.toEntity(createUserRequestDTO, passwordEncoder);
-        String email = createUserRequestDTO.getEmail();
+    public UserDTO createUser(CreateUserRequestDTO request) {
+        AppUser appUser = UserMapper.toEntity(request, passwordEncoder);
+        String email = request.getEmail();
 
         if (userRepository.existsByEmail(email)) {
             throw new DuplicateEmailException("Email already in use: " + email);
