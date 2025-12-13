@@ -13,3 +13,4 @@ https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation
 
 # TODO's:
 - Review @Transactional annotations
+- Create Mock tests

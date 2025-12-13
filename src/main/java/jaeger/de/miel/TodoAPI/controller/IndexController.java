@@ -9,6 +9,7 @@ import jaeger.de.miel.TodoAPI.service.TaskService;
 import jaeger.de.miel.TodoAPI.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -37,8 +38,8 @@ public class IndexController {
 
 
     @RequestMapping(value = "/users/{userId}/lists",
-                    method = RequestMethod.GET,
-                    produces = MediaType.APPLICATION_JSON_VALUE)
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ListDTO>> getLists(@PathVariable("userId") Long userId) {
         List<ListDTO> lists = listService.getLists(userId);
         if (lists.isEmpty()) return ResponseEntity.notFound().build();  // 404
@@ -47,8 +48,8 @@ public class IndexController {
 
 
     @RequestMapping(value = "/users/{userId}/lists/{listId}/tasks",
-                    method = RequestMethod.GET,
-                    produces = MediaType.APPLICATION_JSON_VALUE)
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TaskDTO>> getTasks(@PathVariable("userId") Long userId, @PathVariable("listId") Long listId) {
         List<TaskDTO> tasks = taskService.getTasks(userId, listId);
         if (tasks.isEmpty()) return ResponseEntity.notFound().build();
@@ -67,9 +68,31 @@ public class IndexController {
     }
 
 
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<Void> deleteUserById(@PathVariable("userId") Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @DeleteMapping("/users")
+    public ResponseEntity<Void> deleteUserByEmail(@RequestParam("email") String email) {
+        userService.deleteUser(email);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    // ---------------------------------------
+    // Exceptions
+    // ---------------------------------------
     @ExceptionHandler(UserService.DuplicateEmailException.class)
     public ResponseEntity<String> handleDuplicateEmail(UserService.DuplicateEmailException ex) {
         return ResponseEntity.status(409).body(ex.getMessage()); // 409 Conflict
+    }
+
+    @ExceptionHandler(UserService.UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFound(UserService.UserNotFoundException ex) {
+        return ResponseEntity.notFound().build();
     }
 
 }
