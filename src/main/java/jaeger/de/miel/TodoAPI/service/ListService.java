@@ -1,20 +1,27 @@
 package jaeger.de.miel.TodoAPI.service;
 
+import jaeger.de.miel.TodoAPI.dto.CreateListRequestDTO;
 import jaeger.de.miel.TodoAPI.dto.ListDTO;
+import jaeger.de.miel.TodoAPI.entity.AppUser;
 import jaeger.de.miel.TodoAPI.mapper.ListMapper;
 import jaeger.de.miel.TodoAPI.repository.ListRepository;
+import jaeger.de.miel.TodoAPI.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+@Transactional
 @AllArgsConstructor
 @Service
 public class ListService {
 
     private final ListRepository listRepository;
+    private final UserRepository userRepository;
+
 
     public List<ListDTO> getLists(Long userId) {
         List<jaeger.de.miel.TodoAPI.entity.List> lists = listRepository.findListsByUserId(userId);
@@ -26,4 +33,34 @@ public class ListService {
         return listList;
     }
 
+
+    public ListDTO createList(Long userId, CreateListRequestDTO request) {
+        String name = request.getName();
+
+        AppUser owner = userRepository.findById(userId)
+                .orElseThrow(() -> new OwnerNotFoundException("OwnerId not found: " + userId));
+
+        if (listRepository.existsByOwner_IdAndNameIgnoreCase(userId, name)) {
+            throw new DuplicateListNameException("List name already exists for owner: '" + name + "'");
+        }
+
+        jaeger.de.miel.TodoAPI.entity.List list = listRepository.save(ListMapper.toEntity(request));
+        return ListMapper.toDTO(list);
+    }
+
+
+    // ---------------------------------------
+    // Exceptions
+    // ---------------------------------------
+    public static class OwnerNotFoundException extends RuntimeException {
+        public OwnerNotFoundException(String message) {
+            super(message);
+        }
+    }
+
+    public static class DuplicateListNameException extends RuntimeException {
+        public DuplicateListNameException(String message) {
+            super(message);
+        }
+    }
 }

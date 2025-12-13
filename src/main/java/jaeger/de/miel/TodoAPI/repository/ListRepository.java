@@ -10,4 +10,6 @@ public interface ListRepository extends CrudRepository<jaeger.de.miel.TodoAPI.en
     @Query("SELECT l FROM List l WHERE l.owner.id = :ownerId")
     List<jaeger.de.miel.TodoAPI.entity.List> findListsByUserId(@Param("ownerId") Long ownerId);
 
+    boolean existsByOwner_IdAndNameIgnoreCase(Long ownerId, String name);
+
 }
