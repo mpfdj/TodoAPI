@@ -44,7 +44,7 @@ public class ListService {
             throw new DuplicateListNameException("List name already exists for owner: '" + name + "'");
         }
 
-        jaeger.de.miel.TodoAPI.entity.List list = listRepository.save(ListMapper.toEntity(request));
+        jaeger.de.miel.TodoAPI.entity.List list = listRepository.save(ListMapper.toEntity(userId, request));
         return ListMapper.toDTO(list);
     }
 

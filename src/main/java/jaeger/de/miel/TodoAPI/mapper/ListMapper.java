@@ -20,9 +20,9 @@ public class ListMapper {
         return listDTO;
     }
 
-    public static List toEntity(CreateListRequestDTO createListRequestDTO) {
+    public static List toEntity(Long userId, CreateListRequestDTO createListRequestDTO) {
         AppUser owner = new AppUser();
-        owner.setId(createListRequestDTO.getUserId());
+        owner.setId(userId);
         Instant now = Instant.now();
 
         var list = new List();
