@@ -3,6 +3,7 @@ package jaeger.de.miel.TodoAPI.controller;
 import jaeger.de.miel.TodoAPI.dto.TaskDTO;
 import jaeger.de.miel.TodoAPI.service.TaskService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,11 @@ public class TaskController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TaskDTO>> getTasks(@PathVariable("userId") Long userId, @PathVariable("listId") Long listId) {
         List<TaskDTO> tasks = taskService.getTasks(userId, listId);
-        if (tasks.isEmpty()) return ResponseEntity.notFound().build();
+
+        if (tasks.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
         return ResponseEntity.ok(tasks);
     }
 

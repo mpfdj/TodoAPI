@@ -1,9 +1,6 @@
 package jaeger.de.miel.TodoAPI.controller;
 
-import jaeger.de.miel.TodoAPI.dto.CreateListRequestDTO;
-import jaeger.de.miel.TodoAPI.dto.CreateUserRequestDTO;
-import jaeger.de.miel.TodoAPI.dto.ListDTO;
-import jaeger.de.miel.TodoAPI.dto.UserDTO;
+import jaeger.de.miel.TodoAPI.dto.*;
 import jaeger.de.miel.TodoAPI.service.ListService;
 import jaeger.de.miel.TodoAPI.service.UserService;
 import jakarta.validation.Valid;
@@ -30,7 +27,11 @@ public class ListController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ListDTO>> getLists(@PathVariable("userId") Long userId) {
         List<ListDTO> lists = listService.getLists(userId);
-        if (lists.isEmpty()) return ResponseEntity.notFound().build();  // 404
+
+        if (lists.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
         return ResponseEntity.ok(lists);
     }
 
@@ -38,29 +39,39 @@ public class ListController {
     @RequestMapping(value = "/users/{userId}/lists",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ListDTO> createList(
+    public ResponseEntity<?> createList(
             @PathVariable("userId") Long userId,
             @Valid @RequestBody CreateListRequestDTO request) {
 
-        ListDTO created = listService.createList(userId, request);
-        long listId = created.getId();
+        try {
+            ListDTO created = listService.createList(userId, request);
+            long listId = created.getId();
 
-        URI location = URI.create("/users/" + userId + "/lists" + listId);
-        return ResponseEntity.created(location).body(created);
+            URI location = URI.create("/users/" + userId + "/lists" + listId);
+            return ResponseEntity.created(location).body(created);
+        } catch (ListService.OwnerNotFoundException ex) {
+            ErrorDTO error = new ErrorDTO(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+        catch (ListService.DuplicateListNameException ex) {
+            ErrorDTO error = new ErrorDTO(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        }
+
     }
 
 
-    // ---------------------------------------
-    // Exceptions
-    // ---------------------------------------
-    @ExceptionHandler(ListService.OwnerNotFoundException.class)
-    public ResponseEntity<String> handleOwnerNotFound(ListService.OwnerNotFoundException ex) {
-        return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler(ListService.DuplicateListNameException.class)
-    public ResponseEntity<String> handleDuplicateListName(ListService.DuplicateListNameException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
-    }
+//    // ---------------------------------------
+//    // Exceptions
+//    // ---------------------------------------
+//    @ExceptionHandler(ListService.OwnerNotFoundException.class)
+//    public ResponseEntity<String> handleOwnerNotFound(ListService.OwnerNotFoundException ex) {
+//        return ResponseEntity.notFound().build();
+//    }
+//
+//    @ExceptionHandler(ListService.DuplicateListNameException.class)
+//    public ResponseEntity<String> handleDuplicateListName(ListService.DuplicateListNameException ex) {
+//        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+//    }
 
 }
