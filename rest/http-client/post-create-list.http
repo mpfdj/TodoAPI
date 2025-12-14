@@ -1,4 +1,4 @@
-### Create a new user
+### Create a new list
 POST http://localhost:8080/users/1/lists
 Content-Type: application/json
 

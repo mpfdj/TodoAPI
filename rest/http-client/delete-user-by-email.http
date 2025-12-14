@@ -1,2 +1,2 @@
-### Create a new user
+### Delete a user by Email
 DELETE http://localhost:8080/users?email=test@gmail.com
