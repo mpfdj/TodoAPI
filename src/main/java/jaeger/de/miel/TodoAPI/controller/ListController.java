@@ -35,17 +35,6 @@ public class ListController {
     }
 
 
-    @RequestMapping(value = "/users",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody CreateUserRequestDTO request) {
-        UserDTO created = userService.createUser(request);
-
-        URI location = URI.create("/users/" + created.getId());
-        return ResponseEntity.created(location).body(created);
-    }
-
-
     @RequestMapping(value = "/users/{userId}/lists",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -59,7 +48,6 @@ public class ListController {
         URI location = URI.create("/users/" + userId + "/lists" + listId);
         return ResponseEntity.created(location).body(created);
     }
-
 
 
     // ---------------------------------------
