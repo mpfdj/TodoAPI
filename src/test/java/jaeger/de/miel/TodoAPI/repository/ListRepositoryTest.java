@@ -34,14 +34,14 @@ public class ListRepositoryTest {
 
     @Test
     public void testFindListsByUserId() {
-        List<jaeger.de.miel.TodoAPI.entity.List> lists = listRepository.findListsByUserId(1L);
-        lists.forEach(list -> System.out.println(list));
+        List<jaeger.de.miel.TodoAPI.entity.List> lists = listRepository.findListsByOwner_Id(1L);
+        lists.forEach(System.out::println);
         assertEquals(2, lists.size());
     }
 
     @Test
     public void testFindListsByUserIdNotFound() {
-        List<jaeger.de.miel.TodoAPI.entity.List> lists = listRepository.findListsByUserId(-1L);
+        List<jaeger.de.miel.TodoAPI.entity.List> lists = listRepository.findListsByOwner_Id(-1L);
         assertEquals(0, lists.size());
     }
 

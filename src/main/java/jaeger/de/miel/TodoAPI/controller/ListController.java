@@ -18,7 +18,6 @@ import java.util.List;
 @Controller
 public class ListController {
 
-    private final UserService userService;
     private final ListService listService;
 
 

@@ -24,7 +24,7 @@ public class ListService {
 
 
     public List<ListDTO> getLists(Long userId) {
-        List<jaeger.de.miel.TodoAPI.entity.List> lists = listRepository.findListsByUserId(userId);
+        List<jaeger.de.miel.TodoAPI.entity.List> lists = listRepository.findListsByOwner_Id(userId);
 
         List<ListDTO> listList = new ArrayList<>();
         lists.forEach(l -> listList.add(ListMapper.toDTO(l)));
