@@ -96,6 +96,10 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -112,7 +116,9 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <url>jdbc:h2:tcp://localhost:9092/./tododb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;</url>
+                    <url>
+                        jdbc:h2:tcp://localhost:9092/./tododb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;
+                    </url>
                     <user>sa</user>
                     <password>sa</password>
                     <cleanDisabled>false</cleanDisabled>

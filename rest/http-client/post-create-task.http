@@ -1,0 +1,11 @@
+### Create a new task
+POST http://localhost:8080/users/1/lists/1/tasks
+Content-Type: application/json
+
+{
+  "title": "task title",
+  "description": "task description",
+  "status": "TODO",
+  "dueDate": "2025-12-31",
+  "priority": 5
+}
