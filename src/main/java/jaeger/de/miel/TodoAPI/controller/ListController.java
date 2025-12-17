@@ -1,15 +1,19 @@
 package jaeger.de.miel.TodoAPI.controller;
 
-import jaeger.de.miel.TodoAPI.dto.*;
+import jaeger.de.miel.TodoAPI.dto.CreateListRequestDTO;
+import jaeger.de.miel.TodoAPI.dto.ErrorDTO;
+import jaeger.de.miel.TodoAPI.dto.ListDTO;
 import jaeger.de.miel.TodoAPI.service.ListService;
-import jaeger.de.miel.TodoAPI.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.net.URI;
 import java.util.List;
@@ -47,7 +51,7 @@ public class ListController {
             long listId = created.getId();
 
             URI location = URI.create("/users/" + userId + "/lists" + listId);
-            return ResponseEntity.created(location).body(created);
+            return ResponseEntity.status(HttpStatus.CREATED).location(location).body(created);
         } catch (ListService.OwnerNotFoundException ex) {
             ErrorDTO error = new ErrorDTO(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);

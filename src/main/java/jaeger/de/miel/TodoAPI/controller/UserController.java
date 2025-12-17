@@ -43,7 +43,7 @@ public class UserController {
         try {
             UserDTO created = userService.createUser(request);
             URI location = URI.create("/users/" + created.getId());
-            return ResponseEntity.created(location).body(created);
+            return ResponseEntity.status(HttpStatus.CREATED).location(location).body(created);
         } catch (UserService.DuplicateEmailException ex) {
             ErrorDTO error = new ErrorDTO(ex.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
@@ -55,7 +55,7 @@ public class UserController {
     public ResponseEntity<?> deleteUserById(@PathVariable("userId") Long userId) {
         try {
             userService.deleteUser(userId);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (UserService.UserNotFoundException ex) {
             ErrorDTO error = new ErrorDTO(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
@@ -67,7 +67,7 @@ public class UserController {
     public ResponseEntity<?> deleteUserByEmail(@RequestParam("email") String email) {
         try {
             userService.deleteUser(email);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (UserService.UserNotFoundException ex) {
             ErrorDTO error = new ErrorDTO(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
