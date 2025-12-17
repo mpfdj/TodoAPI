@@ -4,6 +4,7 @@ import jaeger.de.miel.TodoAPI.dto.CreateListRequestDTO;
 import jaeger.de.miel.TodoAPI.dto.ErrorDTO;
 import jaeger.de.miel.TodoAPI.dto.ListDTO;
 import jaeger.de.miel.TodoAPI.service.ListService;
+import jaeger.de.miel.TodoAPI.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -59,6 +60,24 @@ public class ListController {
         catch (ListService.DuplicateListNameException ex) {
             ErrorDTO error = new ErrorDTO(ex.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        }
+
+    }
+
+
+    @RequestMapping(value = "/users/{userId}/lists/{listId}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> deleteList(
+            @PathVariable("userId") Long userId,
+            @PathVariable("listId") Long listId) {
+
+        try {
+            listService.deleteList(userId, listId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (ListService.ListNotFoundException ex ) {
+            ErrorDTO error = new ErrorDTO(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
 
     }

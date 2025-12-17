@@ -1,0 +1,2 @@
+:: Delete a list
+curl -v -X DELETE "http://localhost:8080/users/1/lists/2" | jq

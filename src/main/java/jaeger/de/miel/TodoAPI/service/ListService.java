@@ -7,6 +7,7 @@ import jaeger.de.miel.TodoAPI.mapper.ListMapper;
 import jaeger.de.miel.TodoAPI.repository.ListRepository;
 import jaeger.de.miel.TodoAPI.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +50,15 @@ public class ListService {
     }
 
 
+    public void deleteList(Long userId, Long listId) {
+        try {
+            listRepository.deleteByIdAndOwner_Id(listId, userId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ListNotFoundException("List not found with id: " + listId);
+        }
+    }
+
+
     // ---------------------------------------
     // Exceptions
     // ---------------------------------------
@@ -63,4 +73,11 @@ public class ListService {
             super(message);
         }
     }
+
+    public static class ListNotFoundException extends RuntimeException {
+        public ListNotFoundException(String message) {
+            super(message);
+        }
+    }
+
 }
