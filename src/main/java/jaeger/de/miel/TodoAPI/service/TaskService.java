@@ -12,6 +12,7 @@ import jaeger.de.miel.TodoAPI.repository.ListRepository;
 import jaeger.de.miel.TodoAPI.repository.TaskRepository;
 import jaeger.de.miel.TodoAPI.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,7 @@ public class TaskService {
 
     public List<TaskDTO> getTasks(Long userId, Long listId) {
 
-        List<Task> tasks = taskRepository.findTasksByUserIdAndListId(userId, listId);
+        List<Task> tasks = taskRepository.findTasksByList_IdAndCreator_Id(listId, userId);
 
         List<TaskDTO> taskList = new ArrayList<>();
         tasks.forEach(t -> taskList.add(TaskMapper.toDTO(t)));
@@ -50,6 +51,14 @@ public class TaskService {
     }
 
 
+    public void deleteTask(Long userId, Long listId, Long taskId) {
+        try {
+            taskRepository.deleteByIdAndList_IdAndCreator_Id(taskId, listId, userId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new TaskNotFoundException("Task not found with id: " + taskId);
+        }
+    }
+
     // ---------------------------------------
     // Exceptions
     // ---------------------------------------
@@ -65,4 +74,9 @@ public class TaskService {
         }
     }
 
+    public static class TaskNotFoundException extends RuntimeException {
+        public TaskNotFoundException(String message) {
+            super(message);
+        }
+    }
 }

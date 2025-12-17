@@ -14,3 +14,7 @@ https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation
 # TODO's:
 - Review @Transactional annotations
 - Create Mock tests
+
+
+# JPA derived query method names
+For nested properties in Spring Data JPA you must include And between predicates, and use underscores (_) to traverse associations.

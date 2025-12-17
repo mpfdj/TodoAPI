@@ -50,8 +50,26 @@ public class TaskController {
             long taskId = created.getId();
 
             URI location = URI.create("/users/" + userId + "/lists" + listId + "/tasks" + taskId);
-            return ResponseEntity.created(location).body(created);
+            return ResponseEntity.status(HttpStatus.CREATED).location(location).body(created);
         } catch (TaskService.CreatorNotFoundException | TaskService.ListNotFoundException ex ) {
+            ErrorDTO error = new ErrorDTO(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+    }
+
+
+    @RequestMapping(value = "/users/{userId}/lists/{listId}/tasks/{taskId}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> deleteTask(
+            @PathVariable("userId") Long userId,
+            @PathVariable("listId") Long listId,
+            @PathVariable("taskId") Long taskId) {
+
+        try {
+            taskService.deleteTask(userId, listId, taskId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (TaskService.TaskNotFoundException ex ) {
             ErrorDTO error = new ErrorDTO(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
