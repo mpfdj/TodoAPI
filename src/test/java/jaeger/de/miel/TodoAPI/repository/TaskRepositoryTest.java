@@ -48,7 +48,6 @@ class TaskRepositoryTest {
         }
     }
 
-
     @Test
     public void testDeleteById() {
         Long taskId = 1L;
@@ -59,6 +58,5 @@ class TaskRepositoryTest {
             System.out.println("Task not found");;
         }
     }
-
 
 }
