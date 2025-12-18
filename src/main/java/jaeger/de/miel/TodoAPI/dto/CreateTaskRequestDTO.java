@@ -10,8 +10,6 @@ import java.time.LocalDate;
 
 @Data
 public class CreateTaskRequestDTO {
-//    private Long listId;
-//    private Long userId ;
 
     @NotNull
     @NotBlank
@@ -29,7 +27,7 @@ public class CreateTaskRequestDTO {
 
     @NotNull
     @FutureOrPresent
-    @JsonFormat
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dueDate;
 
     @NotNull

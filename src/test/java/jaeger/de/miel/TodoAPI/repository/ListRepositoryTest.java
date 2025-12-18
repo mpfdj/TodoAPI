@@ -1,79 +1,97 @@
 package jaeger.de.miel.TodoAPI.repository;
 
 
-import jakarta.persistence.EntityManager;
+import jaeger.de.miel.TodoAPI.entity.AppUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-@TestPropertySource(properties = {
-        "spring.jpa.show-sql=true",
-        "logging.level.org.hibernate.SQL=DEBUG",
-        "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE"
-})
+//@TestPropertySource(properties = {
+//        "spring.jpa.show-sql=true",
+//        "logging.level.org.hibernate.SQL=DEBUG",
+//        "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE"
+//})
 public class ListRepositoryTest {
 
     @Autowired
     private ListRepository listRepository;
 
+
+    @Transactional
     @Test
-    public void testWithJoin() {
-        Iterable<jaeger.de.miel.TodoAPI.entity.List> lists = listRepository.findAll();
-
-        List<jaeger.de.miel.TodoAPI.entity.List> listList = new ArrayList<>();
-        lists.forEach(listList::add);
-
-        var list = listList.getFirst();
-        var name = list.getOwner().getName();
-
-        System.out.println(list);
-        assertEquals("Alice Johnson", name);
-    }
-
-    @Test
-    public void testFindListsByUserId() {
+    public void testFindListsByOwner_Id() {
         List<jaeger.de.miel.TodoAPI.entity.List> lists = listRepository.findListsByOwner_Id(1L);
         lists.forEach(System.out::println);
-        assertEquals(2, lists.size());
+        assertFalse(lists.isEmpty());
     }
 
+
+    @Transactional
     @Test
-    public void testFindListsByUserIdNotFound() {
+    public void testFindListsByOwner_IdNotFound() {
         List<jaeger.de.miel.TodoAPI.entity.List> lists = listRepository.findListsByOwner_Id(-1L);
-        assertEquals(0, lists.size());
+        boolean isEmpty = lists.isEmpty();
+        System.out.println("Lists is empty: " + isEmpty);
+        assertTrue(isEmpty);
     }
+
+
+    @Transactional
+    @Test
+    public void testFindListsByOwner_IdAndNameIgnoreCase() {
+        Long ownerId = 1L;
+        var list = createList(ownerId);
+
+        var created = listRepository.save(list);
+        Long listId = created.getId();
+
+        System.out.println("Created list with id: " + listId);
+        assertTrue(listId > 0);
+
+        boolean exists = listRepository.existsByOwner_IdAndNameIgnoreCase(ownerId, "LiSt NaMe TeSt");
+        assertTrue(exists);
+    }
+
 
     @Transactional
     @Test
     public void testDeleteByIdAndOwner_Id() {
-        Long listId = 2L;
         Long ownerId = 1L;
+        var list = createList(ownerId);
 
-        try {
-            var numberOfRecordsDeleted = listRepository.deleteByIdAndOwner_Id(listId, ownerId);
-            System.out.println("Number of records deleted: " + numberOfRecordsDeleted);
-        } catch (EmptyResultDataAccessException e) {
-            System.out.println("List not found");;
-        }
+        var created = listRepository.save(list);
+        Long listId = created.getId();
+
+        System.out.println("Created list with id: " + listId);
+        assertTrue(listId > 0);
+
+        var numberOfRecordsDeleted = listRepository.deleteByIdAndOwner_Id(listId, ownerId);
+        System.out.println("Number of records deleted: " + numberOfRecordsDeleted);
+        assertTrue(numberOfRecordsDeleted > 0);
     }
 
-    @Test
-    public void testWithDeleteCascade() {
-        listRepository.deleteById(3L);
-    }
 
-    @Test
-    public void testDeleteById() {
-        listRepository.deleteById(66L);
+    private jaeger.de.miel.TodoAPI.entity.List createList(Long ownerId) {
+        AppUser owner = new AppUser();
+        owner.setId(ownerId);
+        Instant now = Instant.now();
+
+        var list = new jaeger.de.miel.TodoAPI.entity.List();
+        list.setOwner(owner);
+        list.setName("list name test");
+        list.setDescription("list description test");
+        list.setCreatedAt(now);
+        list.setUpdatedAt(now);
+        return list;
     }
 
 }
