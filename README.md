@@ -18,3 +18,12 @@ https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation
 
 # JPA derived query method names
 For nested properties in Spring Data JPA you must include And between predicates, and use underscores (_) to traverse associations.
+
+
+# Define customerized JPA queries  
+Use JPQL
+
+
+# Set rollback to false so the SpringBootTests are not automatically rolled back 
+@Rollback(false)
+
