@@ -1,4 +1,3 @@
-
 package jaeger.de.miel.TodoAPI.dto;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -12,13 +11,12 @@ import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class CreateTaskRequestDTOTest {
+class CreateListRequestDTOTest {
 
     private ObjectMapper objectMapper;
     private Validator validator;
@@ -39,27 +37,21 @@ class CreateTaskRequestDTOTest {
         // given
         String json = """
                 {
-                  "title": "title",
-                  "description": "description",
-                  "status": "todo",
-                  "dueDate": "2030-12-31",
-                  "priority": 5
+                  "name": "name",
+                  "description": "description"
                 }
                 """;
 
         // when
-        CreateTaskRequestDTO dto = objectMapper.readValue(json, CreateTaskRequestDTO.class);
-        Set<ConstraintViolation<CreateTaskRequestDTO>> violations = validator.validate(dto);
+        CreateListRequestDTO dto = objectMapper.readValue(json, CreateListRequestDTO.class);
+        Set<ConstraintViolation<CreateListRequestDTO>> violations = validator.validate(dto);
 
         // then
         assertTrue(violations.isEmpty(), () -> "Expected no violations, got: " + violations);
 
         // field assertions
-        assertEquals("title", dto.getTitle());
+        assertEquals("name", dto.getName());
         assertEquals("description", dto.getDescription());
-        assertEquals(TaskStatus.TODO, dto.getStatus());
-        assertEquals(LocalDate.of(2030, 12, 31), dto.getDueDate());
-        assertEquals(5, dto.getPriority());
     }
 
 }
