@@ -1,6 +1,7 @@
 package jaeger.de.miel.TodoAPI.service;
 
 import jaeger.de.miel.TodoAPI.dto.CreateUserRequestDTO;
+import jaeger.de.miel.TodoAPI.dto.UpdateUserRequestDTO;
 import jaeger.de.miel.TodoAPI.dto.UserDTO;
 import jaeger.de.miel.TodoAPI.entity.AppUser;
 import jaeger.de.miel.TodoAPI.mapper.UserMapper;
@@ -56,6 +57,7 @@ public class UserService {
         }
     }
 
+
     public void deleteUser(String email) {
         try {
             email = email.trim().toLowerCase();
@@ -65,6 +67,21 @@ public class UserService {
         }
     }
 
+
+    public UserDTO updateUser(Long id, UpdateUserRequestDTO request) {
+        AppUser user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+
+        String email = request.getEmail();
+        if (userRepository.existsByEmail(email)) {
+            throw new DuplicateEmailException("Email already in use: " + email);
+        }
+
+        AppUser appUser = UserMapper.toEntity(user, request, passwordEncoder);
+
+        AppUser updated = userRepository.save(appUser);
+        return UserMapper.toDTO(updated);
+    }
 
 
     // ---------------------------------------

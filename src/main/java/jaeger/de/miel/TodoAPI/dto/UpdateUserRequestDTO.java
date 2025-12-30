@@ -7,21 +7,15 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class CreateUserRequestDTO {
+public class UpdateUserRequestDTO {
 
-    @NotBlank
-    @NotNull
     @Email
     @Size(max = 128)
     private String email;
 
-    @NotBlank
-    @NotNull
     @Size(max = 200)
     private String name;
 
-    @NotBlank
-    @NotNull
     @Size(max = 128)
     private String password;
 

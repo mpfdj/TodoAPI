@@ -2,6 +2,7 @@ package jaeger.de.miel.TodoAPI.controller;
 
 import jaeger.de.miel.TodoAPI.dto.CreateUserRequestDTO;
 import jaeger.de.miel.TodoAPI.dto.ErrorDTO;
+import jaeger.de.miel.TodoAPI.dto.UpdateUserRequestDTO;
 import jaeger.de.miel.TodoAPI.dto.UserDTO;
 import jaeger.de.miel.TodoAPI.service.UserService;
 import jakarta.validation.Valid;
@@ -71,6 +72,26 @@ public class UserController {
         } catch (UserService.UserNotFoundException ex) {
             ErrorDTO error = new ErrorDTO(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+    }
+
+
+    @RequestMapping(value = "/users/{userId}",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateUser(
+                @PathVariable("userId") Long userId,
+                @Valid @RequestBody UpdateUserRequestDTO request) {
+        try {
+            UserDTO updated = userService.updateUser(userId, request);
+            URI location = URI.create("/users/" + updated.getId());
+            return ResponseEntity.status(HttpStatus.OK).location(location).body(updated);
+        } catch (UserService.UserNotFoundException ex) {
+            ErrorDTO error = new ErrorDTO(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        } catch (UserService.DuplicateEmailException ex) {
+            ErrorDTO error = new ErrorDTO(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
         }
     }
 

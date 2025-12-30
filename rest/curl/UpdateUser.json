@@ -1,0 +1,5 @@
+{
+  "email": "alice@example.com",
+  "name": "Alice Johnson",
+  "password": "hashed_pw_1"
+}
