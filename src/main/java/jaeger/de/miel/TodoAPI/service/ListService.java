@@ -1,9 +1,9 @@
 package jaeger.de.miel.TodoAPI.service;
 
-import jaeger.de.miel.TodoAPI.dto.CreateListRequestDTO;
-import jaeger.de.miel.TodoAPI.dto.ListDTO;
+import jaeger.de.miel.TodoAPI.dto.*;
 import jaeger.de.miel.TodoAPI.entity.AppUser;
 import jaeger.de.miel.TodoAPI.mapper.ListMapper;
+import jaeger.de.miel.TodoAPI.mapper.UserMapper;
 import jaeger.de.miel.TodoAPI.repository.ListRepository;
 import jaeger.de.miel.TodoAPI.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -56,6 +56,17 @@ public class ListService {
         } catch (EmptyResultDataAccessException e) {
             throw new ListNotFoundException("List not found with id: " + listId);
         }
+    }
+
+
+    public ListDTO updateList(Long userId, Long listId, UpdateListRequestDTO request) {
+        jaeger.de.miel.TodoAPI.entity.List list = listRepository.findListByIdAndOwner_Id(listId, userId)
+                .orElseThrow(() -> new ListNotFoundException("List not found with userId: " + userId + " and listId: " + listId));
+
+        jaeger.de.miel.TodoAPI.entity.List entity = ListMapper.toEntity(list, request);
+        jaeger.de.miel.TodoAPI.entity.List updated = listRepository.save(entity);
+
+        return ListMapper.toDTO(updated);
     }
 
 

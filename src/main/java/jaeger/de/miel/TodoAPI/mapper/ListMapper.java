@@ -2,8 +2,11 @@ package jaeger.de.miel.TodoAPI.mapper;
 
 import jaeger.de.miel.TodoAPI.dto.CreateListRequestDTO;
 import jaeger.de.miel.TodoAPI.dto.ListDTO;
+import jaeger.de.miel.TodoAPI.dto.UpdateListRequestDTO;
+import jaeger.de.miel.TodoAPI.dto.UpdateUserRequestDTO;
 import jaeger.de.miel.TodoAPI.entity.AppUser;
 import jaeger.de.miel.TodoAPI.entity.List;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -33,4 +36,17 @@ public class ListMapper {
         list.setUpdatedAt(now);
         return  list;
     }
+
+    public static List toEntity(List list, UpdateListRequestDTO updateListRequestDTO) {
+        String name        = updateListRequestDTO.getName();
+        String description = updateListRequestDTO.getDescription();
+        Instant now        = Instant.now();
+
+        if (name != null) list.setName(name);
+        if (description != null) list.setDescription(description);
+
+        list.setUpdatedAt(now);
+        return list;
+    }
+
 }
