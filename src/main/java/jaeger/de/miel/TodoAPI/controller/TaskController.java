@@ -76,6 +76,25 @@ public class TaskController {
     }
 
 
+    @RequestMapping(value = "/users/{userId}/lists/{listId}/tasks/{taskId}",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateList(
+            @PathVariable("userId") Long userId,
+            @PathVariable("listId") Long listId,
+            @PathVariable("taskId") Long taskId,
+            @Valid @RequestBody UpdateTaskRequestDTO request) {
+        try {
+            TaskDTO updated = taskService.updateTask(taskId, userId, listId, request);
+            URI location = URI.create("/users/" + updated.getUserId() + "/lists" + updated.getListId() + "/tasks" + updated.getId());
+            return ResponseEntity.status(HttpStatus.OK).location(location).body(updated);
+        } catch (TaskService.TaskNotFoundException ex) {
+            ErrorDTO error = new ErrorDTO(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+    }
+
+
     // ---------------------------------------
     // Exceptions
     // ---------------------------------------

@@ -1,13 +1,14 @@
 package jaeger.de.miel.TodoAPI.mapper;
 
-import jaeger.de.miel.TodoAPI.dto.CreateTaskRequestDTO;
-import jaeger.de.miel.TodoAPI.dto.TaskDTO;
+import jaeger.de.miel.TodoAPI.dto.*;
 import jaeger.de.miel.TodoAPI.entity.AppUser;
 import jaeger.de.miel.TodoAPI.entity.List;
 import jaeger.de.miel.TodoAPI.entity.Task;
+import jakarta.validation.constraints.FutureOrPresent;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Service
 public class TaskMapper {
@@ -50,5 +51,22 @@ public class TaskMapper {
         return task;
     }
 
+    public static Task toEntity(Task task, UpdateTaskRequestDTO updateTaskRequestDTO) {
+        String title       = updateTaskRequestDTO.getTitle();
+        String description = updateTaskRequestDTO.getDescription();
+        TaskStatus status  = updateTaskRequestDTO.getStatus();
+        LocalDate dueDate  = updateTaskRequestDTO.getDueDate();
+        Integer priority   = updateTaskRequestDTO.getPriority();
+        Instant now        = Instant.now();
+
+        if (title != null) task.setTitle(title);
+        if (description != null) task.setDescription(description);
+        if (status != null) task.setStatus(status.toString());
+        if (dueDate != null) task.setDueDate(dueDate);
+        if (priority != null) task.setPriority(priority);
+        task.setUpdatedAt(now);
+
+        return task;
+    }
 
 }
