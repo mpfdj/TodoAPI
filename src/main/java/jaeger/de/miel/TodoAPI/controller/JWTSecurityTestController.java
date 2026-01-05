@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/test")
-public class SecurityTestController_2 {
+public class JWTSecurityTestController {
 
     // Test 1: Using hasRole (requires ROLE_ prefix)
     @GetMapping("/has-role-admin")

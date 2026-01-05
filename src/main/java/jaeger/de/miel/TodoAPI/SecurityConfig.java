@@ -1,5 +1,6 @@
 package jaeger.de.miel.TodoAPI;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -28,6 +29,10 @@ import java.util.stream.Collectors;
 @EnableMethodSecurity(prePostEnabled = true) // CRITICAL for @PreAuthorize to work
 public class SecurityConfig {
 
+    @Value("${security.jwt.secret}")
+    private String jwtSecret;
+
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -53,30 +58,13 @@ public class SecurityConfig {
     @Bean
     public JwtDecoder jwtDecoder() {
 
-        String secret = "mySuperSecretKeyThatIsAtLeast32BytesLong123!";  // For development: Use a shared secret instead of external provider
-
         byte[] decodedKey = Base64.getDecoder().decode(
-                Base64.getEncoder().encodeToString(secret.getBytes())
+                Base64.getEncoder().encodeToString(jwtSecret.getBytes())
         );
         SecretKey key = new SecretKeySpec(decodedKey, 0, decodedKey.length, "HmacSHA256");
 
         return NimbusJwtDecoder.withSecretKey(key).build();
     }
-
-
-//    @Bean
-//    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-//        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-//
-//        // Configure to extract roles from "roles" claim in JWT
-//        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
-//        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
-//
-//        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-//        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
-//
-//        return jwtAuthenticationConverter;
-//    }
 
 
     @Bean

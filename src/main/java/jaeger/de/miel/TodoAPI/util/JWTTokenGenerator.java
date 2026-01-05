@@ -2,6 +2,8 @@ package jaeger.de.miel.TodoAPI.util;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -12,23 +14,29 @@ import java.util.Map;
 import java.util.UUID;
 
 @Component
-public class JwtTokenGenerator {
+public class JWTTokenGenerator {
 
-    private final SecretKey key;
+    @Value("${security.jwt.secret}")
+    private String jwtSecret;  // Same secret as in SecurityConfig
 
-    public JwtTokenGenerator() {
-        // Same secret as in SecurityConfig
-        String secret = "mySuperSecretKeyThatIsAtLeast32BytesLong123!";
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+    private SecretKey key;
+
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
+
 
     public String generateUserToken(String username) {
         return generateToken(username, new String[]{"USER"});
     }
 
+
     public String generateAdminToken(String username) {
         return generateToken(username, new String[]{"USER", "ADMIN"});
     }
+
 
     private String generateToken(String username, String[] roles) {
         Map<String, Object> claims = new HashMap<>();

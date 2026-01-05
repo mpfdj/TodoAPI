@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/debug")
-public class DebugTimeController {
+public class JWTDebugTimeController {
 
     @GetMapping("/time")
     public Map<String, String> getServerTime() {

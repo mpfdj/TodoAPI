@@ -1,6 +1,6 @@
 package jaeger.de.miel.TodoAPI.controller;
 
-import jaeger.de.miel.TodoAPI.util.JwtTokenGenerator;
+import jaeger.de.miel.TodoAPI.util.JWTTokenGenerator;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,11 +9,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/public/tokens")
-public class TokenController {
+public class JWTTokenController {
 
-    private final JwtTokenGenerator tokenGenerator;
+    private final JWTTokenGenerator tokenGenerator;
 
-    public TokenController(JwtTokenGenerator tokenGenerator) {
+    public JWTTokenController(JWTTokenGenerator tokenGenerator) {
         this.tokenGenerator = tokenGenerator;
     }
 

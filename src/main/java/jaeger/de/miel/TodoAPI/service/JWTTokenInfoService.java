@@ -1,6 +1,6 @@
 package jaeger.de.miel.TodoAPI.service;
 
-import jaeger.de.miel.TodoAPI.util.JwtTimeZoneWrapper;
+import jaeger.de.miel.TodoAPI.util.JWTTimeZoneWrapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class TokenInfoService {
+public class JWTTokenInfoService {
 
     public Map<String, Object> getCurrentTokenInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -21,7 +21,7 @@ public class TokenInfoService {
         }
 
         Jwt jwt = (Jwt) authentication.getPrincipal();
-        JwtTimeZoneWrapper wrapper = JwtTimeZoneWrapper.of(jwt, ZoneId.of("Europe/Amsterdam"));
+        JWTTimeZoneWrapper wrapper = JWTTimeZoneWrapper.of(jwt, ZoneId.of("Europe/Amsterdam"));
 
         Map<String, Object> info = new HashMap<>();
 
@@ -60,7 +60,7 @@ public class TokenInfoService {
         }
 
         Jwt jwt = (Jwt) authentication.getPrincipal();
-        JwtTimeZoneWrapper wrapper = JwtTimeZoneWrapper.of(jwt);
+        JWTTimeZoneWrapper wrapper = JWTTimeZoneWrapper.of(jwt);
 
         Map<String, Object> warning = new HashMap<>();
 

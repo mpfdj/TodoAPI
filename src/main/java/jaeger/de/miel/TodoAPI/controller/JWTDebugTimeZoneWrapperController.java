@@ -1,8 +1,8 @@
 package jaeger.de.miel.TodoAPI.controller;
 
 
-import jaeger.de.miel.TodoAPI.service.TokenInfoService;
-import jaeger.de.miel.TodoAPI.util.JwtTimeZoneWrapper;
+import jaeger.de.miel.TodoAPI.service.JWTTokenInfoService;
+import jaeger.de.miel.TodoAPI.util.JWTTimeZoneWrapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -16,9 +16,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/token")
-public class TokenWithTimezoneController {
+public class JWTDebugTimeZoneWrapperController {
 
-    public TokenWithTimezoneController(TokenInfoService tokenInfoService) {
+    public JWTDebugTimeZoneWrapperController(JWTTokenInfoService JWTTokenInfoService) {
     }
 
     // Using wrapper directly in controller method
@@ -32,7 +32,7 @@ public class TokenWithTimezoneController {
         }
 
         // Create wrapper for Amsterdam timezone
-        JwtTimeZoneWrapper wrapper = JwtTimeZoneWrapper.of(jwt, ZoneId.of("Europe/Amsterdam"));
+        JWTTimeZoneWrapper wrapper = JWTTimeZoneWrapper.of(jwt, ZoneId.of("Europe/Amsterdam"));
 
         Map<String, Object> response = new HashMap<>();
         response.put("token_summary", wrapper.getTimeSummary());
@@ -47,7 +47,7 @@ public class TokenWithTimezoneController {
     public ResponseEntity<Map<String, Object>> checkExpiry(
             @AuthenticationPrincipal Jwt jwt) {
 
-        JwtTimeZoneWrapper wrapper = JwtTimeZoneWrapper.of(jwt);
+        JWTTimeZoneWrapper wrapper = JWTTimeZoneWrapper.of(jwt);
 
         Map<String, Object> response = new HashMap<>();
         response.put("status", wrapper.isExpired() ? "EXPIRED" : "VALID");

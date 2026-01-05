@@ -1,5 +1,6 @@
 package jaeger.de.miel.TodoAPI.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -14,13 +15,16 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/debug")
-public class DebugController {
+public class JWTDebugController {
+
+    @Value("${security.jwt.secret}")
+    private String jwtSecret;
+
 
     @PostMapping("/validate-token")
     public ResponseEntity<?> validateToken(@RequestBody Map<String, String> request) {
         String token = request.get("token");
-        String secret = request.get("secret") != null ?
-                request.get("secret") : "mySuperSecretKeyThatIsAtLeast32BytesLong123!";
+        String secret = request.get("secret") != null ? request.get("secret") : jwtSecret;
 
         Map<String, Object> response = new HashMap<>();
 

@@ -14,16 +14,16 @@ import java.util.function.Function;
 /**
  * Wrapper class to display JWT timestamps in different time zones
  */
-public class JwtTimeZoneWrapper {
+public class JWTTimeZoneWrapper {
 
     private final Jwt jwt;
     private final ZoneId displayZone;
 
-    public JwtTimeZoneWrapper(Jwt jwt) {
+    public JWTTimeZoneWrapper(Jwt jwt) {
         this(jwt, ZoneId.systemDefault());
     }
 
-    public JwtTimeZoneWrapper(Jwt jwt, ZoneId displayZone) {
+    public JWTTimeZoneWrapper(Jwt jwt, ZoneId displayZone) {
         this.jwt = jwt;
         this.displayZone = displayZone;
     }
@@ -164,19 +164,19 @@ public class JwtTimeZoneWrapper {
 
     // ===== STATIC UTILITY METHODS =====
 
-    public static JwtTimeZoneWrapper of(Jwt jwt) {
-        return new JwtTimeZoneWrapper(jwt);
+    public static JWTTimeZoneWrapper of(Jwt jwt) {
+        return new JWTTimeZoneWrapper(jwt);
     }
 
-    public static JwtTimeZoneWrapper of(Jwt jwt, ZoneId zoneId) {
-        return new JwtTimeZoneWrapper(jwt, zoneId);
+    public static JWTTimeZoneWrapper of(Jwt jwt, ZoneId zoneId) {
+        return new JWTTimeZoneWrapper(jwt, zoneId);
     }
 
-    public static Function<Jwt, JwtTimeZoneWrapper> toAmsterdamWrapper() {
-        return jwt -> new JwtTimeZoneWrapper(jwt, ZoneId.of("Europe/Amsterdam"));
+    public static Function<Jwt, JWTTimeZoneWrapper> toAmsterdamWrapper() {
+        return jwt -> new JWTTimeZoneWrapper(jwt, ZoneId.of("Europe/Amsterdam"));
     }
 
-    public static Function<Jwt, JwtTimeZoneWrapper> toUTCWrapper() {
-        return jwt -> new JwtTimeZoneWrapper(jwt, ZoneOffset.UTC);
+    public static Function<Jwt, JWTTimeZoneWrapper> toUTCWrapper() {
+        return jwt -> new JWTTimeZoneWrapper(jwt, ZoneOffset.UTC);
     }
 }

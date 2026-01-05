@@ -1,5 +1,5 @@
-::set JAVA_HOME=%PROGRAMFILES%\Java\jdk-21.0.6
-set JAVA_HOME=%PROGRAMFILES%\Java\jdk-25
+set JAVA_HOME=%PROGRAMFILES%\Java\jdk-21.0.6
+::set JAVA_HOME=%PROGRAMFILES%\Java\jdk-25
 
 <# : batch portion
 @REM ----------------------------------------------------------------------------
