@@ -3,6 +3,7 @@ package jaeger.de.miel.TodoAPI;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -33,7 +34,24 @@ public class SecurityConfig {
     private String jwtSecret;
 
 
+    // 1) Special chain for H2 console
     @Bean
+    @Order(1)
+    public SecurityFilterChain h2ConsoleSecurity(HttpSecurity http) throws Exception {
+        http
+            .securityMatcher("/h2-console/**")
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+            // Let H2 console use an HttpSession, independent from the API being stateless
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+        // No resource server or custom auth on this chain
+        return http.build();
+    }
+
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())

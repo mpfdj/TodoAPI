@@ -19,6 +19,12 @@ public class JWTTokenGenerator {
     @Value("${security.jwt.secret}")
     private String jwtSecret;  // Same secret as in SecurityConfig
 
+    @Value("${security.jwt.expiration}")
+    private long jwtExpiration;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String issuerUri;
+
     private SecretKey key;
 
 
@@ -49,8 +55,8 @@ public class JWTTokenGenerator {
                 .subject(username)
                 .id(UUID.randomUUID().toString())
                 .issuedAt(Date.from(Instant.now()))
-                .expiration(Date.from(Instant.now().plusSeconds(3600)))  // 1 hour 3600
-                .issuer("http://todo-api")
+                .expiration(Date.from(Instant.now().plusSeconds(jwtExpiration)))
+                .issuer(issuerUri)
                 .signWith(key)
                 .compact();
     }
