@@ -1,8 +1,8 @@
+<# : batch portion
 ::set JAVA_HOME=%PROGRAMFILES%\Java\jdk-21.0.6
 ::set JAVA_HOME=%PROGRAMFILES%\Java\jdk-25
 set JAVA_HOME=%PROGRAMFILES%\Java\jdk-25.0.1
 
-<# : batch portion
 @REM ----------------------------------------------------------------------------
 @REM Licensed to the Apache Software Foundation (ASF) under one
 @REM or more contributor license agreements.  See the NOTICE file
