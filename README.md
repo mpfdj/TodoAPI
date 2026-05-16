@@ -27,3 +27,7 @@ Use JPQL
 # Set rollback to false so the SpringBootTests are not automatically rolled back 
 @Rollback(false)
 
+
+# Swagger URL
+http://localhost:8080/swagger-ui/index.html
+
