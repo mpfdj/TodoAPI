@@ -12,39 +12,16 @@
         a:hover { text-decoration: underline; }
         .task-info { display: inline-block; flex: 1; }
         .task-name { font-weight: bold; }
+        .task-name-archived { font-weight: bold; color: #666; }
         .task-description { color: #666; font-size: 0.9em; margin-left: 10px; }
         .task-completed { text-decoration: line-through; color: #888; }
-        .archived-badge {
+
+        .archived-badge { background-color: #D1CAC9; color: #333; }
+        .done-badge { background-color: #09851E; color: white; }
+        .in_progress-badge { background-color: #0D5AE0; color: white; }
+        .todo-badge { background-color: #0DE042; color: white; }
+        .archived-badge, .done-badge, .in_progress-badge, .todo-badge {
             display: inline-block;
-            background-color: #D1CAC9;
-            color: #333;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            margin-left: 10px;
-        }
-        .done-badge {
-            display: inline-block;
-            background-color: #09851E;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            margin-left: 10px;
-        }
-        .in_progress-badge {
-            display: inline-block;
-            background-color: #0D5AE0;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            margin-left: 10px;
-        }
-        .todo-badge {
-            display: inline-block;
-            background-color: #0DE042;
-            color: white;
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 0.8em;
@@ -52,15 +29,37 @@
         }
 
         hr { margin: 20px 0; }
-        input[type="text"], textarea {
+
+        /* Basic consistent styling for all inputs */
+        input, textarea, select {
             padding: 5px;
             margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        input[type="text"], input[type="date"], select {
             width: 200px;
         }
+
         textarea {
             width: 300px;
             vertical-align: middle;
         }
+
+        button {
+            padding: 5px 10px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0052a3;
+        }
+
         form { display: inline-block; margin-right: 10px; }
         .delete-form { display: inline; }
         .edit-form { display: inline; }
@@ -71,18 +70,14 @@
             justify-content: space-between;
             flex-wrap: wrap;
         }
-        .task-actions {
-            display: inline-block;
-        }
+        .task-actions { display: inline-block; }
         .checkbox-label {
             display: inline-flex;
             align-items: center;
             margin-right: 10px;
             cursor: pointer;
         }
-        .checkbox-label input {
-            margin-right: 5px;
-        }
+        .checkbox-label input { margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -101,6 +96,14 @@
 <form th:action="@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks'}" method="post">
     <input type="text" name="title" placeholder="Enter task title" required />
     <input type="text" name="description" placeholder="Description (optional)" />
+    <input type="date" name="dueDate" required th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" />
+    <select name="priority" required>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
     <button type="submit">Add Task</button>
 </form>
 
@@ -112,31 +115,14 @@
     <li th:each="task : ${tasks}">
         <div class="task-item">
             <div class="task-info">
-                <!-- Toggle Complete Checkbox -->
-                <label class="checkbox-label">
-                    <form th:action="@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id} + '/toggle'}"
-                          method="post"
-                          style="display: inline;">
-                        <input type="hidden" name="_method" value="PUT" />
-                        <input type="checkbox"
-                               th:checked="${task.status == 'done' }"
-                               onchange="this.form.submit()" />
-                    </form>
-                </label>
-
                 <!-- Task Title -->
-                <span class="task-name" th:text="${task.title}">Task Title</span>
+                <span th:class="(${task.status == 'archived'} ? ' task-name-archived' : 'task-name')"
+                      th:text="${task.title}">Task Title</span>
 
                 <!-- Task Description -->
                 <span th:if="${task.description != null and task.description != ''}"
                       class="task-description"
                       th:text="'- ' + ${task.description}">- Description</span>
-
-
-                archived
-                done
-                in_progress
-                todo
 
                 <!-- Status Badge -->
                 <span th:if="${task.status == 'archived' }" class="archived-badge">Archived</span>
@@ -146,6 +132,27 @@
             </div>
 
             <div class="task-actions">
+
+                <form th:action="@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id} + '/toggle'}"
+                      method="post"
+                      style="display: inline;">
+                    <input type="hidden" name="_method" value="PUT" />
+                    <select name="status" required onchange="this.form.submit()">
+                        <option value="todo" th:selected="${task.status == 'todo'}">todo</option>
+                        <option value="in_progress" th:selected="${task.status == 'in_progress'}">in_progress</option>
+                        <option value="done" th:selected="${task.status == 'done'}">done</option>
+                        <option value="archived" th:selected="${task.status == 'archived'}">archived</option>
+                    </select>
+                </form>
+
+
+
+
+
+
+
+
+
                 <!-- Edit Task -->
                 <a th:href="@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id} + '/edit'}">Edit</a>
 

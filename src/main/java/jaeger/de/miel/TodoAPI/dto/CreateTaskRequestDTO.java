@@ -16,8 +16,8 @@ public class CreateTaskRequestDTO {
     @Size(max = 200)
     private String title;
 
-    @NotNull
-    @NotBlank
+//    @NotNull
+//    @NotBlank
     @Size(max = 512)
     private String description;
 

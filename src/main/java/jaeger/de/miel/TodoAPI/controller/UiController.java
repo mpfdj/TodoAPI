@@ -1,10 +1,12 @@
 package jaeger.de.miel.TodoAPI.controller;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,53 +86,20 @@ public class UiController {
         return "tasks";
     }
 
-
-    @PostMapping("/users/{userId}/lists/{listId}/tasks")
-    public String createTask(@PathVariable Long userId, @PathVariable Long listId,
-                             @RequestParam String title,
-                             @RequestParam(required = false) String description) {
-        try {
-            String url = API_BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks";
-
-            // Create request body
-            Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("title", title);
-            requestBody.put("description", description != null ? description : "");
-            requestBody.put("completed", false);
-            requestBody.put("listId", listId);
-
-            // Set headers
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-
-            // Make POST request
-            restTemplate.exchange(
-                    url,
-                    HttpMethod.POST,
-                    requestEntity,
-                    new ParameterizedTypeReference<Map<String, Object>>() {}
-            );
-
-            return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
-
-        } catch (Exception e) {
-            return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks?error=" + e.getMessage();
-        }
-    }
-
-
-//    TODO: WORK IN PROGRESS
-
-
     @PostMapping("/users/{userId}/lists/{listId}/tasks")
     public String createTask(@PathVariable Long userId,
                              @PathVariable Long listId,
                              @RequestParam String title,
-                             @RequestParam(required = false) String description) {
+                             @RequestParam(required = false) String description,
+                             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate,
+                             @RequestParam Integer priority) {
+        Map<String, String> body = new HashMap<>();
+        body.put("title", title);
+        body.put("description", description != null ? description : "");
+        body.put("status", "todo");
+        body.put("dueDate", dueDate.toString());
+        body.put("priority", String.valueOf(priority));
 
-        Map<String, String> body = Map.of("name", name);
         restTemplate.postForObject(
                 BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks",
                 body,
@@ -142,12 +111,98 @@ public class UiController {
 
 
 
+//    @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}/toggle")
+//    public String toggleTask(@PathVariable Long userId, @PathVariable Long listId,
+//                             @PathVariable Long taskId) {
+//        try {
+//            // First get the current task
+//            String getUrl = API_BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
+//            ResponseEntity<Map<String, Object>> taskResponse = restTemplate.getForEntity(getUrl,
+//                    new ParameterizedTypeReference<Map<String, Object>>() {});
+//
+//            if (taskResponse.getStatusCode() == HttpStatus.OK && taskResponse.getBody() != null) {
+//                Map<String, Object> task = taskResponse.getBody();
+//                boolean currentStatus = (boolean) task.getOrDefault("completed", false);
+//
+//                // Update the task with toggled status
+//                task.put("completed", !currentStatus);
+//
+//                String updateUrl = API_BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
+//                HttpHeaders headers = new HttpHeaders();
+//                headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//                HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(task, headers);
+//
+//                restTemplate.exchange(
+//                        updateUrl,
+//                        HttpMethod.PUT,
+//                        requestEntity,
+//                        new ParameterizedTypeReference<Map<String, Object>>() {}
+//                );
+//            }
+//
+//            return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
+//
+//        } catch (Exception e) {
+//            return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks?error=" + e.getMessage();
+//        }
+//    }
 
 
+//    @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
+//    public String toggleTask(@PathVariable Long userId,
+//                             @PathVariable Long listId,
+//                             @PathVariable Long taskId,
+//                             @RequestParam(required = false) String title,
+//                             @RequestParam(required = false) String description,
+//                             @RequestParam(required = false) String status,
+//                             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate,
+//                             @RequestParam(required = false) Integer priority) {
+//
+//        Map<String, String> body = new HashMap<>();
+//        if (title != null) body.put("title", title);
+//        if (description != null) body.put("description", description);
+//        if (status != null) body.put("status", status);
+//        if (dueDate != null) body.put("dueDate", dueDate.toString());
+//        if (priority != null) body.put("priority", String.valueOf(priority));
+//
+//        restTemplate.put(
+//                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId,
+//                body,
+//                Object.class
+//        );
+//
+//        return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
+//
+//    }
 
+    @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}/toggle")
+    public String toggleTask(@PathVariable Long userId,
+                             @PathVariable Long listId,
+                             @PathVariable Long taskId,
+                             @RequestParam String status,
+                             @RequestParam(defaultValue = "off") String checkbox) {
 
+        System.out.println("---------- DEBUG ---------");
+        System.out.println("status" + status);
+//        System.out.println("checkbox" + checkbox);
 
+        Map<String, String> body = new HashMap<>();
+        body.put("status", status);
 
+//        boolean isDone = "on".equals(checkbox);
+//        if (isDone) body.put("status", "done");
+//        else body.put("status", status);
+
+        restTemplate.put(
+                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId,
+                body,
+                Object.class
+        );
+
+        return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
+
+    }
 
 
 
@@ -187,21 +242,21 @@ public class UiController {
 //        model.addAttribute("listId", listId);
 //        return "tasks";
 //    }
-
-    @PostMapping("/users/{userId}/lists/{listId}/tasks")
-    public String createTask(@PathVariable Long userId,
-                             @PathVariable Long listId,
-                             @RequestParam String name) {
-
-        Map<String, String> body = Map.of("name", name);
-        restTemplate.postForObject(
-                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks",
-                body,
-                Object.class
-        );
-
-        return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
-    }
+//
+//    @PostMapping("/users/{userId}/lists/{listId}/tasks")
+//    public String createTask(@PathVariable Long userId,
+//                             @PathVariable Long listId,
+//                             @RequestParam String name) {
+//
+//        Map<String, String> body = Map.of("name", name);
+//        restTemplate.postForObject(
+//                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks",
+//                body,
+//                Object.class
+//        );
+//
+//        return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
+//    }
 
     @PostMapping("/users/{userId}/lists/{listId}/tasks/delete")
     public String deleteTask(@PathVariable Long userId,
