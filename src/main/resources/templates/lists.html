@@ -6,47 +6,62 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         ul { list-style-type: none; padding: 0; }
-        li { margin: 10px 0; }
+        li { margin: 10px 0; padding: 10px; background-color: #f5f5f5; border-radius: 5px; }
         button { margin-left: 10px; }
-        a { margin-left: 10px; }
+        a { margin-left: 10px; text-decoration: none; color: #0066cc; }
+        a:hover { text-decoration: underline; }
+        .list-info { display: inline-block; }
+        .list-name { font-weight: bold; }
+        hr { margin: 20px 0; }
+        input[type="text"] { padding: 5px; margin-right: 10px; width: 200px; }
+        form { display: inline-block; margin-right: 10px; }
+        .delete-form { display: inline; }
+        .back-link { margin-bottom: 20px; display: inline-block; }
     </style>
 </head>
 <body>
 
-<h1>User Lists</h1>
+<h1>Todo Lists for User: <span th:text="${userName}" th:if="${userName}">User Name</span></h1>
 
 <!-- Back to Users -->
 <p>
-    @{/ui/users}← Back to Users</a>
+    <a th:href="@{/ui/users}" class="back-link">← Back to Users</a>
 </p>
 
 <hr/>
 
 <!-- Create List -->
-<form th:action="@{'/ui/users/' + name" placeholder="Enter list name" required />
-<button type="submit">Add List</button>
+<form th:action="@{'/ui/users/' + ${userId} + '/lists'}" method="post">
+    <input type="text" name="name" placeholder="Enter list name" required />
+    <input type="text" name="description" placeholder="Enter description" required />
+    <button type="submit">Add List</button>
 </form>
 
 <hr/>
 
 <!-- Lists -->
+<h2>All Lists</h2>
 <ul>
     <li th:each="list : ${lists}">
-
-        <!-- List Name -->
-        <span th:text="${list.name}">List Name</span>
+        <div class="list-info">
+            <span class="list-name" th:text="${list.name}">List Name</span>
+        </div>
 
         <!-- View Tasks -->
-        <a th:href     View Tasks
-        </a>
+        <a th:href="@{/ui/users/{userId}/lists/{listId}/tasks(userId=${userId}, listId=${list.id})}">View Tasks</a>
 
         <!-- Delete List -->
-        <form th:action="@{'/ui/users/' + ${userId} +tId" th:value="${list.id}" />
-        <button type="submit">Delete</button>
+        <form class="delete-form" th:action="@{'/ui/users/' + ${userId} + '/lists/' + ${list.id}}" method="post">
+            <input type="hidden" name="_method" value="DELETE" />
+            <button type="submit" onclick="return confirm('Delete this list and all its tasks?')">Delete</button>
         </form>
-
     </li>
 </ul>
+
+<!-- Message when no lists exist -->
+<div th:if="${lists.empty}" style="color: #666; font-style: italic; margin-top: 20px;">
+    No lists yet. Create your first list above!
+</div>
 
 </body>
 </html>
