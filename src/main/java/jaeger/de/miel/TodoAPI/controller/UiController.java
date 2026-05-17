@@ -1,5 +1,6 @@
 package jaeger.de.miel.TodoAPI.controller;
 
+import jaeger.de.miel.TodoAPI.dto.TaskDTO;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,7 +46,6 @@ public class UiController {
     }
 
 
-
     // LISTS
     @GetMapping("/users/{userId}/lists")
     public String lists(@PathVariable Long userId, Model model) {
@@ -73,7 +73,6 @@ public class UiController {
     }
 
 
-
     // TASKS
     @GetMapping("/users/{userId}/lists/{listId}/tasks")
     public String tasks(@PathVariable Long userId, @PathVariable Long listId, Model model) {
@@ -83,6 +82,29 @@ public class UiController {
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
         model.addAttribute("tasks", tasks);
+        return "tasks";
+    }
+
+
+
+
+
+
+
+
+
+
+
+// TODO: Create a new endpoint for this (and the rest)
+
+    @GetMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
+    public String task(@PathVariable Long userId, @PathVariable Long listId, @PathVariable Long taskId, Model model) {
+        TaskDTO task = restTemplate.getForObject(
+                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId, TaskDTO.class);
+
+        model.addAttribute("userId", userId);
+        model.addAttribute("listId", listId);
+        model.addAttribute("task", task);
         return "tasks";
     }
 
@@ -110,45 +132,7 @@ public class UiController {
     }
 
 
-
-//    @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}/toggle")
-//    public String toggleTask(@PathVariable Long userId, @PathVariable Long listId,
-//                             @PathVariable Long taskId) {
-//        try {
-//            // First get the current task
-//            String getUrl = API_BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
-//            ResponseEntity<Map<String, Object>> taskResponse = restTemplate.getForEntity(getUrl,
-//                    new ParameterizedTypeReference<Map<String, Object>>() {});
-//
-//            if (taskResponse.getStatusCode() == HttpStatus.OK && taskResponse.getBody() != null) {
-//                Map<String, Object> task = taskResponse.getBody();
-//                boolean currentStatus = (boolean) task.getOrDefault("completed", false);
-//
-//                // Update the task with toggled status
-//                task.put("completed", !currentStatus);
-//
-//                String updateUrl = API_BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
-//                HttpHeaders headers = new HttpHeaders();
-//                headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//                HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(task, headers);
-//
-//                restTemplate.exchange(
-//                        updateUrl,
-//                        HttpMethod.PUT,
-//                        requestEntity,
-//                        new ParameterizedTypeReference<Map<String, Object>>() {}
-//                );
-//            }
-//
-//            return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
-//
-//        } catch (Exception e) {
-//            return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks?error=" + e.getMessage();
-//        }
-//    }
-
-
+//      //UPDATE
 //    @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
 //    public String toggleTask(@PathVariable Long userId,
 //                             @PathVariable Long listId,
@@ -176,37 +160,77 @@ public class UiController {
 //
 //    }
 
+
+//    // WORKING
+//    @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}/toggle")
+//    public String toggleTask(@PathVariable Long userId,
+//                             @PathVariable Long listId,
+//                             @PathVariable Long taskId,
+//                             @RequestParam String status,
+//                             @RequestParam(defaultValue = "off") String checkbox) {
+//
+//        System.out.println("---------- DEBUG ---------");
+//        System.out.println("status" + status);
+
+////        System.out.println("checkbox" + checkbox);
+//
+//        Map<String, String> body = new HashMap<>();
+//        body.put("status", status);
+//
+//        restTemplate.put(
+//                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId,
+//                body,
+//                Object.class
+//        );
+//
+//        return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
+//
+//    }
     @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}/toggle")
     public String toggleTask(@PathVariable Long userId,
                              @PathVariable Long listId,
                              @PathVariable Long taskId,
                              @RequestParam String status,
-                             @RequestParam(defaultValue = "off") String checkbox) {
+                             Model model) {
 
-        System.out.println("---------- DEBUG ---------");
-        System.out.println("status" + status);
-//        System.out.println("checkbox" + checkbox);
 
-        Map<String, String> body = new HashMap<>();
+        System.out.println("-------- DEBUG -----------");
+        System.out.println("status: " + status);
+
+        // Update task status
+        Map<String, Object> body = new HashMap<>();
         body.put("status", status);
-
-//        boolean isDone = "on".equals(checkbox);
-//        if (isDone) body.put("status", "done");
-//        else body.put("status", status);
+//        body.put("completed", "done".equals(status));
 
         restTemplate.put(
                 BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId,
-                body,
-                Object.class
+                body
         );
 
-        return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
+        // Get updated task
+        String getUrl = BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
+        Map<String, Object> updatedTask = restTemplate.getForObject(getUrl, Map.class);
 
+        System.out.println("========== UPDATED TASK ==========");
+        System.out.println("ID: " + updatedTask.get("id"));
+        System.out.println("Title: " + updatedTask.get("title"));
+        System.out.println("Status: " + updatedTask.get("status"));
+        System.out.println("Description: " + updatedTask.get("description"));
+        System.out.println("Priority: " + updatedTask.get("priority"));
+        System.out.println("Due Date: " + updatedTask.get("dueDate"));
+        System.out.println("Completed: " + updatedTask.get("completed"));
+        System.out.println("==================================");
+
+
+
+        // Add to model
+        model.addAttribute("task", updatedTask);
+        model.addAttribute("userId", userId);
+        model.addAttribute("listId", listId);
+
+        // Return ONLY the task fragment, not the whole page
+        return "fragments/task-item";
     }
-
-
-
-
 
 
     // LISTS

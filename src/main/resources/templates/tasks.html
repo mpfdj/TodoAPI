@@ -3,88 +3,13 @@
 <head>
     <title>Tasks</title>
     <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        ul { list-style-type: none; padding: 0; }
-        li { margin: 10px 0; padding: 10px; background-color: #f5f5f5; border-radius: 5px; }
-        button { margin-left: 10px; }
-        a { margin-right: 10px; text-decoration: none; color: #0066cc; }
-        a:hover { text-decoration: underline; }
-        .task-info { display: inline-block; flex: 1; }
-        .task-name { font-weight: bold; }
-        .task-name-archived { font-weight: bold; color: #666; }
-        .task-description { color: #666; font-size: 0.9em; margin-left: 10px; }
-        .task-completed { text-decoration: line-through; color: #888; }
-
-        .archived-badge { background-color: #D1CAC9; color: #333; }
-        .done-badge { background-color: #09851E; color: white; }
-        .in_progress-badge { background-color: #0D5AE0; color: white; }
-        .todo-badge { background-color: #0DE042; color: white; }
-        .archived-badge, .done-badge, .in_progress-badge, .todo-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            margin-left: 10px;
-        }
-
-        hr { margin: 20px 0; }
-
-        /* Basic consistent styling for all inputs */
-        input, textarea, select {
-            padding: 5px;
-            margin-right: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        input[type="text"], input[type="date"], select {
-            width: 200px;
-        }
-
-        textarea {
-            width: 300px;
-            vertical-align: middle;
-        }
-
-        button {
-            padding: 5px 10px;
-            background-color: #0066cc;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0052a3;
-        }
-
-        form { display: inline-block; margin-right: 10px; }
-        .delete-form { display: inline; }
-        .edit-form { display: inline; }
-        .back-link { margin-bottom: 20px; display: inline-block; }
-        .task-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-        .task-actions { display: inline-block; }
-        .checkbox-label {
-            display: inline-flex;
-            align-items: center;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        .checkbox-label input { margin-right: 5px; }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 <body>
 
 <h1>Tasks for List: <span th:text="${listName}">List Name</span></h1>
 
-<!-- Navigation -->
 <p>
     <a th:href="@{'/ui/users/' + ${userId} + '/lists'}" class="back-link">← Back to Lists</a>
 </p>
@@ -109,71 +34,16 @@
 
 <hr/>
 
-<!-- Task List -->
 <h2>All Tasks</h2>
 <ul>
     <li th:each="task : ${tasks}">
-        <div class="task-item">
-            <div class="task-info">
-                <!-- Task Title -->
-                <span th:class="(${task.status == 'archived'} ? ' task-name-archived' : 'task-name')"
-                      th:text="${task.title}">Task Title</span>
-
-                <!-- Task Description -->
-                <span th:if="${task.description != null and task.description != ''}"
-                      class="task-description"
-                      th:text="'- ' + ${task.description}">- Description</span>
-
-                <!-- Status Badge -->
-                <span th:if="${task.status == 'archived' }" class="archived-badge">Archived</span>
-                <span th:if="${task.status == 'done' }" class="done-badge">Done</span>
-                <span th:if="${task.status == 'in_progress' }" class="in_progress-badge">In progress</span>
-                <span th:if="${task.status == 'todo' }" class="todo-badge">Todo</span>
-            </div>
-
-            <div class="task-actions">
-
-                <form th:action="@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id} + '/toggle'}"
-                      method="post"
-                      style="display: inline;">
-                    <input type="hidden" name="_method" value="PUT" />
-                    <select name="status" required onchange="this.form.submit()">
-                        <option value="todo" th:selected="${task.status == 'todo'}">todo</option>
-                        <option value="in_progress" th:selected="${task.status == 'in_progress'}">in_progress</option>
-                        <option value="done" th:selected="${task.status == 'done'}">done</option>
-                        <option value="archived" th:selected="${task.status == 'archived'}">archived</option>
-                    </select>
-                </form>
-
-
-
-
-
-
-
-
-
-                <!-- Edit Task -->
-                <a th:href="@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id} + '/edit'}">Edit</a>
-
-                <!-- Delete Task -->
-                <form class="delete-form" th:action="@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id}}"
-                      method="post"
-                      style="display: inline;">
-                    <input type="hidden" name="_method" value="DELETE" />
-                    <button type="submit" onclick="return confirm('Delete this task?')">Delete</button>
-                </form>
-            </div>
-        </div>
+        <div th:replace="~{fragments/task-item :: task-item(task=${task}, userId=${userId}, listId=${listId})}"></div>
     </li>
 </ul>
 
-<!-- Message when no tasks exist -->
 <div th:if="${tasks.empty}" style="color: #666; font-style: italic; margin-top: 20px;">
     No tasks yet. Create your first task above!
 </div>
-
-<hr/>
 
 </body>
 </html>
