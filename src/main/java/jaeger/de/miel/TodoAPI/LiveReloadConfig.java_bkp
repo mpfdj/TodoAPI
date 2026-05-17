@@ -1,0 +1,15 @@
+package jaeger.de.miel.TodoAPI;
+
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.devtools.livereload.LiveReloadServer;
+
+import java.io.IOException;
+
+@Configuration
+public class LiveReloadConfig {
+
+    public LiveReloadConfig() throws IOException {
+        new LiveReloadServer().start();
+    }
+}

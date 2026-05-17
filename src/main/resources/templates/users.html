@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<style>
+    body { font-family: Arial; margin: 20px; }
+    input { padding: 6px; }
+    button { padding: 6px 10px; }
+</style>
+<body>
+
+<h1>Create User</h1>
+
+<form action="/ui/users" method="post">
+    <input type="text" name="email" placeholder="Enter email" required />
+    <input type="text" name="name" placeholder="Enter name" required />
+    <input type="password" name="password" placeholder="Enter password" required />
+    <button type="submit">Add User</button>
+</form>
+<ul>
+    <li th:each="user : ${users}">
+        <span th:text="${user.name}"></span>
+    </li>
+</ul>
+AAAA
+BBBB
+CCCC
+DDDD
+EEEE
+FFFF
+GGGG
+HHHH
+IIII
+JJJJ
+
+</body>
+</html>

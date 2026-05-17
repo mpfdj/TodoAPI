@@ -31,3 +31,10 @@ Use JPQL
 # Swagger URL
 http://localhost:8080/swagger-ui/index.html
 
+
+# Theamleaf URL
+http://localhost:8080/ui/users
+
+
+# Spring Boot devtools
+https://docs.spring.io/spring-boot/reference/using/devtools.html#using.devtools.livereload

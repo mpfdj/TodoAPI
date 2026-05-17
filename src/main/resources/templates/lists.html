@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Lists</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin: 10px 0; }
+        button { margin-left: 10px; }
+        a { margin-left: 10px; }
+    </style>
+</head>
+<body>
+
+<h1>User Lists</h1>
+
+<!-- Back to Users -->
+<p>
+    @{/ui/users}← Back to Users</a>
+</p>
+
+<hr/>
+
+<!-- Create List -->
+<form th:action="@{'/ui/users/' + name" placeholder="Enter list name" required />
+<button type="submit">Add List</button>
+</form>
+
+<hr/>
+
+<!-- Lists -->
+<ul>
+    <li th:each="list : ${lists}">
+
+        <!-- List Name -->
+        <span th:text="${list.name}">List Name</span>
+
+        <!-- View Tasks -->
+        <a th:href     View Tasks
+        </a>
+
+        <!-- Delete List -->
+        <form th:action="@{'/ui/users/' + ${userId} +tId" th:value="${list.id}" />
+        <button type="submit">Delete</button>
+        </form>
+
+    </li>
+</ul>
+
+</body>
+</html>
