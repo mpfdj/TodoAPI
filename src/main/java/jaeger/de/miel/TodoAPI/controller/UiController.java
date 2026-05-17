@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -98,14 +99,17 @@ public class UiController {
 // TODO: Create a new endpoint for this (and the rest)
 
     @GetMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
-    public String task(@PathVariable Long userId, @PathVariable Long listId, @PathVariable Long taskId, Model model) {
+    public String task(@PathVariable Long userId,
+                       @PathVariable Long listId,
+                       @PathVariable Long taskId,
+                       Model model) {
         TaskDTO task = restTemplate.getForObject(
                 BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId, TaskDTO.class);
 
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
         model.addAttribute("task", task);
-        return "tasks";
+        return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
     }
 
     @PostMapping("/users/{userId}/lists/{listId}/tasks")

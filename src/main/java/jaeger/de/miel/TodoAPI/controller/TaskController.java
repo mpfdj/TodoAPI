@@ -23,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 // import io.swagger.v3.oas.annotations.security.SecurityRequirement; // if you add auth
 
@@ -234,6 +236,45 @@ public class TaskController {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @GetMapping(value = "/users/{userId}/lists/{listId}/tasks/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TaskDTO> getTasks(
+            @PathVariable("userId") Long userId,
+            @PathVariable("listId") Long listId,
+            @PathVariable("taskId") Long taskId) {
+
+        TaskDTO dummy = new TaskDTO();
+        dummy.setId(1L);
+        dummy.setListId(1L);
+        dummy.setUserId(1L);
+        dummy.setTitle("Complete project documentation");
+        dummy.setDescription("Write technical documentation for the API");
+        dummy.setStatus("in_progress");
+        dummy.setDueDate(LocalDate.of(2024, 12, 31));
+        dummy.setPriority(3);
+        dummy.setCreatedAt(Instant.now());
+        dummy.setUpdatedAt(Instant.now());
+        dummy.setCompletedAt(null);
+
+        return ResponseEntity.ok(dummy);
+    }
     // ---------------------------------------
     // Exceptions
     // ---------------------------------------
