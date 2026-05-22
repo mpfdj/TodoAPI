@@ -31,10 +31,11 @@
 
     <div class="task-actions">
         <!-- HTMX Status Update with th:attr -->
-        <form th:attr="hx-put=@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id} + '?fragment=task-item'},
-                       hx-target='#task-' + ${task.id},
-                       hx-swap='outerHTML',
-                       hx-trigger='change'">
+        <form th:hx-put="@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id} + '?fragment=task-item'}"
+              th:hx-target="'#task-' + ${task.id}"
+              th:hx-swap="outerHTML"
+              th:hx-trigger="change">
+
             <select name="status" required>
                 <option value="todo" th:selected="${task.status == 'todo'}">todo</option>
                 <option value="in_progress" th:selected="${task.status == 'in_progress'}">in_progress</option>
