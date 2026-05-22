@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<div th:fragment="tasks-container" id="tasks-container">
+<div th:fragment="tasks-container(tasks, userId, listId)" id="tasks-container">
     <h2>All Tasks</h2>
     <ul>
-        <li th:each="task : ${tasks}" th:id="'task-li-' + ${task.id}">
+        <li th:each="task : ${tasks}">
             <div th:replace="~{fragments/task-item :: task-item(task=${task}, userId=${userId}, listId=${listId})}"></div>
         </li>
     </ul>
-
     <div th:if="${tasks.empty}" style="color: #666; font-style: italic; margin-top: 20px;">
         No tasks yet. Create your first task above!
     </div>

@@ -9,6 +9,23 @@
 </head>
 <body>
 
+
+
+<!-- DEBUG -->
+<!--<div style="background: #e8f4f8; border: 1px solid #2196F3; padding: 10px; margin-bottom: 20px;">-->
+<!--    <strong>📋 All Model Attributes:</strong>-->
+<!--    <div th:each="variable : ${#ctx.getVariableNames()}">-->
+<!--        <div th:if="${!variable.startsWith('org.springframework') and-->
+<!--                      !variable.startsWith('spring') and-->
+<!--                      !variable.startsWith('thymeleaf') and-->
+<!--                      !variable.contains('FILTERED')-->
+<!--                     }">-->
+<!--            <span th:text="'• ' + ${variable} + ': ' + ${#ctx.getVariable(variable)}"></span>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+
 <h1>Tasks for List: <span th:text="${listName}">List Name</span></h1>
 
 <p>
@@ -36,7 +53,6 @@
 <hr/>
 
 <!-- Tasks Container - This will be replaced on delete -->
-<div th:replace="~{fragments/tasks-container :: tasks-container}"></div>
-
+<div th:replace="~{fragments/tasks-container :: tasks-container(tasks=${tasks}, userId=${userId}, listId=${listId})}"></div>
 </body>
 </html>

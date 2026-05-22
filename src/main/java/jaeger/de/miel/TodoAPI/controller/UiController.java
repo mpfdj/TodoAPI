@@ -3,7 +3,6 @@ package jaeger.de.miel.TodoAPI.controller;
 import jaeger.de.miel.TodoAPI.dto.TaskDTO;
 import jaeger.de.miel.TodoAPI.entity.Task;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -125,48 +124,30 @@ public class UiController {
     }
 
 
-//      //UPDATE
-//    @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
-//    public String toggleTask(@PathVariable Long userId,
-//                             @PathVariable Long listId,
-//                             @PathVariable Long taskId,
-//                             @RequestParam(required = false) String title,
-//                             @RequestParam(required = false) String description,
-//                             @RequestParam(required = false) String status,
-//                             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate,
-//                             @RequestParam(required = false) Integer priority) {
-//
-//        Map<String, String> body = new HashMap<>();
-//        if (title != null) body.put("title", title);
-//        if (description != null) body.put("description", description);
-//        if (status != null) body.put("status", status);
-//        if (dueDate != null) body.put("dueDate", dueDate.toString());
-//        if (priority != null) body.put("priority", String.valueOf(priority));
-//
-//        restTemplate.put(
-//                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId,
-//                body,
-//                Object.class
-//        );
-//
-//        return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
-//
-//    }
-
-    @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}/toggle")
-    public String toggleTask(@PathVariable Long userId,
+    // UPDATE
+    @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
+    public String updateTask(@PathVariable Long userId,
                              @PathVariable Long listId,
                              @PathVariable Long taskId,
-                             @RequestParam String status,
+                             @RequestParam(required = false) String fragment,
+                             @RequestParam(required = false) String title,
+                             @RequestParam(required = false) String description,
+                             @RequestParam(required = false) String status,
+                             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate,
+                             @RequestParam(required = false) Integer priority,
                              Model model) {
 
-        // Update task status
-        Map<String, Object> body = new HashMap<>();
-        body.put("status", status);
+        Map<String, String> body = new HashMap<>();
+        if (title != null) body.put("title", title);
+        if (description != null) body.put("description", description);
+        if (status != null) body.put("status", status);
+        if (dueDate != null) body.put("dueDate", dueDate.toString());
+        if (priority != null) body.put("priority", String.valueOf(priority));
 
         restTemplate.put(
                 BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId,
-                body
+                body,
+                Object.class
         );
 
         // Get updated task
@@ -178,7 +159,12 @@ public class UiController {
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
 
-        return "fragments/task-item";  // Return ONLY the task fragment, not the whole page
+        if (fragment == null || fragment.isEmpty()) fragment = "default";
+
+        return switch (fragment) {
+            case "task-item" -> "fragments/task-item :: task-item";
+            default -> "fragments/task-item :: task-item";
+        };
     }
 
     @DeleteMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
@@ -187,16 +173,7 @@ public class UiController {
                              @PathVariable Long taskId,
                              Model model) {
 
-        System.out.println("========= DEBUG ==========");
-        System.out.println("userId: " + userId);
-        System.out.println("listId: " + listId);
-        System.out.println("taskId: " + taskId);
-
         restTemplate.delete(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId);
-//
-//        return ResponseEntity.ok().build();
-
-
 
         // Fetch updated tasks
         Task[] tasks = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks", Task[].class);
@@ -206,8 +183,6 @@ public class UiController {
         model.addAttribute("listId", listId);
 
         return "fragments/tasks-container :: tasks-container";
-
-
     }
 
 }
