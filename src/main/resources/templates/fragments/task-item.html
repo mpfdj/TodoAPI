@@ -2,14 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <style>
-        .htmx-indicator { display: none; }
-        .htmx-request .htmx-indicator { display: inline; }
-    </style>
 </head>
 <body>
 <div th:fragment="task-item(task, userId, listId)" th:id="'task-' + ${task.id}" class="task-item">
     <div class="task-info">
+        <!-- Checkbox -->
+        <input type="checkbox"
+               th:checked="${task.status == 'done' or task.status == 'archived'}"
+               th:disabled="${task.status == 'archived'}"
+               onclick="return false;"
+               onkeydown="return false;"/>
+
         <!-- Task Title -->
         <span th:class="(${task.status == 'archived'} ? 'task-name-archived' : 'task-name')"
               th:text="${task.title}">Task Title</span>
@@ -28,13 +31,10 @@
 
     <div class="task-actions">
         <!-- HTMX Status Update with th:attr -->
-        <form method="post"
-              style="display: inline;"
-              th:attr="hx-post=@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id} + '/toggle'},
+        <form th:attr="hx-put=@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id} + '/toggle'},
                        hx-target='#task-' + ${task.id},
                        hx-swap='outerHTML',
                        hx-trigger='change'">
-            <input type="hidden" name="_method" value="PUT" />
             <select name="status" required>
                 <option value="todo" th:selected="${task.status == 'todo'}">todo</option>
                 <option value="in_progress" th:selected="${task.status == 'in_progress'}">in_progress</option>
@@ -42,6 +42,32 @@
                 <option value="archived" th:selected="${task.status == 'archived'}">archived</option>
             </select>
         </form>
+
+<!--        <form method="post"-->
+<!--              style="display: inline;"-->
+<!--              th:attr="hx-post=@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id} + '/toggle'},-->
+<!--                       hx-target='#task-' + ${task.id},-->
+<!--                       hx-swap='outerHTML',-->
+<!--                       hx-trigger='change'">-->
+<!--            <input type="hidden" name="_method" value="PUT" />-->
+<!--            <select name="status" required>-->
+<!--                <option value="todo" th:selected="${task.status == 'todo'}">todo</option>-->
+<!--                <option value="in_progress" th:selected="${task.status == 'in_progress'}">in_progress</option>-->
+<!--                <option value="done" th:selected="${task.status == 'done'}">done</option>-->
+<!--                <option value="archived" th:selected="${task.status == 'archived'}">archived</option>-->
+<!--            </select>-->
+<!--        </form>-->
+
+
+
+
+
+
+
+
+
+
+
 
         <!-- Edit Task -->
         <a th:href="@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id} + '/edit'}">Edit</a>

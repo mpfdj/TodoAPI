@@ -7,6 +7,11 @@ a { text-decoration: none; color: #0066cc; }
 a:hover { text-decoration: underline; }
 hr { margin: 20px 0; }
 
+/* User specific styles (from users.html) */
+.user-info { display: inline-block; margin-right: 20px; }
+.user-name { font-weight: bold; }
+.user-email { color: #666; font-size: 0.9em; }
+
 /* Form elements */
 input, textarea, select {
     padding: 5px;
@@ -15,7 +20,7 @@ input, textarea, select {
     border-radius: 4px;
 }
 
-input[type="text"], input[type="date"], select {
+input[type="text"], input[type="date"], input[type="email"] {
     width: 200px;
 }
 
@@ -83,3 +88,13 @@ form { display: inline-block; margin-right: 10px; }
     cursor: pointer;
 }
 .checkbox-label input { margin-right: 5px; }
+
+/* Keep disabled checkbox active appearance */
+input[type="checkbox"]:disabled {
+    opacity: 1;
+    cursor: pointer;
+}
+
+/* htmx */
+.htmx-indicator { display: none; }
+.htmx-request .htmx-indicator { display: inline; }

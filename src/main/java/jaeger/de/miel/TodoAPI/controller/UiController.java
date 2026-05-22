@@ -7,7 +7,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -86,18 +85,6 @@ public class UiController {
         return "tasks";
     }
 
-
-
-
-
-
-
-
-
-
-
-// TODO: Create a new endpoint for this (and the rest)
-
     @GetMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
     public String task(@PathVariable Long userId,
                        @PathVariable Long listId,
@@ -164,32 +151,6 @@ public class UiController {
 //
 //    }
 
-
-//    // WORKING
-//    @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}/toggle")
-//    public String toggleTask(@PathVariable Long userId,
-//                             @PathVariable Long listId,
-//                             @PathVariable Long taskId,
-//                             @RequestParam String status,
-//                             @RequestParam(defaultValue = "off") String checkbox) {
-//
-//        System.out.println("---------- DEBUG ---------");
-//        System.out.println("status" + status);
-
-////        System.out.println("checkbox" + checkbox);
-//
-//        Map<String, String> body = new HashMap<>();
-//        body.put("status", status);
-//
-//        restTemplate.put(
-//                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId,
-//                body,
-//                Object.class
-//        );
-//
-//        return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
-//
-//    }
     @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}/toggle")
     public String toggleTask(@PathVariable Long userId,
                              @PathVariable Long listId,
@@ -197,14 +158,9 @@ public class UiController {
                              @RequestParam String status,
                              Model model) {
 
-
-        System.out.println("-------- DEBUG -----------");
-        System.out.println("status: " + status);
-
         // Update task status
         Map<String, Object> body = new HashMap<>();
         body.put("status", status);
-//        body.put("completed", "done".equals(status));
 
         restTemplate.put(
                 BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId,
@@ -215,76 +171,13 @@ public class UiController {
         String getUrl = BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
         Map<String, Object> updatedTask = restTemplate.getForObject(getUrl, Map.class);
 
-        System.out.println("========== UPDATED TASK ==========");
-        System.out.println("ID: " + updatedTask.get("id"));
-        System.out.println("Title: " + updatedTask.get("title"));
-        System.out.println("Status: " + updatedTask.get("status"));
-        System.out.println("Description: " + updatedTask.get("description"));
-        System.out.println("Priority: " + updatedTask.get("priority"));
-        System.out.println("Due Date: " + updatedTask.get("dueDate"));
-        System.out.println("Completed: " + updatedTask.get("completed"));
-        System.out.println("==================================");
-
-
-
         // Add to model
         model.addAttribute("task", updatedTask);
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
 
-        // Return ONLY the task fragment, not the whole page
-        return "fragments/task-item";
+        return "fragments/task-item";  // Return ONLY the task fragment, not the whole page
     }
-
-
-    // LISTS
-//    @GetMapping("/users/{userId}/lists")
-//    public String lists(@PathVariable Long userId, Model model) {
-//        List lists = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists", List.class);
-//        model.addAttribute("lists", lists);
-//        model.addAttribute("userId", userId);
-//        return "lists";
-//    }
-//
-//    @PostMapping("/users/{userId}/lists")
-//    public String createList(@PathVariable Long userId, @RequestParam String name) {
-//        Map<String, String> body = Map.of("name", name);
-//        restTemplate.postForObject(BASE_URL + "/users/" + userId + "/lists", body, Object.class);
-//        return "redirect:/ui/users/" + userId + "/lists";
-//    }
-//
-//    @PostMapping("/users/{userId}/lists/delete")
-//    public String deleteList(@PathVariable Long userId, @RequestParam Long listId) {
-//        restTemplate.delete(BASE_URL + "/users/" + userId + "/lists/" + listId);
-//        return "redirect:/ui/users/" + userId + "/lists";
-//    }
-//
-//    // TASKS
-//    @GetMapping("/users/{userId}/lists/{listId}/tasks")
-//    public String tasks(@PathVariable Long userId, @PathVariable Long listId, Model model) {
-//        List tasks = restTemplate.getForObject(
-//                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks", List.class);
-//
-//        model.addAttribute("tasks", tasks);
-//        model.addAttribute("userId", userId);
-//        model.addAttribute("listId", listId);
-//        return "tasks";
-//    }
-//
-//    @PostMapping("/users/{userId}/lists/{listId}/tasks")
-//    public String createTask(@PathVariable Long userId,
-//                             @PathVariable Long listId,
-//                             @RequestParam String name) {
-//
-//        Map<String, String> body = Map.of("name", name);
-//        restTemplate.postForObject(
-//                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks",
-//                body,
-//                Object.class
-//        );
-//
-//        return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
-//    }
 
     @PostMapping("/users/{userId}/lists/{listId}/tasks/delete")
     public String deleteTask(@PathVariable Long userId,

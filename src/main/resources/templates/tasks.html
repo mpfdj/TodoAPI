@@ -3,7 +3,8 @@
 <head>
     <title>Tasks</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}" />  <!-- In users.html, lists.html, tasks.html, etc. -->
+    <link rel="stylesheet" href="/css/style.css" />        <!-- or for static HTML -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 <body>

@@ -253,28 +253,25 @@ public class TaskController {
 
 
 
-
+// TODO: Add swagger annotations or use file openai.yaml
     @GetMapping(value = "/users/{userId}/lists/{listId}/tasks/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<TaskDTO> getTasks(
+    public ResponseEntity<?> getTasks(
             @PathVariable("userId") Long userId,
             @PathVariable("listId") Long listId,
             @PathVariable("taskId") Long taskId) {
 
-        TaskDTO dummy = new TaskDTO();
-        dummy.setId(1L);
-        dummy.setListId(1L);
-        dummy.setUserId(1L);
-        dummy.setTitle("Complete project documentation");
-        dummy.setDescription("Write technical documentation for the API");
-        dummy.setStatus("in_progress");
-        dummy.setDueDate(LocalDate.of(2024, 12, 31));
-        dummy.setPriority(3);
-        dummy.setCreatedAt(Instant.now());
-        dummy.setUpdatedAt(Instant.now());
-        dummy.setCompletedAt(null);
-
-        return ResponseEntity.ok(dummy);
+        try {
+            TaskDTO taskDTO = taskService.getTask(userId, listId, taskId);
+            URI location = URI.create("/users/" + taskDTO.getUserId() + "/lists/" + taskDTO.getListId() + "/tasks/" + taskDTO.getId());
+            return ResponseEntity.status(HttpStatus.OK).location(location).body(taskDTO);
+        } catch (TaskService.TaskNotFoundException ex) {
+            ErrorDTO error = new ErrorDTO(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
     }
+
+
+
     // ---------------------------------------
     // Exceptions
     // ---------------------------------------

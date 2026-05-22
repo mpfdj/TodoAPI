@@ -3,21 +3,8 @@
 <head>
     <title>Users</title>
     <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        ul { list-style-type: none; padding: 0; }
-        li { margin: 10px 0; padding: 10px; background-color: #f5f5f5; border-radius: 5px; }
-        button { margin-left: 10px; }
-        a { margin-left: 10px; text-decoration: none; color: #0066cc; }
-        a:hover { text-decoration: underline; }
-        .user-info { display: inline-block; margin-right: 20px; }
-        .user-name { font-weight: bold; }
-        .user-email { color: #666; font-size: 0.9em; }
-        hr { margin: 20px 0; }
-        input[type="text"], input[type="email"] { padding: 5px; margin-right: 10px; width: 200px; }
-        form { display: inline-block; margin-right: 10px; }
-        .delete-form { display: inline; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />  <!-- In users.html, lists.html, tasks.html, etc. -->
+    <link rel="stylesheet" href="/css/style.css" />        <!-- or for static HTML -->
 </head>
 <body>
 

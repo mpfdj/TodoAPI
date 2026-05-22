@@ -1,9 +1,10 @@
 package jaeger.de.miel.TodoAPI.service;
 
-import jaeger.de.miel.TodoAPI.dto.*;
+import jaeger.de.miel.TodoAPI.dto.CreateTaskRequestDTO;
+import jaeger.de.miel.TodoAPI.dto.TaskDTO;
+import jaeger.de.miel.TodoAPI.dto.UpdateTaskRequestDTO;
 import jaeger.de.miel.TodoAPI.entity.AppUser;
 import jaeger.de.miel.TodoAPI.entity.Task;
-import jaeger.de.miel.TodoAPI.mapper.ListMapper;
 import jaeger.de.miel.TodoAPI.mapper.TaskMapper;
 import jaeger.de.miel.TodoAPI.repository.ListRepository;
 import jaeger.de.miel.TodoAPI.repository.TaskRepository;
@@ -34,6 +35,12 @@ public class TaskService {
         return taskList;
     }
 
+    public TaskDTO getTask(Long userId, Long listId, Long taskId) {
+        Task task = taskRepository.findTaskByIdAndList_IdAndCreator_Id(taskId, listId, userId)
+                .orElseThrow(() -> new TaskNotFoundException("TaskId not found: " + taskId));
+        return TaskMapper.toDTO(task);
+
+    }
 
     public TaskDTO createTask(Long userId, Long listId, CreateTaskRequestDTO createTaskRequestDTO) {
 
