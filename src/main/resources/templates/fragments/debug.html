@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="debug" style="background: #e8f4f8; border: 1px solid #2196F3; padding: 10px; margin-bottom: 20px;">
+    <strong>📋 All Model Attributes:</strong>
+    <div th:each="variable : ${#ctx.getVariableNames()}">
+        <div th:if="${!variable.startsWith('org.springframework') and
+                      !variable.startsWith('spring') and
+                      !variable.startsWith('thymeleaf') and
+                      !variable.contains('FILTERED')
+                     }">
+            <span th:text="'• ' + ${variable} + ': ' + ${#ctx.getVariable(variable)}"></span>
+        </div>
+    </div>
+</div>
+</html>

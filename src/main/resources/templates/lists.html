@@ -8,11 +8,14 @@
 </head>
 <body>
 
+<!-- DEBUG -->
+<div th:replace="~{fragments/debug :: debug}"></div>
+
 <h1>Todo Lists for User: <span th:text="${userName}" th:if="${userName}">User Name</span></h1>
 
 <!-- Back to Users -->
 <p>
-    <a th:href="@{/ui/users}" class="back-link">← Back to Users</a>
+    <a th:href="@{/ui/users(userId=${userId})}">← Back to Users</a>
 </p>
 
 <hr/>
