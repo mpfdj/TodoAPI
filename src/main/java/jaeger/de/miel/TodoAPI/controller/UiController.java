@@ -2,6 +2,7 @@ package jaeger.de.miel.TodoAPI.controller;
 
 import jaeger.de.miel.TodoAPI.dto.TaskDTO;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +53,6 @@ public class UiController {
         List lists = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists", List.class);
         model.addAttribute("lists", lists);
         model.addAttribute("userId", userId);
-//        model.addAttribute("userName", "userName");
         return "lists";
     }
 
@@ -179,13 +179,20 @@ public class UiController {
         return "fragments/task-item";  // Return ONLY the task fragment, not the whole page
     }
 
-    @PostMapping("/users/{userId}/lists/{listId}/tasks/delete")
-    public String deleteTask(@PathVariable Long userId,
+    @DeleteMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
+    public ResponseEntity<?> deleteTask(@PathVariable Long userId,
                              @PathVariable Long listId,
-                             @RequestParam Long taskId) {
+                             @PathVariable Long taskId) {
+
+        System.out.println("========= DEBUG ==========");
+        System.out.println("userId: " + userId);
+        System.out.println("listId: " + listId);
+        System.out.println("taskId: " + taskId);
 
         restTemplate.delete(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId);
 
-        return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
+        return ResponseEntity.ok().build();
+
     }
+
 }

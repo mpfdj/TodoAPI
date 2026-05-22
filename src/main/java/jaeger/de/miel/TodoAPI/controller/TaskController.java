@@ -15,6 +15,7 @@ import jaeger.de.miel.TodoAPI.dto.ErrorDTO;
 import jaeger.de.miel.TodoAPI.dto.TaskDTO;
 import jaeger.de.miel.TodoAPI.dto.UpdateTaskRequestDTO;
 import jaeger.de.miel.TodoAPI.service.TaskService;
+import jaeger.de.miel.TodoAPI.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -269,6 +270,7 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
     }
+
 
 
 

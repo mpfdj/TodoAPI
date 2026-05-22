@@ -43,46 +43,19 @@
             </select>
         </form>
 
-<!--        <form method="post"-->
-<!--              style="display: inline;"-->
-<!--              th:attr="hx-post=@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id} + '/toggle'},-->
-<!--                       hx-target='#task-' + ${task.id},-->
-<!--                       hx-swap='outerHTML',-->
-<!--                       hx-trigger='change'">-->
-<!--            <input type="hidden" name="_method" value="PUT" />-->
-<!--            <select name="status" required>-->
-<!--                <option value="todo" th:selected="${task.status == 'todo'}">todo</option>-->
-<!--                <option value="in_progress" th:selected="${task.status == 'in_progress'}">in_progress</option>-->
-<!--                <option value="done" th:selected="${task.status == 'done'}">done</option>-->
-<!--                <option value="archived" th:selected="${task.status == 'archived'}">archived</option>-->
-<!--            </select>-->
-<!--        </form>-->
-
-
-
-
-
-
-
-
-
-
-
-
         <!-- Edit Task -->
         <a th:href="@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id} + '/edit'}">Edit</a>
 
         <!-- Delete Task with th:attr -->
         <form class="delete-form"
-              method="post"
-              style="display: inline;"
-              th:attr="hx-post=@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id}},
-                       hx-target='#task-' + ${task.id},
-                       hx-swap='outerHTML',
-                       hx-confirm='Delete this task?'">
-            <input type="hidden" name="_method" value="DELETE" />
+              th:hx-delete="@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id}}"
+              th:hx-target="'#task-' + ${task.id}"
+              th:hx-swap="outerHTML">
+<!--              th:hx-confirm="'Delete this task?'">-->
             <button type="submit">Delete</button>
         </form>
+
+
     </div>
 </div>
 </body>
