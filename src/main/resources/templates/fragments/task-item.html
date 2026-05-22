@@ -56,6 +56,14 @@
         </form>
 
 
+        <form class="delete-form"
+              th:hx-delete="@{'/ui/users/' + ${userId} + '/lists/' + ${listId} + '/tasks/' + ${task.id}}"
+              th:hx-target="'#tasks-container'"
+              th:hx-swap="outerHTML">
+            <button type="submit">Delete</button>
+        </form>
+
+
     </div>
 </div>
 </body>

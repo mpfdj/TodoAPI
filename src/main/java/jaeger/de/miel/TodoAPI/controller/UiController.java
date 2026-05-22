@@ -1,6 +1,7 @@
 package jaeger.de.miel.TodoAPI.controller;
 
 import jaeger.de.miel.TodoAPI.dto.TaskDTO;
+import jaeger.de.miel.TodoAPI.entity.Task;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -180,9 +182,10 @@ public class UiController {
     }
 
     @DeleteMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
-    public ResponseEntity<?> deleteTask(@PathVariable Long userId,
+    public String deleteTask(@PathVariable Long userId,
                              @PathVariable Long listId,
-                             @PathVariable Long taskId) {
+                             @PathVariable Long taskId,
+                             Model model) {
 
         System.out.println("========= DEBUG ==========");
         System.out.println("userId: " + userId);
@@ -190,8 +193,20 @@ public class UiController {
         System.out.println("taskId: " + taskId);
 
         restTemplate.delete(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId);
+//
+//        return ResponseEntity.ok().build();
 
-        return ResponseEntity.ok().build();
+
+
+        // Fetch updated tasks
+        Task[] tasks = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks", Task[].class);
+
+        model.addAttribute("tasks", Arrays.asList(tasks));
+        model.addAttribute("userId", userId);
+        model.addAttribute("listId", listId);
+
+        return "fragments/tasks-container :: tasks-container";
+
 
     }
 
