@@ -23,9 +23,13 @@ public class UiController {
 
     // USERS
     @GetMapping("/users")
-    public String users(Model model) {
+    public String users(@RequestParam(required = false) Long userId,
+                        Model model) {
+        if (userId != null) model.addAttribute("userId", userId);
+
         List users = restTemplate.getForObject(BASE_URL + "/users", List.class);
         model.addAttribute("users", users);
+
         return "users";
     }
 
