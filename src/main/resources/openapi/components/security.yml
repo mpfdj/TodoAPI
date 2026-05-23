@@ -1,5 +1,0 @@
-bearerAuth:
-  type: http
-  scheme: bearer
-  bearerFormat: JWT
-  description: JWT token authentication (uncomment security in operations when enabled)

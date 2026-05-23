@@ -43,3 +43,8 @@ https://docs.spring.io/spring-boot/reference/using/devtools.html#using.devtools.
 # Swagger / OpenAPI
 Main OpenAPI spec: http://localhost:8080/v3/api-docs
 Swagger UI: http://localhost:8080/swagger-ui.html
+
+
+# Generate openapi.yaml
+.\mvnw.cmd verify -DskipTests
+
