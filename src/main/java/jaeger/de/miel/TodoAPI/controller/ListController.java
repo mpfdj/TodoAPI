@@ -10,11 +10,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jaeger.de.miel.TodoAPI.dto.CreateListRequestDTO;
-import jaeger.de.miel.TodoAPI.dto.ErrorDTO;
-import jaeger.de.miel.TodoAPI.dto.ListDTO;
-import jaeger.de.miel.TodoAPI.dto.UpdateListRequestDTO;
+import jaeger.de.miel.TodoAPI.dto.*;
 import jaeger.de.miel.TodoAPI.service.ListService;
+import jaeger.de.miel.TodoAPI.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -242,6 +240,20 @@ public class ListController {
             ListDTO updated = listService.updateList(userId, listId, request);
             URI location = URI.create("/users/" + updated.getUserId() + "/lists/" + updated.getId());
             return ResponseEntity.status(HttpStatus.OK).location(location).body(updated);
+        } catch (ListService.ListNotFoundException ex) {
+            ErrorDTO error = new ErrorDTO(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+    }
+
+
+    @GetMapping(value = "/users/{userId}/lists/{listId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getList(@PathVariable("userId") Long userId,
+                                     @PathVariable("listId") Long listId) {
+        try {
+            ListDTO listDTO = listService.getList(userId, listId);
+            URI location = URI.create("/users/" + userId + "/lists/" + listId);
+            return ResponseEntity.status(HttpStatus.OK).location(location).body(listDTO);
         } catch (ListService.ListNotFoundException ex) {
             ErrorDTO error = new ErrorDTO(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);

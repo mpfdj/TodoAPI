@@ -12,7 +12,7 @@
 <!-- DEBUG -->
 <div th:replace="~{fragments/debug :: debug}"></div>
 
-<h1>Tasks for List: <span th:text="${listName}">List Name</span></h1>
+<h1>Tasks for List: <span th:text="${listName}" /></h1>
 
 <p>
     <a th:href="@{/ui/users/{userId}/lists(userId=${userId})}" class="back-link">← Back to Lists</a>

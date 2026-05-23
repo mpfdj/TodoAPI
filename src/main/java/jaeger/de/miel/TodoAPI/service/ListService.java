@@ -34,6 +34,11 @@ public class ListService {
         return listList;
     }
 
+    public ListDTO getList(Long userId, Long listId) {
+        jaeger.de.miel.TodoAPI.entity.List list = listRepository.findListByIdAndOwner_Id(listId, userId)
+                .orElseThrow(() -> new ListService.ListNotFoundException("List not found with id: " + listId));
+        return ListMapper.toDTO(list);
+    }
 
     public ListDTO createList(Long userId, CreateListRequestDTO request) {
         String name = request.getName();

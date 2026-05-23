@@ -1,5 +1,6 @@
 package jaeger.de.miel.TodoAPI.controller;
 
+import jaeger.de.miel.TodoAPI.dto.ListDTO;
 import jaeger.de.miel.TodoAPI.dto.TaskDTO;
 import jaeger.de.miel.TodoAPI.dto.UserDTO;
 import jaeger.de.miel.TodoAPI.entity.Task;
@@ -56,7 +57,6 @@ public class UiController {
     // LISTS
     @GetMapping("/users/{userId}/lists")
     public String lists(@PathVariable Long userId, Model model) {
-
         model.addAttribute("userId", userId);
 
         UserDTO userDTO = restTemplate.getForObject(BASE_URL + "/users/" + userId, UserDTO.class);
@@ -89,12 +89,14 @@ public class UiController {
     // TASKS
     @GetMapping("/users/{userId}/lists/{listId}/tasks")
     public String tasks(@PathVariable Long userId, @PathVariable Long listId, Model model) {
-        List tasks = restTemplate.getForObject(
-                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks", List.class);
+        ListDTO listDTO = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists/" + listId, ListDTO.class);
+        model.addAttribute("listName", listDTO.getName());
 
+        List tasks = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks", List.class);
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
         model.addAttribute("tasks", tasks);
+
         return "tasks";
     }
 
@@ -103,9 +105,7 @@ public class UiController {
                        @PathVariable Long listId,
                        @PathVariable Long taskId,
                        Model model) {
-        TaskDTO task = restTemplate.getForObject(
-                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId, TaskDTO.class);
-
+        TaskDTO task = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId, TaskDTO.class);
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
         model.addAttribute("task", task);
@@ -126,11 +126,7 @@ public class UiController {
         body.put("dueDate", dueDate.toString());
         body.put("priority", String.valueOf(priority));
 
-        restTemplate.postForObject(
-                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks",
-                body,
-                Object.class
-        );
+        restTemplate.postForObject(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks", body, Object.class);
 
         return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
     }
@@ -156,11 +152,7 @@ public class UiController {
         if (dueDate != null) body.put("dueDate", dueDate.toString());
         if (priority != null) body.put("priority", String.valueOf(priority));
 
-        restTemplate.put(
-                BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId,
-                body,
-                Object.class
-        );
+        restTemplate.put(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId, body, Object.class);
 
         // Get updated task
         String getUrl = BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
