@@ -1,0 +1,421 @@
+paths:
+  /users/{userId}/lists/{listId}/tasks:
+    get:
+      tags:
+        - Tasks
+      summary: List all tasks for a user's list
+      description: Returns all tasks belonging to the specified list of the specified user. Responds with **404** if no tasks are present.
+      operationId: getTasks
+      parameters:
+        - name: userId
+          in: path
+          description: Owner user id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 42
+        - name: listId
+          in: path
+          description: List id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1001
+      responses:
+        '200':
+          description: Tasks found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: './components/schemas.yml#/TaskDTO'
+              examples:
+                MultipleTasks:
+                  summary: Multiple tasks returned
+                  value:
+                    - id: 555
+                      title: "Complete project documentation"
+                      description: "Write API documentation for all endpoints"
+                      status: "in_progress"
+                      dueDate: "2024-12-31"
+                      priority: 5
+                      listId: 1001
+                      userId: 42
+                      createdAt: "2024-01-15T10:00:00Z"
+                      updatedAt: "2024-01-15T10:00:00Z"
+                    - id: 556
+                      title: "Review pull requests"
+                      description: "Review and merge pending PRs"
+                      status: "todo"
+                      dueDate: "2024-12-30"
+                      priority: 3
+                      listId: 1001
+                      userId: 42
+                      createdAt: "2024-01-15T10:00:00Z"
+                      updatedAt: "2024-01-15T10:00:00Z"
+        '404':
+          description: No tasks found
+          content: {}
+
+    post:
+      tags:
+        - Tasks
+      summary: Create a task in a list
+      description: Creates a new task in the specified list for the specified user and returns it. Responds with **404** if the creator or list does not exist.
+      operationId: createTask
+      parameters:
+        - name: userId
+          in: path
+          description: Owner user id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 42
+        - name: listId
+          in: path
+          description: List id where the task will be created
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1001
+      requestBody:
+        required: true
+        description: Task details
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas.yml#/CreateTaskRequestDTO'
+            examples:
+              HighPriorityTask:
+                summary: Create a high priority task
+                value:
+                  title: "Complete project documentation"
+                  description: "Write API documentation for all endpoints"
+                  dueDate: "2024-12-31"
+                  priority: 5
+              MediumPriorityTask:
+                summary: Create a medium priority task
+                value:
+                  title: "Review pull requests"
+                  description: "Review and merge pending PRs"
+                  dueDate: "2024-12-30"
+                  priority: 3
+      responses:
+        '201':
+          description: Task created
+          headers:
+            Location:
+              description: URI of the created task resource
+              schema:
+                type: string
+                format: uri
+                example: /users/42/lists/1001/tasks/555
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas.yml#/TaskDTO'
+              examples:
+                CreatedTask:
+                  summary: Successfully created task
+                  value:
+                    id: 555
+                    title: "Complete project documentation"
+                    description: "Write API documentation for all endpoints"
+                    status: "todo"
+                    dueDate: "2024-12-31"
+                    priority: 5
+                    listId: 1001
+                    userId: 42
+                    createdAt: "2024-01-15T10:30:00Z"
+                    updatedAt: "2024-01-15T10:30:00Z"
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas.yml#/ErrorDTO'
+              examples:
+                ValidationError:
+                  summary: Invalid input
+                  value:
+                    message: "Validation failed: title must not be blank"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    status: 400
+                InvalidDate:
+                  summary: Invalid due date
+                  value:
+                    message: "dueDate must be a valid date in the format yyyy-MM-dd"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    status: 400
+                InvalidPriority:
+                  summary: Invalid priority
+                  value:
+                    message: "priority must be between 1 and 5"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    status: 400
+        '404':
+          description: Creator or list not found
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas.yml#/ErrorDTO'
+              examples:
+                UserNotFound:
+                  summary: User does not exist
+                  value:
+                    message: "User with id 42 not found"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    status: 404
+                ListNotFound:
+                  summary: List does not exist
+                  value:
+                    message: "List with id 1001 not found for user 42"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    status: 404
+
+  /users/{userId}/lists/{listId}/tasks/{taskId}:
+    get:
+      tags:
+        - Tasks
+      summary: Get a task by id
+      description: Returns a specific task by its ID within the specified list for the specified user.
+      operationId: getTask
+      parameters:
+        - name: userId
+          in: path
+          description: Owner user id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 42
+        - name: listId
+          in: path
+          description: List id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1001
+        - name: taskId
+          in: path
+          description: Task id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 555
+      responses:
+        '200':
+          description: Task found
+          headers:
+            Location:
+              description: URI of the task resource
+              schema:
+                type: string
+                format: uri
+                example: /users/42/lists/1001/tasks/555
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas.yml#/TaskDTO'
+              examples:
+                FoundTask:
+                  summary: Task details
+                  value:
+                    id: 555
+                    title: "Complete project documentation"
+                    description: "Write API documentation for all endpoints"
+                    status: "in_progress"
+                    dueDate: "2024-12-31"
+                    priority: 5
+                    listId: 1001
+                    userId: 42
+                    createdAt: "2024-01-15T10:00:00Z"
+                    updatedAt: "2024-01-15T10:00:00Z"
+        '404':
+          description: Task not found for the given user and list
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas.yml#/ErrorDTO'
+              examples:
+                TaskNotFound:
+                  summary: Task does not exist
+                  value:
+                    message: "Task with id 555 not found for list 1001 and user 42"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    status: 404
+
+    put:
+      tags:
+        - Tasks
+      summary: Update a task
+      description: Updates an existing task and returns the updated representation.
+      operationId: updateTask
+      parameters:
+        - name: userId
+          in: path
+          description: Owner user id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 42
+        - name: listId
+          in: path
+          description: List id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1001
+        - name: taskId
+          in: path
+          description: Task id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 555
+      requestBody:
+        required: true
+        description: Updated task values
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas.yml#/UpdateTaskRequestDTO'
+            examples:
+              UpdateTitle:
+                summary: Update task title
+                value:
+                  title: "Complete project documentation and tests"
+              UpdateStatus:
+                summary: Update task status
+                value:
+                  status: "done"
+              UpdatePriority:
+                summary: Update priority
+                value:
+                  priority: 4
+              FullUpdate:
+                summary: Update all fields
+                value:
+                  title: "Complete project documentation"
+                  description: "Write API documentation and examples"
+                  status: "in_progress"
+                  dueDate: "2024-12-25"
+                  priority: 5
+      responses:
+        '200':
+          description: Task updated
+          headers:
+            Location:
+              description: URI of the updated task resource
+              schema:
+                type: string
+                format: uri
+                example: /users/42/lists/1001/tasks/555
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas.yml#/TaskDTO'
+              examples:
+                UpdatedTask:
+                  summary: Successfully updated task
+                  value:
+                    id: 555
+                    title: "Complete project documentation and tests"
+                    description: "Write API documentation for all endpoints"
+                    status: "in_progress"
+                    dueDate: "2024-12-31"
+                    priority: 5
+                    listId: 1001
+                    userId: 42
+                    createdAt: "2024-01-15T10:00:00Z"
+                    updatedAt: "2024-01-15T10:35:00Z"
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas.yml#/ErrorDTO'
+              examples:
+                ValidationError:
+                  summary: Invalid input
+                  value:
+                    message: "Validation failed: priority must be between 1 and 5"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    status: 400
+                InvalidStatus:
+                  summary: Invalid status value
+                  value:
+                    message: "Status must be one of: todo, in_progress, done, archived"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    status: 400
+        '404':
+          description: Task not found for the given user and list
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas.yml#/ErrorDTO'
+              examples:
+                TaskNotFound:
+                  summary: Task does not exist
+                  value:
+                    message: "Task with id 555 not found for list 1001 and user 42"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    status: 404
+
+    delete:
+      tags:
+        - Tasks
+      summary: Delete a task
+      description: Deletes a task by id within the specified list for the specified user.
+      operationId: deleteTask
+      parameters:
+        - name: userId
+          in: path
+          description: Owner user id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 42
+        - name: listId
+          in: path
+          description: List id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1001
+        - name: taskId
+          in: path
+          description: Task id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 555
+      responses:
+        '204':
+          description: Deleted successfully
+        '404':
+          description: Task not found for the given user and list
+          content:
+            application/json:
+              schema:
+                $ref: './components/schemas.yml#/ErrorDTO'
+              examples:
+                TaskNotFound:
+                  summary: Task does not exist
+                  value:
+                    message: "Task with id 555 not found for list 1001 and user 42"
+                    timestamp: "2024-01-15T10:30:00Z"
+                    status: 404

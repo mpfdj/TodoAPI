@@ -26,38 +26,11 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@Tag(name = "Lists", description = "Operations for managing todo lists for a specific user")
 public class ListController {
 
     private final ListService listService;
 
-    @Operation(
-            summary = "List all lists for a user",
-            description = "Returns all lists that belong to the given user. Responds with **404** if the user has no lists.",
-            parameters = {
-                    @Parameter(
-                            name = "userId",
-                            description = "Owner user id",
-                            required = true,
-                            example = "42"
-                    )
-            },
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Lists found",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    array = @ArraySchema(schema = @Schema(implementation = ListDTO.class))
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "No lists found for the user",
-                            content = @Content // empty body
-                    )
-            }
-    )
+
     @GetMapping(value = "/users/{userId}/lists", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ListDTO>> getLists(@PathVariable("userId") Long userId) {
         List<ListDTO> lists = listService.getLists(userId);
@@ -69,67 +42,7 @@ public class ListController {
         return ResponseEntity.ok(lists);
     }
 
-    @Operation(
-            summary = "Create a list for a user",
-            description = "Creates a new list for the specified user and returns it. Responds with **404** if the owner user does not exist; **409** if a list with the same name already exists for the user.",
-            parameters = {
-                    @Parameter(
-                            name = "userId",
-                            description = "Owner user id",
-                            required = true,
-                            example = "42"
-                    )
-            },
-            requestBody = @RequestBody(
-                    required = true,
-                    description = "List details",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = CreateListRequestDTO.class)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "201",
-                            description = "List created",
-                            headers = {
-                                    @Header(
-                                            name = "Location",
-                                            description = "URI of the created list resource",
-                                            schema = @Schema(type = "string", example = "/users/42/lists/1001")
-                                    )
-                            },
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ListDTO.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Owner user not found",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ErrorDTO.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "409",
-                            description = "Duplicate list name for this user",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ErrorDTO.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Validation error",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ErrorDTO.class)
-                            )
-                    )
-            }
-    )
+
     @PostMapping(value = "/users/{userId}/lists", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createList(
             @PathVariable("userId") Long userId,
@@ -149,25 +62,7 @@ public class ListController {
         }
     }
 
-    @Operation(
-            summary = "Delete a list",
-            description = "Deletes a list by id for the given user.",
-            parameters = {
-                    @Parameter(name = "userId", description = "Owner user id", required = true, example = "42"),
-                    @Parameter(name = "listId", description = "List id", required = true, example = "1001")
-            },
-            responses = {
-                    @ApiResponse(responseCode = "204", description = "Deleted"),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "List not found for the given user",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ErrorDTO.class)
-                            )
-                    )
-            }
-    )
+
     @DeleteMapping(value = "/users/{userId}/lists/{listId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteList(
             @PathVariable("userId") Long userId,
@@ -182,55 +77,7 @@ public class ListController {
         }
     }
 
-    @Operation(
-            summary = "Update a list",
-            description = "Updates an existing list for the given user and returns it.",
-            parameters = {
-                    @Parameter(name = "userId", description = "Owner user id", required = true, example = "42"),
-                    @Parameter(name = "listId", description = "List id", required = true, example = "1001")
-            },
-            requestBody = @RequestBody(
-                    required = true,
-                    description = "Updated list values",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = UpdateListRequestDTO.class)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "List updated",
-                            headers = {
-                                    @Header(
-                                            name = "Location",
-                                            description = "URI of the updated list resource",
-                                            schema = @Schema(type = "string", example = "/users/42/lists/1001")
-                                    )
-                            },
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ListDTO.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "List not found for the given user",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ErrorDTO.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Validation error",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ErrorDTO.class)
-                            )
-                    )
-            }
-    )
+
     @PutMapping(value = "/users/{userId}/lists/{listId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateList(
             @PathVariable("userId") Long userId,

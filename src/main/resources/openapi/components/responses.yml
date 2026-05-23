@@ -1,0 +1,381 @@
+# Common HTTP Responses for TodoAPI
+
+# Success Responses
+200Success:
+  description: Request successful
+  content:
+    application/json:
+      schema:
+        type: object
+        additionalProperties: true
+
+200SuccessArray:
+  description: Request successful - returns array
+  content:
+    application/json:
+      schema:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+
+201Created:
+  description: Resource created successfully
+  headers:
+    Location:
+      description: URI of the created resource
+      schema:
+        type: string
+        format: uri
+        example: /users/123
+
+204NoContent:
+  description: Resource deleted successfully - no content returned
+
+# Error Responses
+400BadRequest:
+  description: Bad request - validation error or invalid input
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yml#/ErrorDTO'
+      examples:
+        ValidationError:
+          summary: Validation failed
+          value:
+            message: "Validation failed: name must not be blank"
+            timestamp: "2024-01-15T10:30:00Z"
+            status: 400
+        InvalidFormat:
+          summary: Invalid data format
+          value:
+            message: "Invalid email format"
+            timestamp: "2024-01-15T10:30:00Z"
+            status: 400
+
+401Unauthorized:
+  description: Authentication required
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yml#/ErrorDTO'
+      examples:
+        NoToken:
+          summary: No authentication token provided
+          value:
+            message: "Authentication token is missing"
+            timestamp: "2024-01-15T10:30:00Z"
+            status: 401
+        InvalidToken:
+          summary: Invalid or expired token
+          value:
+            message: "Invalid or expired authentication token"
+            timestamp: "2024-01-15T10:30:00Z"
+            status: 401
+
+403Forbidden:
+  description: Access denied - insufficient permissions
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yml#/ErrorDTO'
+      examples:
+        WrongUser:
+          summary: Cannot access another user's resources
+          value:
+            message: "Access denied: Cannot access resources of another user"
+            timestamp: "2024-01-15T10:30:00Z"
+            status: 403
+
+404NotFound:
+  description: Resource not found
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yml#/ErrorDTO'
+      examples:
+        UserNotFound:
+          summary: User not found
+          value:
+            message: "User with id 123 not found"
+            timestamp: "2024-01-15T10:30:00Z"
+            status: 404
+        ListNotFound:
+          summary: List not found
+          value:
+            message: "List with id 456 not found"
+            timestamp: "2024-01-15T10:30:00Z"
+            status: 404
+        TaskNotFound:
+          summary: Task not found
+          value:
+            message: "Task with id 789 not found"
+            timestamp: "2024-01-15T10:30:00Z"
+            status: 404
+
+409Conflict:
+  description: Conflict - resource already exists or state conflict
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yml#/ErrorDTO'
+      examples:
+        DuplicateEmail:
+          summary: Email already exists
+          value:
+            message: "User with email john@example.com already exists"
+            timestamp: "2024-01-15T10:30:00Z"
+            status: 409
+        DuplicateListName:
+          summary: List name already exists for this user
+          value:
+            message: "List with name 'Work' already exists for this user"
+            timestamp: "2024-01-15T10:30:00Z"
+            status: 409
+
+500InternalServerError:
+  description: Internal server error
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yml#/ErrorDTO'
+      examples:
+        DatabaseError:
+          summary: Database connection error
+          value:
+            message: "Database connection failed"
+            timestamp: "2024-01-15T10:30:00Z"
+            status: 500
+
+# Specific Response for Users
+200UsersFound:
+  description: Users found successfully
+  content:
+    application/json:
+      schema:
+        type: array
+        items:
+          $ref: './schemas.yml#/UserDTO'
+      examples:
+        MultipleUsers:
+          summary: Multiple users returned
+          value:
+            - id: 1
+              name: "John Doe"
+              email: "john@example.com"
+              createdAt: "2024-01-15T10:00:00Z"
+              updatedAt: "2024-01-15T10:00:00Z"
+            - id: 2
+              name: "Jane Smith"
+              email: "jane@example.com"
+              createdAt: "2024-01-15T10:00:00Z"
+              updatedAt: "2024-01-15T10:00:00Z"
+        SingleUser:
+          summary: Single user returned
+          value:
+            - id: 1
+              name: "John Doe"
+              email: "john@example.com"
+              createdAt: "2024-01-15T10:00:00Z"
+              updatedAt: "2024-01-15T10:00:00Z"
+
+201UserCreated:
+  description: User created successfully
+  headers:
+    Location:
+      description: URI of the created user
+      schema:
+        type: string
+        format: uri
+        example: /users/123
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yml#/UserDTO'
+      examples:
+        NewUser:
+          summary: Newly created user
+          value:
+            id: 123
+            name: "John Doe"
+            email: "john@example.com"
+            createdAt: "2024-01-15T10:30:00Z"
+            updatedAt: "2024-01-15T10:30:00Z"
+
+200UserUpdated:
+  description: User updated successfully
+  headers:
+    Location:
+      description: URI of the updated user
+      schema:
+        type: string
+        format: uri
+        example: /users/123
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yml#/UserDTO'
+      examples:
+        UpdatedUser:
+          summary: Updated user information
+          value:
+            id: 123
+            name: "Johnathan Doe"
+            email: "johnathan@example.com"
+            createdAt: "2024-01-15T10:00:00Z"
+            updatedAt: "2024-01-15T10:30:00Z"
+
+# Specific Responses for Lists
+200ListsFound:
+  description: Lists found successfully
+  content:
+    application/json:
+      schema:
+        type: array
+        items:
+          $ref: './schemas.yml#/ListDTO'
+      examples:
+        MultipleLists:
+          summary: Multiple lists returned
+          value:
+            - id: 1
+              name: "Work"
+              description: "Work-related tasks"
+              userId: 123
+              createdAt: "2024-01-15T10:00:00Z"
+              updatedAt: "2024-01-15T10:00:00Z"
+            - id: 2
+              name: "Personal"
+              description: "Personal tasks"
+              userId: 123
+              createdAt: "2024-01-15T10:00:00Z"
+              updatedAt: "2024-01-15T10:00:00Z"
+
+201ListCreated:
+  description: List created successfully
+  headers:
+    Location:
+      description: URI of the created list
+      schema:
+        type: string
+        format: uri
+        example: /users/123/lists/456
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yml#/ListDTO'
+      examples:
+        NewList:
+          summary: Newly created list
+          value:
+            id: 456
+            name: "Shopping"
+            description: "Grocery items to buy"
+            userId: 123
+            createdAt: "2024-01-15T10:30:00Z"
+            updatedAt: "2024-01-15T10:30:00Z"
+
+200ListUpdated:
+  description: List updated successfully
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yml#/ListDTO'
+      examples:
+        UpdatedList:
+          summary: Updated list information
+          value:
+            id: 456
+            name: "Weekend Shopping"
+            description: "Items to buy this weekend"
+            userId: 123
+            createdAt: "2024-01-15T10:00:00Z"
+            updatedAt: "2024-01-15T10:30:00Z"
+
+# Specific Responses for Tasks
+200TasksFound:
+  description: Tasks found successfully
+  content:
+    application/json:
+      schema:
+        type: array
+        items:
+          $ref: './schemas.yml#/TaskDTO'
+      examples:
+        MultipleTasks:
+          summary: Multiple tasks returned
+          value:
+            - id: 1
+              title: "Complete API documentation"
+              description: "Write OpenAPI spec"
+              status: "in_progress"
+              dueDate: "2024-12-31"
+              priority: 5
+              listId: 456
+              createdAt: "2024-01-15T10:00:00Z"
+              updatedAt: "2024-01-15T10:00:00Z"
+            - id: 2
+              title: "Review pull requests"
+              description: "Review and merge PRs"
+              status: "todo"
+              dueDate: "2024-12-30"
+              priority: 3
+              listId: 456
+              createdAt: "2024-01-15T10:00:00Z"
+              updatedAt: "2024-01-15T10:00:00Z"
+
+201TaskCreated:
+  description: Task created successfully
+  headers:
+    Location:
+      description: URI of the created task
+      schema:
+        type: string
+        format: uri
+        example: /users/123/lists/456/tasks/789
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yml#/TaskDTO'
+      examples:
+        NewTask:
+          summary: Newly created task
+          value:
+            id: 789
+            title: "Implement authentication"
+            description: "Add JWT authentication"
+            status: "todo"
+            dueDate: "2024-12-25"
+            priority: 5
+            listId: 456
+            createdAt: "2024-01-15T10:30:00Z"
+            updatedAt: "2024-01-15T10:30:00Z"
+
+200TaskUpdated:
+  description: Task updated successfully
+  content:
+    application/json:
+      schema:
+        $ref: './schemas.yml#/TaskDTO'
+      examples:
+        UpdatedTask:
+          summary: Updated task information
+          value:
+            id: 789
+            title: "Implement JWT authentication"
+            description: "Add JWT authentication with refresh tokens"
+            status: "in_progress"
+            dueDate: "2024-12-20"
+            priority: 5
+            listId: 456
+            createdAt: "2024-01-15T10:00:00Z"
+            updatedAt: "2024-01-15T10:30:00Z"
+
+# Empty Responses
+200Empty:
+  description: Request successful - no content to return
+  content: {}
+
+404Empty:
+  description: Resource not found - no content returned
+  content: {}

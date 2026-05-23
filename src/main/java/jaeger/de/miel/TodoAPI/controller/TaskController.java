@@ -31,34 +31,11 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@Tag(name = "Tasks", description = "Operations for managing tasks within a user's list")
 public class TaskController {
 
     private final TaskService taskService;
 
-    @Operation(
-            summary = "List all tasks for a user's list",
-            description = "Returns all tasks belonging to the specified list of the specified user. Responds with **404** if no tasks are present.",
-            parameters = {
-                    @Parameter(name = "userId", description = "Owner user id", required = true, example = "42"),
-                    @Parameter(name = "listId", description = "List id", required = true, example = "1001")
-            },
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Tasks found",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    array = @ArraySchema(schema = @Schema(implementation = TaskDTO.class))
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "No tasks found",
-                            content = @Content // empty body
-                    )
-            }
-    )
+
     @GetMapping(value = "/users/{userId}/lists/{listId}/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TaskDTO>> getTasks(
             @PathVariable("userId") Long userId,
@@ -71,55 +48,7 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
-    @Operation(
-            summary = "Create a task in a list",
-            description = "Creates a new task in the specified list for the specified user and returns it. Responds with **404** if the creator or list does not exist.",
-            parameters = {
-                    @Parameter(name = "userId", description = "Owner user id", required = true, example = "42"),
-                    @Parameter(name = "listId", description = "List id where the task will be created", required = true, example = "1001")
-            },
-            requestBody = @RequestBody(
-                    required = true,
-                    description = "Task details",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = CreateTaskRequestDTO.class)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "201",
-                            description = "Task created",
-                            headers = {
-                                    @Header(
-                                            name = "Location",
-                                            description = "URI of the created task resource",
-                                            schema = @Schema(type = "string", example = "/users/42/lists/1001/tasks/555")
-                                    )
-                            },
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = TaskDTO.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Creator or list not found",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ErrorDTO.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Validation error",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ErrorDTO.class)
-                            )
-                    )
-            }
-    )
+
     @PostMapping(value = "/users/{userId}/lists/{listId}/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createTask(
             @PathVariable("userId") Long userId,
@@ -137,26 +66,7 @@ public class TaskController {
         }
     }
 
-    @Operation(
-            summary = "Delete a task",
-            description = "Deletes a task by id within the specified list for the specified user.",
-            parameters = {
-                    @Parameter(name = "userId", description = "Owner user id", required = true, example = "42"),
-                    @Parameter(name = "listId", description = "List id", required = true, example = "1001"),
-                    @Parameter(name = "taskId", description = "Task id", required = true, example = "555")
-            },
-            responses = {
-                    @ApiResponse(responseCode = "204", description = "Deleted"),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Task not found for the given user and list",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ErrorDTO.class)
-                            )
-                    )
-            }
-    )
+
     @DeleteMapping(value = "/users/{userId}/lists/{listId}/tasks/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteTask(
             @PathVariable("userId") Long userId,
@@ -172,54 +82,7 @@ public class TaskController {
         }
     }
 
-    @Operation(
-            summary = "Update a task",
-            description = "Updates an existing task and returns the updated representation.",
-            parameters = {
-                    @Parameter(name = "userId", description = "Owner user id", required = true, example = "42"),
-                    @Parameter(name = "listId", description = "List id", required = true, example = "1001"),
-                    @Parameter(name = "taskId", description = "Task id", required = true, example = "555")
-            },
-            requestBody = @RequestBody(
-                    required = true,
-                    description = "Updated task values",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = UpdateTaskRequestDTO.class)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Task updated",
-                            headers = @Header(
-                                    name = "Location",
-                                    description = "URI of the updated task resource",
-                                    schema = @Schema(type = "string", example = "/users/42/lists/1001/tasks/555")
-                            ),
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = TaskDTO.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Task not found for the given user and list",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ErrorDTO.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Validation error",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ErrorDTO.class)
-                            )
-                    )
-            }
-    )
+
     @PutMapping(value = "/users/{userId}/lists/{listId}/tasks/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateTask(
             @PathVariable("userId") Long userId,
@@ -237,24 +100,6 @@ public class TaskController {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// TODO: Add swagger annotations or use file openai.yaml
     @GetMapping(value = "/users/{userId}/lists/{listId}/tasks/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getTasks(
             @PathVariable("userId") Long userId,
@@ -270,8 +115,6 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
     }
-
-
 
 
     // ---------------------------------------

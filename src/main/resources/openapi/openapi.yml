@@ -1,0 +1,70 @@
+openapi: 3.0.1
+info:
+  title: TodoAPI - Task Management API
+  description: API for managing users, lists, and tasks in the Todo application
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+
+tags:
+  - name: Users
+    description: Operations for managing users
+  - name: Lists
+    description: Operations for managing todo lists
+  - name: Tasks
+    description: Operations for managing tasks within lists
+
+paths:
+  # Users endpoints
+  /users:
+    $ref: './users.yml#/paths/~1users'
+  /users/{userId}:
+    $ref: './users.yml#/paths/~1users~1{userId}'
+
+  # Lists endpoints
+  /users/{userId}/lists:
+    $ref: './lists.yml#/paths/~1users~1{userId}~1lists'
+  /users/{userId}/lists/{listId}:
+    $ref: './lists.yml#/paths/~1users~1{userId}~1lists~1{listId}'
+
+  # Tasks endpoints
+  /users/{userId}/lists/{listId}/tasks:
+    $ref: './tasks.yml#/paths/~1users~1{userId}~1lists~1{listId}~1tasks'
+  /users/{userId}/lists/{listId}/tasks/{taskId}:
+    $ref: './tasks.yml#/paths/~1users~1{userId}~1lists~1{listId}~1tasks~1{taskId}'
+
+components:
+  schemas:
+    # User schemas
+    UserDTO:
+      $ref: './components/schemas.yml#/UserDTO'
+    CreateUserRequestDTO:
+      $ref: './components/schemas.yml#/CreateUserRequestDTO'
+    UpdateUserRequestDTO:
+      $ref: './components/schemas.yml#/UpdateUserRequestDTO'
+
+    # List schemas
+    ListDTO:
+      $ref: './components/schemas.yml#/ListDTO'
+    CreateListRequestDTO:
+      $ref: './components/schemas.yml#/CreateListRequestDTO'
+    UpdateListRequestDTO:
+      $ref: './components/schemas.yml#/UpdateListRequestDTO'
+
+    # Task schemas
+    TaskDTO:
+      $ref: './components/schemas.yml#/TaskDTO'
+    CreateTaskRequestDTO:
+      $ref: './components/schemas.yml#/CreateTaskRequestDTO'
+    UpdateTaskRequestDTO:
+      $ref: './components/schemas.yml#/UpdateTaskRequestDTO'
+
+    # Error schema
+    ErrorDTO:
+      $ref: './components/schemas.yml#/ErrorDTO'
+
+  securitySchemes:
+    bearerAuth:
+      $ref: './components/security.yml#/bearerAuth'

@@ -38,3 +38,8 @@ http://localhost:8080/ui/users
 
 # Spring Boot devtools
 https://docs.spring.io/spring-boot/reference/using/devtools.html#using.devtools.livereload
+
+
+# Swagger / OpenAPI
+Main OpenAPI spec: http://localhost:8080/v3/api-docs
+Swagger UI: http://localhost:8080/swagger-ui.html
