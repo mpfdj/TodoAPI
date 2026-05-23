@@ -32,25 +32,25 @@ public class UserController {
     private final UserService userService;
 
     @Operation(
-        summary = "List users",
-        description = "Returns all users. Responds with **404** if no users are present.",
-        // Uncomment if your endpoints require auth and you've defined a security scheme named "bearerAuth"
-        // security = @SecurityRequirement(name = "bearerAuth")
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "Users found",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    array = @ArraySchema(schema = @Schema(implementation = UserDTO.class))
-                )
-            ),
-            @ApiResponse(
-                responseCode = "404",
-                description = "No users found",
-                content = @Content // empty body
-            )
-        }
+            summary = "List users",
+            description = "Returns all users. Responds with **404** if no users are present.",
+            // Uncomment if your endpoints require auth and you've defined a security scheme named "bearerAuth"
+            // security = @SecurityRequirement(name = "bearerAuth")
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Users found",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    array = @ArraySchema(schema = @Schema(implementation = UserDTO.class))
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "No users found",
+                            content = @Content // empty body
+                    )
+            }
     )
     @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserDTO>> getUsers() {
@@ -64,49 +64,49 @@ public class UserController {
     }
 
     @Operation(
-        summary = "Create a user",
-        description = "Creates a new user and returns it. Responds with **409** if the email already exists.",
-        requestBody = @RequestBody(
-            required = true,
-            description = "User details",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = CreateUserRequestDTO.class)
-            )
-        ),
-        responses = {
-            @ApiResponse(
-                responseCode = "201",
-                description = "User created",
-                headers = {
-                    @Header(
-                        name = "Location",
-                        description = "URI of the created user resource",
-                        schema = @Schema(type = "string", example = "/users/123")
+            summary = "Create a user",
+            description = "Creates a new user and returns it. Responds with **409** if the email already exists.",
+            requestBody = @RequestBody(
+                    required = true,
+                    description = "User details",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = CreateUserRequestDTO.class)
                     )
-                },
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = UserDTO.class)
-                )
             ),
-            @ApiResponse(
-                responseCode = "409",
-                description = "Duplicate email",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-                )
-            ),
-            @ApiResponse(
-                responseCode = "400",
-                description = "Validation error",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-                )
-            )
-        }
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "User created",
+                            headers = {
+                                    @Header(
+                                            name = "Location",
+                                            description = "URI of the created user resource",
+                                            schema = @Schema(type = "string", example = "/users/123")
+                                    )
+                            },
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UserDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "Duplicate email",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation error",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            )
+                    )
+            }
     )
     @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createUser(
@@ -122,30 +122,30 @@ public class UserController {
     }
 
     @Operation(
-        summary = "Delete user by id",
-        description = "Deletes a user by its id. Idempotent: returns **204** even if resource was already removed (but here it returns **404** if not found per current implementation).",
-        parameters = {
-            @Parameter(
-                name = "userId",
-                description = "Numeric identifier of the user",
-                required = true,
-                example = "123"
-            )
-        },
-        responses = {
-            @ApiResponse(
-                responseCode = "204",
-                description = "Deleted"
-            ),
-            @ApiResponse(
-                responseCode = "404",
-                description = "User not found",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-                )
-            )
-        }
+            summary = "Delete user by id",
+            description = "Deletes a user by its id. Idempotent: returns **204** even if resource was already removed (but here it returns **404** if not found per current implementation).",
+            parameters = {
+                    @Parameter(
+                            name = "userId",
+                            description = "Numeric identifier of the user",
+                            required = true,
+                            example = "123"
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "204",
+                            description = "Deleted"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "User not found",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            )
+                    )
+            }
     )
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<?> deleteUserById(@PathVariable("userId") Long userId) {
@@ -159,35 +159,35 @@ public class UserController {
     }
 
     @Operation(
-        summary = "Delete user by email",
-        description = "Deletes a user by email.",
-        parameters = {
-            @Parameter(
-                name = "email",
-                description = "Email address of the user to delete",
-                required = true,
-                example = "jane.doe@example.com"
-            )
-        },
-        responses = {
-            @ApiResponse(responseCode = "204", description = "Deleted"),
-            @ApiResponse(
-                responseCode = "404",
-                description = "User not found",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-                )
-            ),
-            @ApiResponse(
-                responseCode = "400",
-                description = "Invalid email format",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-                )
-            )
-        }
+            summary = "Delete user by email",
+            description = "Deletes a user by email.",
+            parameters = {
+                    @Parameter(
+                            name = "email",
+                            description = "Email address of the user to delete",
+                            required = true,
+                            example = "jane.doe@example.com"
+                    )
+            },
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Deleted"),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "User not found",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid email format",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            )
+                    )
+            }
     )
     @DeleteMapping("/users")
     public ResponseEntity<?> deleteUserByEmail(@RequestParam("email") String email) {
@@ -201,65 +201,65 @@ public class UserController {
     }
 
     @Operation(
-        summary = "Update a user",
-        description = "Updates an existing user and returns it.",
-        parameters = {
-            @Parameter(
-                name = "userId",
-                description = "Numeric identifier of the user to update",
-                required = true,
-                example = "123"
-            )
-        },
-        requestBody = @RequestBody(
-            required = true,
-            description = "Updated user values",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = UpdateUserRequestDTO.class)
-            )
-        ),
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "User updated",
-                headers = {
-                    @Header(
-                        name = "Location",
-                        description = "URI of the updated user resource",
-                        schema = @Schema(type = "string", example = "/users/123")
+            summary = "Update a user",
+            description = "Updates an existing user and returns it.",
+            parameters = {
+                    @Parameter(
+                            name = "userId",
+                            description = "Numeric identifier of the user to update",
+                            required = true,
+                            example = "123"
                     )
-                },
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = UserDTO.class)
-                )
+            },
+            requestBody = @RequestBody(
+                    required = true,
+                    description = "Updated user values",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = UpdateUserRequestDTO.class)
+                    )
             ),
-            @ApiResponse(
-                responseCode = "404",
-                description = "User not found",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-                )
-            ),
-            @ApiResponse(
-                responseCode = "409",
-                description = "Duplicate email",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-                )
-            ),
-            @ApiResponse(
-                responseCode = "400",
-                description = "Validation error",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDTO.class)
-                )
-            )
-        }
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "User updated",
+                            headers = {
+                                    @Header(
+                                            name = "Location",
+                                            description = "URI of the updated user resource",
+                                            schema = @Schema(type = "string", example = "/users/123")
+                                    )
+                            },
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UserDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "User not found",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "Duplicate email",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation error",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ErrorDTO.class)
+                            )
+                    )
+            }
     )
     @PutMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateUser(
@@ -278,6 +278,17 @@ public class UserController {
         }
     }
 
+    @GetMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getUser(@PathVariable("userId") Long userId) {
+        try {
+            UserDTO userDTO = userService.getUser(userId);
+            URI location = URI.create("/users/" + userDTO.getId());
+            return ResponseEntity.status(HttpStatus.OK).location(location).body(userDTO);
+        } catch (UserService.UserNotFoundException ex) {
+            ErrorDTO error = new ErrorDTO(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+    }
 
 //    // ---------------------------------------
 //    // Exceptions

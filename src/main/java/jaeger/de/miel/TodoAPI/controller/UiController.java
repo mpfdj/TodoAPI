@@ -1,6 +1,7 @@
 package jaeger.de.miel.TodoAPI.controller;
 
 import jaeger.de.miel.TodoAPI.dto.TaskDTO;
+import jaeger.de.miel.TodoAPI.dto.UserDTO;
 import jaeger.de.miel.TodoAPI.entity.Task;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -55,9 +56,16 @@ public class UiController {
     // LISTS
     @GetMapping("/users/{userId}/lists")
     public String lists(@PathVariable Long userId, Model model) {
+
+        model.addAttribute("userId", userId);
+
+        UserDTO userDTO = restTemplate.getForObject(BASE_URL + "/users/" + userId, UserDTO.class);
+        model.addAttribute("name", userDTO.getName());
+        model.addAttribute("email", userDTO.getEmail());
+
         List lists = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists", List.class);
         model.addAttribute("lists", lists);
-        model.addAttribute("userId", userId);
+
         return "lists";
     }
 

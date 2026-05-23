@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @AllArgsConstructor
@@ -35,6 +36,11 @@ public class UserService {
         return userList;
     }
 
+    public UserDTO getUser(Long userId) {
+        AppUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+        return UserMapper.toDTO(user);
+    }
 
     public UserDTO createUser(CreateUserRequestDTO request) {
         AppUser appUser = UserMapper.toEntity(request, passwordEncoder);
