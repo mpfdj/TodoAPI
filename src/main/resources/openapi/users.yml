@@ -14,7 +14,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: './components/schemas.yml#/UserDTO'
+                  $ref: '#/components/schemas/UserDTO'
         '404':
           description: No users found
           content: {}
@@ -31,7 +31,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './components/schemas.yml#/CreateUserRequestDTO'
+              $ref: '#/components/schemas/CreateUserRequestDTO'
       responses:
         '201':
           description: User created
@@ -44,19 +44,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './components/schemas.yml#/UserDTO'
+                $ref: '#/components/schemas/UserDTO'
         '400':
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: './components/schemas.yml#/ErrorDTO'
+                $ref: '#/components/schemas/ErrorDTO'  # Fixed reference
         '409':
           description: Duplicate email
           content:
             application/json:
               schema:
-                $ref: './components/schemas.yml#/ErrorDTO'
+                $ref: '#/components/schemas/ErrorDTO'  # Fixed reference
 
     delete:
       tags:
@@ -80,13 +80,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './components/schemas.yml#/ErrorDTO'
+                $ref: '#/components/schemas/ErrorDTO'  # Fixed reference
         '404':
           description: User not found
           content:
             application/json:
               schema:
-                $ref: './components/schemas.yml#/ErrorDTO'
+                $ref: '#/components/schemas/ErrorDTO'  # Fixed reference
 
   /users/{userId}:
     get:
@@ -116,13 +116,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './components/schemas.yml#/UserDTO'
+                $ref: '#/components/schemas/UserDTO'
         '404':
           description: User not found
           content:
             application/json:
               schema:
-                $ref: './components/schemas.yml#/ErrorDTO'
+                $ref: '#/components/schemas/ErrorDTO'  # Fixed reference
 
     put:
       tags:
@@ -145,38 +145,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './components/schemas.yml#/UpdateUserRequestDTO'
+              $ref: '#/components/schemas/UpdateUserRequestDTO'
       responses:
         '200':
           description: User updated
-          headers:
-            Location:
-              description: URI of the updated user resource
-              schema:
-                type: string
-                example: /users/123
           content:
             application/json:
               schema:
-                $ref: './components/schemas.yml#/UserDTO'
+                $ref: '#/components/schemas/UserDTO'
         '400':
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: './components/schemas.yml#/ErrorDTO'
+                $ref: '#/components/schemas/ErrorDTO'  # Fixed reference
         '404':
           description: User not found
           content:
             application/json:
               schema:
-                $ref: './components/schemas.yml#/ErrorDTO'
+                $ref: '#/components/schemas/ErrorDTO'  # Fixed reference
         '409':
           description: Duplicate email
           content:
             application/json:
               schema:
-                $ref: './components/schemas.yml#/ErrorDTO'
+                $ref: '#/components/schemas/ErrorDTO'  # Fixed reference
 
     delete:
       tags:
@@ -201,4 +195,4 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './components/schemas.yml#/ErrorDTO'
+                $ref: '#/components/schemas/ErrorDTO'  # Fixed reference

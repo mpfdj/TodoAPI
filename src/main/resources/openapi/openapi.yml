@@ -62,8 +62,27 @@ components:
       $ref: './components/schemas.yml#/UpdateTaskRequestDTO'
 
     # Error schema
+#    ErrorDTO:
+#      $ref: './components/schemas.yml#/ErrorDTO'
+
     ErrorDTO:
-      $ref: './components/schemas.yml#/ErrorDTO'
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message describing what went wrong
+          example: "User with email john@example.com already exists"
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp when the error occurred
+          example: "2024-01-15T10:30:00Z"
+        status:
+          type: integer
+          description: HTTP status code
+          example: 409
+
+
 
   securitySchemes:
     bearerAuth:
