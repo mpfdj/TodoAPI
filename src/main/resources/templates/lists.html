@@ -21,7 +21,7 @@
 <hr/>
 
 <!-- Create List -->
-<form th:action="@{'/ui/users/' + ${userId} + '/lists'}" method="post">
+<form th:action="@{/ui/users/{userId}/lists(userId=${userId})}" method="post">
     <input type="text" name="name" placeholder="Enter list name" required />
     <input type="text" name="description" placeholder="Enter description" required />
     <button type="submit">Add List</button>
@@ -41,7 +41,7 @@
         <a th:href="@{/ui/users/{userId}/lists/{listId}/tasks(userId=${userId}, listId=${list.id})}">View Tasks</a>
 
         <!-- Delete List -->
-        <form class="delete-form" th:action="@{'/ui/users/' + ${userId} + '/lists/' + ${list.id}}" method="post">
+        <form class="delete-form" th:action="@{/ui/users/{userId}/lists/{listId}(userId=${userId}, listId=${list.id})}" method="post">
             <input type="hidden" name="_method" value="DELETE" />
             <button type="submit" onclick="return confirm('Delete this list and all its tasks?')">Delete</button>
         </form>
