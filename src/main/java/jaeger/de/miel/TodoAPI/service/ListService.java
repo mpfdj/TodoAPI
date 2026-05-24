@@ -1,9 +1,10 @@
 package jaeger.de.miel.TodoAPI.service;
 
-import jaeger.de.miel.TodoAPI.dto.*;
+import jaeger.de.miel.TodoAPI.dto.CreateListRequestDTO;
+import jaeger.de.miel.TodoAPI.dto.ListDTO;
+import jaeger.de.miel.TodoAPI.dto.UpdateListRequestDTO;
 import jaeger.de.miel.TodoAPI.entity.AppUser;
 import jaeger.de.miel.TodoAPI.mapper.ListMapper;
-import jaeger.de.miel.TodoAPI.mapper.UserMapper;
 import jaeger.de.miel.TodoAPI.repository.ListRepository;
 import jaeger.de.miel.TodoAPI.repository.UserRepository;
 import lombok.AllArgsConstructor;

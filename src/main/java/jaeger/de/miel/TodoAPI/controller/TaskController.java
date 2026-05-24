@@ -37,19 +37,40 @@ public class TaskController {
 
 
     @GetMapping(value = "/users/{userId}/lists/{listId}/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200", description = "Tasks found")
+    @ApiResponse(responseCode = "404", description = "No tasks found", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     public ResponseEntity<List<TaskDTO>> getTasks(
             @PathVariable("userId") Long userId,
             @PathVariable("listId") Long listId) {
 
         List<TaskDTO> tasks = taskService.getTasks(userId, listId);
-        if (tasks.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        if (tasks.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(tasks);
     }
 
 
+    @GetMapping(value = "/users/{userId}/lists/{listId}/tasks/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200", description = "Task found")
+    @ApiResponse(responseCode = "404", description = "Task not found", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    public ResponseEntity<?> getTask(
+            @PathVariable("userId") Long userId,
+            @PathVariable("listId") Long listId,
+            @PathVariable("taskId") Long taskId) {
+
+        try {
+            TaskDTO taskDTO = taskService.getTask(userId, listId, taskId);
+            URI location = URI.create("/users/" + taskDTO.getUserId() + "/lists/" + taskDTO.getListId() + "/tasks/" + taskDTO.getId());
+            return ResponseEntity.status(HttpStatus.OK).location(location).body(taskDTO);
+        } catch (TaskService.TaskNotFoundException ex) {
+            ErrorDTO error = new ErrorDTO(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+    }
+
+
     @PostMapping(value = "/users/{userId}/lists/{listId}/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "201", description = "Task created")
+    @ApiResponse(responseCode = "404", description = "Creator not found", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     public ResponseEntity<?> createTask(
             @PathVariable("userId") Long userId,
             @PathVariable("listId") Long listId,
@@ -68,6 +89,8 @@ public class TaskController {
 
 
     @DeleteMapping(value = "/users/{userId}/lists/{listId}/tasks/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "204", description = "Task deleted")
+    @ApiResponse(responseCode = "404", description = "Task not found", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     public ResponseEntity<?> deleteTask(
             @PathVariable("userId") Long userId,
             @PathVariable("listId") Long listId,
@@ -84,6 +107,8 @@ public class TaskController {
 
 
     @PutMapping(value = "/users/{userId}/lists/{listId}/tasks/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200", description = "Task updated")
+    @ApiResponse(responseCode = "404", description = "Task not found", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     public ResponseEntity<?> updateTask(
             @PathVariable("userId") Long userId,
             @PathVariable("listId") Long listId,
@@ -93,23 +118,6 @@ public class TaskController {
             TaskDTO updated = taskService.updateTask(taskId, userId, listId, request);
             URI location = URI.create("/users/" + updated.getUserId() + "/lists/" + updated.getListId() + "/tasks/" + updated.getId());
             return ResponseEntity.status(HttpStatus.OK).location(location).body(updated);
-        } catch (TaskService.TaskNotFoundException ex) {
-            ErrorDTO error = new ErrorDTO(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-        }
-    }
-
-
-    @GetMapping(value = "/users/{userId}/lists/{listId}/tasks/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTasks(
-            @PathVariable("userId") Long userId,
-            @PathVariable("listId") Long listId,
-            @PathVariable("taskId") Long taskId) {
-
-        try {
-            TaskDTO taskDTO = taskService.getTask(userId, listId, taskId);
-            URI location = URI.create("/users/" + taskDTO.getUserId() + "/lists/" + taskDTO.getListId() + "/tasks/" + taskDTO.getId());
-            return ResponseEntity.status(HttpStatus.OK).location(location).body(taskDTO);
         } catch (TaskService.TaskNotFoundException ex) {
             ErrorDTO error = new ErrorDTO(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
