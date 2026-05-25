@@ -16,12 +16,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@Controller
 @RequestMapping("/ui")
 public class UiController {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final String BASE_URL = "http://localhost:8080";
+
 
     // USERS
     @GetMapping("/users")
