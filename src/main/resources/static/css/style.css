@@ -108,7 +108,7 @@ input[type="checkbox"]:disabled {
 
 
 /* Edit form - alle elementen zelfde breedte */
-.edit-form-row {
+.task-edit-form-row {
     display: grid;
     grid-template-columns: 100px 1fr;
     gap: 6px;
@@ -116,31 +116,31 @@ input[type="checkbox"]:disabled {
     align-items: center;
 }
 
-.edit-form-row label {
+.task-edit-form-row label {
     text-align: left;
 }
 
-.edit-form-row input,
-.edit-form-row select,
-.edit-form-row textarea {
+.task-edit-form-row input,
+.task-edit-form-row select,
+.task-edit-form-row textarea {
     width: 300px;
     padding: 5px 6px;
     margin: 0;
     box-sizing: border-box;
 }
 
-.edit-form-row textarea {
+.task-edit-form-row textarea {
     font-family: Arial, sans-serif;
     resize: vertical;
 }
 
-.edit-form-row:last-child {
+.task-edit-form-row:last-child {
     display: block;
     margin-left: 110px;
     margin-top: 8px;
 }
 
-.edit-form-row:last-child button {
+.task-edit-form-row:last-child button {
     width: auto;
     margin-right: 10px;
 }

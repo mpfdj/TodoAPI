@@ -48,7 +48,7 @@
 
             <!-- Edit Task -->
             <button th:hx-get="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}/edit-form(userId=${userId}, listId=${listId}, taskId=${task.id})}"
-                    th:hx-target="'#edit-container-' + ${task.id}"
+                    th:hx-target="'#task-edit-container-' + ${task.id}"
                     th:hx-swap="innerHTML"
                     hx-trigger="click">
                 Edit
@@ -65,7 +65,7 @@
         </div>
     </div>
 
-    <div th:id="'edit-container-' + ${task.id}" class="edit-form-container hidden"></div>
+    <div th:id="'task-edit-container-' + ${task.id}" class="edit-form-container hidden"></div>
 </div>
 </body>
 </html>

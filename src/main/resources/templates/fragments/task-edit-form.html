@@ -11,17 +11,17 @@
           th:hx-confirm="'Save changes?'">
 
         <div><br><br></div>
-        <div class="edit-form-row">
+        <div class="task-edit-form-row">
             <label>Title:</label>
             <input type="text" name="title" th:value="${task.title}" required />
         </div>
 
-        <div class="edit-form-row">
+        <div class="task-edit-form-row">
             <label>Description:</label>
             <textarea name="description" rows="2" th:text="${task.description}"></textarea>
         </div>
 
-        <div class="edit-form-row">
+        <div class="task-edit-form-row">
             <label>Status:</label>
             <select name="status" required>
                 <option value="todo" th:selected="${task.status == 'todo'}">Todo</option>
@@ -31,12 +31,12 @@
             </select>
         </div>
 
-        <div class="edit-form-row">
+        <div class="task-edit-form-row">
             <label>Due Date:</label>
             <input type="date" name="dueDate" th:value="${#temporals.format(task.dueDate, 'yyyy-MM-dd')}" />
         </div>
 
-        <div class="edit-form-row">
+        <div class="task-edit-form-row">
             <label>Priority:</label>
             <select name="priority" required>
                 <option value="1" th:selected="${task.priority == 1}">1 (Lowest)</option>
@@ -47,10 +47,10 @@
             </select>
         </div>
 
-        <div class="edit-form-row">
+        <div class="task-edit-form-row">
             <button type="submit">Save</button>
             <button type="button"
-                    th:attr="onclick='document.getElementById(`edit-container-${task.id}`).classList.add(`hidden`);'">
+                    th:attr="onclick='document.getElementById(`task-edit-container-${task.id}`).classList.add(`hidden`);'">
                 Cancel
             </button>
         </div>
