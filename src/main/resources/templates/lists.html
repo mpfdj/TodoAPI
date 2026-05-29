@@ -13,9 +13,6 @@
 </head>
 <body class="container py-4">
 
-<!-- DEBUG -->
-<div th:replace="~{fragments/debug :: debug}"></div>
-
 <!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="display-5 fw-bold text-primary">
@@ -79,10 +76,11 @@
                         <span class="fw-bold list-name" th:text="${list.name}">List Name</span>
                         <span class="text-secondary small ms-2" th:text="${list.description}" th:if="${list.description}"></span>
                     </div>
-                    <div>
-                        <!-- View Tasks -->
+                    <div class="d-flex gap-2 align-items-center flex-shrink-0" role="group" >
+
+                    <!-- View Tasks -->
                         <a th:href="@{/ui/users/{userId}/lists/{listId}/tasks(userId=${userId}, listId=${list.id})}"
-                           class="btn btn-sm btn-primary me-2">
+                           class="btn btn-sm btn-outline-primary">
                             View Tasks
                         </a>
 
@@ -92,7 +90,7 @@
                               method="post">
                             <input type="hidden" name="_method" value="DELETE" />
                             <button type="submit"
-                                    class="btn btn-sm btn-danger"
+                                    class="btn btn-sm btn-outline-danger"
                                     onclick="return confirm('Delete this list and all its tasks?')">
                                 Delete
                             </button>
@@ -103,6 +101,9 @@
         </ul>
     </div>
 </div>
+
+<!-- DEBUG -->
+<div th:replace="~{fragments/debug :: debug}"></div>
 
 <!-- Bootstrap Icons (optioneel) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
