@@ -21,7 +21,7 @@ public class UpdateTaskRequestDTO {
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
-    @FutureOrPresent
+//    @FutureOrPresent
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dueDate;
 
