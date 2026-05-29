@@ -73,11 +73,18 @@ form { display: inline-block; margin-right: 10px; }
 
 /* Task layout */
 .task-item {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.task-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
 }
+
 .task-actions { display: inline-block; }
 
 /* Checkbox */
@@ -98,3 +105,43 @@ input[type="checkbox"]:disabled {
 /* htmx */
 .htmx-indicator { display: none; }
 .htmx-request .htmx-indicator { display: inline; }
+
+
+/* Edit form - alle elementen zelfde breedte */
+.edit-form-row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 6px;
+    margin-bottom: 8px;
+    align-items: center;
+}
+
+.edit-form-row label {
+    text-align: left;
+}
+
+.edit-form-row input,
+.edit-form-row select,
+.edit-form-row textarea {
+    width: 300px;
+    padding: 5px 6px;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.edit-form-row textarea {
+    font-family: Arial, sans-serif;
+    resize: vertical;
+}
+
+.edit-form-row:last-child {
+    display: block;
+    margin-left: 110px;
+    margin-top: 8px;
+}
+
+.edit-form-row:last-child button {
+    width: auto;
+    margin-right: 10px;
+}
+

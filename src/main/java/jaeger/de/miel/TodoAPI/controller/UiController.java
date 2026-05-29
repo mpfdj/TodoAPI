@@ -133,7 +133,6 @@ public class UiController {
     }
 
 
-    // UPDATE
     @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
     public String updateTask(@PathVariable Long userId,
                              @PathVariable Long listId,
@@ -172,6 +171,7 @@ public class UiController {
         };
     }
 
+
     @DeleteMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
     public String deleteTask(@PathVariable Long userId,
                              @PathVariable Long listId,
@@ -190,4 +190,19 @@ public class UiController {
         return "fragments/tasks-container :: tasks-container";
     }
 
+
+    @GetMapping("/users/{userId}/lists/{listId}/tasks/{taskId}/edit-form")
+    public String getTaskEditForm(@PathVariable Long userId,
+                                  @PathVariable Long listId,
+                                  @PathVariable Long taskId,
+                                  Model model) {
+        TaskDTO task = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId, TaskDTO.class);
+
+
+        model.addAttribute("task", task);
+        model.addAttribute("userId", userId);
+        model.addAttribute("listId", listId);
+
+        return "fragments/task-edit-form :: task-edit-form";
+    }
 }

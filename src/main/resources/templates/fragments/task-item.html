@@ -2,60 +2,70 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>  <!-- In users.html, lists.html, tasks.html, etc. -->
+    <link rel="stylesheet" href="/static/css/style.css"/>        <!-- or for static HTML -->
 </head>
 <body>
 <div th:fragment="task-item(task, userId, listId)" th:id="'task-' + ${task.id}" class="task-item">
-    <div class="task-info">
-        <!-- Checkbox -->
-        <input type="checkbox"
-               th:checked="${task.status == 'done' or task.status == 'archived'}"
-               th:disabled="${task.status == 'archived'}"
-               onclick="return false;"
-               onkeydown="return false;"/>
+    <div class="task-header">
+        <div class="task-info">
+            <!-- Checkbox -->
+            <input type="checkbox"
+                   th:checked="${task.status == 'done' or task.status == 'archived'}"
+                   th:disabled="${task.status == 'archived'}"
+                   onclick="return false;"
+                   onkeydown="return false;"/>
 
-        <!-- Task Title -->
-        <span th:class="(${task.status == 'archived'} ? 'task-name-archived' : 'task-name')"
-              th:text="${task.title}">Task Title</span>
+            <!-- Task Title -->
+            <span th:class="(${task.status == 'archived'} ? 'task-name-archived' : 'task-name')"
+                  th:text="${task.title}">Task Title</span>
 
-        <!-- Task Description -->
-        <span th:if="${task.description != null and task.description != ''}"
-              class="task-description"
-              th:text="'- ' + ${task.description}">- Description</span>
+            <!-- Task Description -->
+            <span th:if="${task.description != null and task.description != ''}"
+                  class="task-description"
+                  th:text="'- ' + ${task.description}">- Description</span>
 
-        <!-- Status Badge -->
-        <span th:if="${task.status == 'archived'}" class="archived-badge">Archived</span>
-        <span th:if="${task.status == 'done'}" class="done-badge">Done</span>
-        <span th:if="${task.status == 'in_progress'}" class="in_progress-badge">In progress</span>
-        <span th:if="${task.status == 'todo'}" class="todo-badge">Todo</span>
+            <!-- Status Badge -->
+            <span th:if="${task.status == 'archived'}" class="archived-badge">Archived</span>
+            <span th:if="${task.status == 'done'}" class="done-badge">Done</span>
+            <span th:if="${task.status == 'in_progress'}" class="in_progress-badge">In progress</span>
+            <span th:if="${task.status == 'todo'}" class="todo-badge">Todo</span>
+        </div>
+
+        <div class="task-actions">
+            <!-- HTMX Status Update -->
+            <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id}, fragment='task-item')}"
+                  th:hx-target="'#task-' + ${task.id}"
+                  th:hx-swap="outerHTML"
+                  th:hx-trigger="change">
+                <select name="status" required>
+                    <option value="todo" th:selected="${task.status == 'todo'}">todo</option>
+                    <option value="in_progress" th:selected="${task.status == 'in_progress'}">in_progress</option>
+                    <option value="done" th:selected="${task.status == 'done'}">done</option>
+                    <option value="archived" th:selected="${task.status == 'archived'}">archived</option>
+                </select>
+            </form>
+
+            <!-- Edit Task -->
+            <button th:hx-get="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}/edit-form(userId=${userId}, listId=${listId}, taskId=${task.id})}"
+                    th:hx-target="'#edit-container-' + ${task.id}"
+                    th:hx-swap="innerHTML"
+                    hx-trigger="click">
+                Edit
+            </button>
+
+            <form class="delete-form"
+                  th:hx-delete="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id})}"
+                  th:hx-target="'#tasks-container'"
+                  th:hx-swap="outerHTML"
+                  th:hx-confirm="'Delete this task?'">
+                <button type="submit">Delete</button>
+            </form>
+
+        </div>
     </div>
 
-    <div class="task-actions">
-        <!-- HTMX Status Update with th:attr -->
-        <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id}, fragment='task-item')}"
-              th:hx-target="'#task-' + ${task.id}"
-              th:hx-swap="outerHTML"
-              th:hx-trigger="change">
-
-            <select name="status" required>
-                <option value="todo" th:selected="${task.status == 'todo'}">todo</option>
-                <option value="in_progress" th:selected="${task.status == 'in_progress'}">in_progress</option>
-                <option value="done" th:selected="${task.status == 'done'}">done</option>
-                <option value="archived" th:selected="${task.status == 'archived'}">archived</option>
-            </select>
-        </form>
-
-        <!-- Edit Task -->
-        <a th:href="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}/edit(userId=${userId}, listId=${listId}, taskId=${task.id})}">Edit</a>
-
-        <form class="delete-form"
-              th:hx-delete="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id})}"
-              th:hx-target="'#tasks-container'"
-              th:hx-swap="outerHTML"
-              th:hx-confirm="'Delete this task?'">
-            <button type="submit">Delete</button>
-        </form>
-
-    </div>
+    <div th:id="'edit-container-' + ${task.id}" class="edit-form-container hidden"></div>
 </div>
 </body>
 </html>
