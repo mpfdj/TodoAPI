@@ -29,6 +29,7 @@ public class UserMapper {
         appUser.setName(createUserRequestDTO.getName());
         appUser.setEmail(email);
         appUser.setPasswordHash(hash);
+        appUser.setIsAdministrator(false);  // At the moment it is not possible to create admin users
         appUser.setCreatedAt(now);
         appUser.setUpdatedAt(now);
         return appUser;

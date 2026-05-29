@@ -1,21 +1,14 @@
 
-package jaeger.de.miel.TodoAPI.controller;
+package jaeger.de.miel.TodoAPI.controller.api;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jaeger.de.miel.TodoAPI.dto.CreateTaskRequestDTO;
 import jaeger.de.miel.TodoAPI.dto.ErrorDTO;
 import jaeger.de.miel.TodoAPI.dto.TaskDTO;
 import jaeger.de.miel.TodoAPI.dto.UpdateTaskRequestDTO;
 import jaeger.de.miel.TodoAPI.service.TaskService;
-import jaeger.de.miel.TodoAPI.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,8 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 // import io.swagger.v3.oas.annotations.security.SecurityRequirement; // if you add auth
 

@@ -1,9 +1,10 @@
-package jaeger.de.miel.TodoAPI.controller;
+package jaeger.de.miel.TodoAPI.controller.thymeleaf;
 
 import jaeger.de.miel.TodoAPI.dto.ListDTO;
 import jaeger.de.miel.TodoAPI.dto.TaskDTO;
 import jaeger.de.miel.TodoAPI.dto.UserDTO;
 import jaeger.de.miel.TodoAPI.entity.Task;
+import jaeger.de.miel.TodoAPI.service.UserService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +24,13 @@ public class UiController {
     private final RestTemplate restTemplate = new RestTemplate();
     private final String BASE_URL = "http://localhost:8080";
 
+    private final UserService userService;
+
+    public UiController(UserService userService) {
+        this.userService = userService;
+    }
+
+
 
     // Return an empty response
     @GetMapping("/empty")
@@ -33,14 +41,23 @@ public class UiController {
 
 
     // USERS
+//    @GetMapping("/users")
+//    public String users(@RequestParam(required = false) Long userId,
+//                        Model model) {
+//        if (userId != null) model.addAttribute("userId", userId);
+//
+//        List users = restTemplate.getForObject(BASE_URL + "/users", List.class);
+//        model.addAttribute("users", users);
+//
+//        return "users";
+//    }
+
+
     @GetMapping("/users")
     public String users(@RequestParam(required = false) Long userId,
                         Model model) {
         if (userId != null) model.addAttribute("userId", userId);
-
-        List users = restTemplate.getForObject(BASE_URL + "/users", List.class);
-        model.addAttribute("users", users);
-
+        model.addAttribute("users", userService.getUsers());
         return "users";
     }
 

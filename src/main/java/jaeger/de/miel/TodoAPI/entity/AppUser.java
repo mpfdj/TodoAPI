@@ -31,6 +31,9 @@ public class AppUser {
     @Column(name = "PASSWORD_HASH", nullable = false)
     private String passwordHash;
 
+    @Column(name = "IS_ADMINISTRATOR", nullable = false)
+    private Boolean isAdministrator;
+
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "CREATED_AT", nullable = false)
     private Instant createdAt;
