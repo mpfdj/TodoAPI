@@ -24,6 +24,14 @@ public class UiController {
     private final String BASE_URL = "http://localhost:8080";
 
 
+    // Return an empty response
+    @GetMapping("/empty")
+    @ResponseBody
+    public String empty() {
+        return "";
+    }
+
+
     // USERS
     @GetMapping("/users")
     public String users(@RequestParam(required = false) Long userId,

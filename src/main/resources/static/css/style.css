@@ -145,3 +145,6 @@ input[type="checkbox"]:disabled {
     margin-right: 10px;
 }
 
+.task-edit-form-container.hidden {
+    display: none !important;
+}

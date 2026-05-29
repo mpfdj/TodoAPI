@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link rel="stylesheet" th:href="@{/css/style.css}" />  <!-- In users.html, lists.html, tasks.html, etc. -->
-    <link rel="stylesheet" href="/static/css/style.css" />        <!-- or for static HTML -->
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>  <!-- In users.html, lists.html, tasks.html, etc. -->
+    <link rel="stylesheet" href="/static/css/style.css"/> <!-- or for static HTML -->
 </head>
 <div th:fragment="task-edit-form(task, userId, listId)">
+
     <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id}, fragment='task-item')}"
           th:hx-target="'#task-' + ${task.id}"
-          th:hx-swap="outerHTML"
-          th:hx-confirm="'Save changes?'">
+          th:hx-swap="outerHTML">
 
-        <div><br><br></div>
-        <div class="task-edit-form-row">
+        <div class="task-edit-form-row" style="margin-top: 20px;">
             <label>Title:</label>
-            <input type="text" name="title" th:value="${task.title}" required />
+            <input type="text" name="title" th:value="${task.title}" required/>
         </div>
 
         <div class="task-edit-form-row">
@@ -33,7 +32,7 @@
 
         <div class="task-edit-form-row">
             <label>Due Date:</label>
-            <input type="date" name="dueDate" th:value="${#temporals.format(task.dueDate, 'yyyy-MM-dd')}" />
+            <input type="date" name="dueDate" th:value="${#temporals.format(task.dueDate, 'yyyy-MM-dd')}"/>
         </div>
 
         <div class="task-edit-form-row">
@@ -47,13 +46,21 @@
             </select>
         </div>
 
-        <div class="task-edit-form-row">
-            <button type="submit">Save</button>
+        <div class="task-edit-form-row" style="display: flex; justify-content: flex-end;">
+            <button type="submit"
+                    th:hx-confirm="'Save changes?'">
+                Save
+            </button>
+
             <button type="button"
-                    th:attr="onclick='document.getElementById(`task-edit-container-${task.id}`).classList.add(`hidden`);'">
+                    th:hx-get="@{/ui/empty}"
+                    th:hx-target="'#task-edit-container-' + ${task.id}"
+                    th:hx-swap="innerHTML"
+                    th:hx-trigger="click">
                 Cancel
             </button>
         </div>
+
     </form>
 </div>
 </html>
