@@ -3,4 +3,10 @@ VALUES
     ('alice@example.com', 'Alice Johnson', 'hashed_pw_1', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('bob@example.com', 'Bob Smith', 'hashed_pw_2', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('carol@example.com', 'Carol Davis', 'hashed_pw_3', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('mpf.dejaeger@gmail.com', 'Miel de Jaeger', 'admin', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    ('mpf.dejaeger@gmail.com', 'Miel de Jaeger', 'admin', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('admin@example.com', 'Administrator', '$2a$10$ktMYwMZCWkLHPEXz9w5.V.AWnBWJ0WY5nuGKa7hJbPn11XLOoMFrm', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('user@example.com', 'Normal user', '$2a$10$hYdpg9JKf4ZNuqCDBiOfQ.qKo/jQblLDfl2PQ4Wr32Muh5IvHOLiS', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+
+-- admin@example.com admin123
+-- user@example.com user123

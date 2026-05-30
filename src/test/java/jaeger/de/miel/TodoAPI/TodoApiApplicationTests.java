@@ -17,7 +17,7 @@ class TodoApiApplicationTests {
 
     @Test
     void generateHash() {
-        String password = "admin";
+        String password = "user123";
         String hashed = passwordEncoder.encode(password);
         System.out.println("Password: " + password);
         System.out.println("Hash: " + hashed);
