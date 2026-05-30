@@ -9,12 +9,16 @@
 
     <div class="small">
         <div th:each="variable : ${#ctx.getVariableNames()}">
-            <div th:if="${!variable.startsWith('org.springframework') and
-                          !variable.startsWith('spring') and
-                          !variable.startsWith('thymeleaf') and
-                          !variable.contains('FILTERED')
-                         }"
-                 class="py-1 border-bottom border-info border-opacity-25">
+<!--            <div th:if="${!variable.startsWith('org.springframework') and-->
+<!--                          !variable.startsWith('spring') and-->
+<!--                          !variable.startsWith('thymeleaf') and-->
+<!--                          !variable.contains('FILTERED')-->
+<!--                         }"-->
+<!--                 class="py-1 border-bottom border-info border-opacity-25">-->
+
+            <div th:if="${!variable.startsWith('org.springframework.core.convert.ConversionService')}"
+                class="py-1 border-bottom border-info border-opacity-25">
+
                 <span class="text-primary fw-mono" th:text="'• ' + ${variable} + ':'"></span>
                 <span class="text-secondary ms-2 font-monospace small" th:text="${#ctx.getVariable(variable)}"></span>
             </div>
