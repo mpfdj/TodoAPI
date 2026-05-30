@@ -104,9 +104,64 @@ public class SecurityConfig {
     }
 
 
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
+
+
+      // Extends / overrides CLASS BCryptPasswordEncoder not allowed to override a final method
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder() {
+//            @Override
+//            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+//                System.out.println("═══════════════════════════════════════════════════");
+//                System.out.println("🔐 PASSWORDENCODER WORDT AANGEROEPEN!");
+//                System.out.println("📝 Raw password uit formulier: " + rawPassword);
+//                System.out.println("🔑 Encoded password uit database: " + encodedPassword);
+//                System.out.println("───────────────────────────────────────────────────");
+//
+//                boolean result = super.matches(rawPassword, encodedPassword);
+//
+//                System.out.println("✅ Resultaat: " + (result ? "MATCH! ✅" : "GEEN MATCH! ❌"));
+//                System.out.println("═══════════════════════════════════════════════════");
+//
+//                return result;
+//            }
+//        };
+//    }
+
+
+
+    // Implements INTERFACE PasswordEncoder
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new PasswordEncoder() {
+            private final BCryptPasswordEncoder delegate = new BCryptPasswordEncoder();
+
+            @Override
+            public String encode(CharSequence rawPassword) {
+                return delegate.encode(rawPassword);
+            }
+
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                System.out.println("═══════════════════════════════════════════════════");
+                System.out.println("🔐 PASSWORDENCODER WORDT AANGEROEPEN!");
+                System.out.println("📝 Raw password uit formulier: " + rawPassword);
+                System.out.println("🔑 Encoded password uit database: " + encodedPassword);
+                System.out.println("───────────────────────────────────────────────────");
+
+                boolean result = delegate.matches(rawPassword, encodedPassword);
+
+                System.out.println("✅ Resultaat: " + (result ? "MATCH! ✅" : "GEEN MATCH! ❌"));
+                System.out.println("═══════════════════════════════════════════════════");
+
+                return result;
+            }
+        };
     }
+
 
 }
