@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,8 +29,13 @@ import java.io.IOException;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final UserDetailsService userDetailsService;
+
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService, UserDetailsService userDetailsService) {
+        this.customUserDetailsService = customUserDetailsService;
+        this.userDetailsService = userDetailsService;
+    }
 
 
     @Bean
@@ -52,6 +58,15 @@ public class SecurityConfig {
                     .logoutSuccessUrl("/login?logout=true")
                     .permitAll()
             )
+
+            .rememberMe(rememberMe -> rememberMe
+                    .rememberMeParameter("remember-me")  // Naam van de checkbox
+                    .rememberMeCookieName("remember-me-cookie")
+                    .tokenValiditySeconds(604800)  // 7 dagen (7 * 24 * 3600)
+                    .key("uniqueAndSecretKeyForRememberMe")
+                    .userDetailsService(userDetailsService))
+
+
             .sessionManagement(session -> session
                     .maximumSessions(1)
                     .sessionRegistry(sessionRegistry())

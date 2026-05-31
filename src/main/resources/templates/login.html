@@ -73,7 +73,6 @@
                                        class="form-control bg-light"
                                        id="email"
                                        name="email"
-                                       value="admin@example.com"
                                        placeholder="Enter your email"
                                        required autofocus>
                             </div>
@@ -88,7 +87,6 @@
                                        class="form-control bg-light"
                                        id="password"
                                        name="password"
-                                       value="admin123"
                                        placeholder="Enter your password"
                                        required>
                                 <button class="btn btn-outline-secondary bg-light" type="button" id="togglePassword">
@@ -145,6 +143,25 @@
         const icon = this.querySelector('i');
         icon.classList.toggle('bi-eye');
         icon.classList.toggle('bi-eye-slash');
+    });
+
+    // Optioneel: Sla email in localStorage als remember me is aangevinkt
+    const rememberCheckbox = document.getElementById('remember-me');
+    const emailInput = document.getElementById('email');
+
+    // Bij laden van pagina, check of er een opgeslagen email is
+    if (localStorage.getItem('rememberedEmail')) {
+        emailInput.value = localStorage.getItem('rememberedEmail');
+        rememberCheckbox.checked = true;
+    }
+
+    // Bij submit, sla email op als remember me is aangevinkt
+    document.querySelector('form').addEventListener('submit', function() {
+        if (rememberCheckbox.checked) {
+            localStorage.setItem('rememberedEmail', emailInput.value);
+        } else {
+            localStorage.removeItem('rememberedEmail');
+        }
     });
 </script>
 
