@@ -1,18 +1,25 @@
 package jaeger.de.miel.TodoAPI.controller.thymeleaf;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class IndexController {
 
-    @GetMapping("/")
-    public String index() {
-        return "redirect:/login";
-    }
+    @GetMapping({"/", "/index.html"})
+    public String index(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
 
-    @GetMapping("/index.html")
-    public String indexHtml() {
+        if (session != null) {
+            Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
+
+            if (isAdmin) return "redirect:/ui/users";
+
+            return "redirect:/ui/users/" + session.getAttribute("userId") + "/lists";
+        }
+
         return "redirect:/login";
     }
 
