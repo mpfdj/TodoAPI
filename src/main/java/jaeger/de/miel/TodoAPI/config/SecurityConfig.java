@@ -1,11 +1,7 @@
 package jaeger.de.miel.TodoAPI.config;
 
-import jaeger.de.miel.TodoAPI.security.CustomUserDetails;
+import jaeger.de.miel.TodoAPI.security.CustomAuthenticationSuccessHandler;
 import jaeger.de.miel.TodoAPI.security.CustomUserDetailsService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,17 +9,13 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
-
-import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -31,10 +23,13 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final UserDetailsService userDetailsService;
+    private final CustomAuthenticationSuccessHandler customSuccessHandler;
 
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService, UserDetailsService userDetailsService) {
+
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService, UserDetailsService userDetailsService, CustomAuthenticationSuccessHandler customSuccessHandler) {
         this.customUserDetailsService = customUserDetailsService;
         this.userDetailsService = userDetailsService;
+        this.customSuccessHandler = customSuccessHandler;
     }
 
 
@@ -47,7 +42,7 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                     .loginPage("/login")
-                    .successHandler(customSuccessHandler())
+                    .successHandler(customSuccessHandler)
                     .failureUrl("/login?error=true")
                     .usernameParameter("email")
                     .passwordParameter("password")
@@ -78,43 +73,10 @@ public class SecurityConfig {
     }
 
 
-    @Bean
-    public AuthenticationSuccessHandler customSuccessHandler() {
-        return new AuthenticationSuccessHandler() {
-            @Override
-            public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();  // Cast naar CustomUserDetails om userId te krijgen
-                Long userId = userDetails.getUserId();  // ← Geen UserService nodig!
-//                String email = userDetails.getUsername();
-
-                // Check of er een redirect URL in de session staat
-                HttpSession session = request.getSession();
-                String redirectUrl = (String) session.getAttribute("redirectAfterLogin");
-
-                if (redirectUrl != null && !redirectUrl.isEmpty()) {
-                    session.removeAttribute("redirectAfterLogin");  // Redirect naar de opgeslagen URL
-                    response.sendRedirect(redirectUrl);
-                }
-                else if (authentication.getAuthorities().stream()
-                        .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
-                    response.sendRedirect("/ui/users");
-                }
-                else if (authentication.getAuthorities().stream()
-                        .anyMatch(auth -> auth.getAuthority().equals("ROLE_USER"))) {
-                    response.sendRedirect("/ui/users/"+ userId + "/lists");
-                }
-                else {
-                    response.sendRedirect("/");
-                }
-            }
-        };
-    }
-
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
+    public AuthenticationManager authenticationManager(HttpSecurity http) {
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
 
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(customUserDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
