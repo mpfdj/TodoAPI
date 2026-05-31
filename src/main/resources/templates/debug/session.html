@@ -65,6 +65,27 @@
                             <th>Laatste toegang:</th>
                             <td th:text="${#dates.format(lastAccessedTime, 'dd-MM-yyyy HH:mm:ss')}"></td>
                         </tr>
+
+                        <!-- Overgebleven tijd -->
+                        <tr>
+                            <th style="width: 40%">Overgebleven tijd:</th>
+                            <td>
+                                <div th:if="${remainingSeconds > 0}">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-hourglass-split text-success"></i>
+                                        <span>
+                                            <span class="fw-bold" th:text="${remainingMinutes}"></span> minuten en
+                                            <span class="fw-bold" th:text="${remainingSeconds}"></span> seconden
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div th:if="${remainingSeconds <= 0}" class="text-danger">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    <strong>Sessie is verlopen!</strong> Je moet opnieuw inloggen.
+                                </div>
+                            </td>
+                        </tr>
                         <tr>
                             <th>Timeout:</th>
                             <td>

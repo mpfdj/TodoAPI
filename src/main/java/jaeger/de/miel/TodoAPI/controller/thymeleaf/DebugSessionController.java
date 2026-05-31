@@ -25,11 +25,30 @@ public class DebugSessionController {
         long expirationTimeMillis = session.getLastAccessedTime() + (session.getMaxInactiveInterval() * 1000L);
         Date expirationTime = new Date(expirationTimeMillis);
 
+        // Bereken overgebleven tijd
+        long currentTime = System.currentTimeMillis();
+        long elapsedSinceLastAccess = (currentTime - session.getLastAccessedTime()) / 1000;
+        long remainingSeconds = session.getMaxInactiveInterval() - elapsedSinceLastAccess;
+
+        if (remainingSeconds < 0) remainingSeconds = 0;
+
+        long remainingMinutes = remainingSeconds / 60;
+        long remainingSecs = remainingSeconds % 60;
+
+        // Bereken percentage voor progress bar
+        int percentage = (int) (remainingSeconds * 100 / session.getMaxInactiveInterval());
+        if (percentage < 0) percentage = 0;
+        if (percentage > 100) percentage = 100;
+
         model.addAttribute("sessionId", session.getId());
         model.addAttribute("creationTime", creationTime);
         model.addAttribute("lastAccessedTime", lastAccessedTime);
         model.addAttribute("expirationTime", expirationTime);
         model.addAttribute("maxInactiveInterval", session.getMaxInactiveInterval());
+        model.addAttribute("remainingMinutes", remainingMinutes);
+        model.addAttribute("remainingSeconds", remainingSecs);
+        model.addAttribute("remainingTotalSeconds", remainingSeconds);
+        model.addAttribute("percentage", percentage);
         model.addAttribute("isNew", session.isNew());
 
         // Alle sessie attributen
