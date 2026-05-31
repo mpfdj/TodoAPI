@@ -1,9 +1,11 @@
-package jaeger.de.miel.TodoAPI.controller;
+package jaeger.de.miel.TodoAPI.controller.thymeleaf;
 
 import jaeger.de.miel.TodoAPI.dto.ListDTO;
 import jaeger.de.miel.TodoAPI.dto.TaskDTO;
 import jaeger.de.miel.TodoAPI.dto.UserDTO;
 import jaeger.de.miel.TodoAPI.entity.Task;
+import jaeger.de.miel.TodoAPI.service.ListService;
+import jaeger.de.miel.TodoAPI.service.UserService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +25,15 @@ public class UiController {
     private final RestTemplate restTemplate = new RestTemplate();
     private final String BASE_URL = "http://localhost:8080";
 
+    private final UserService userService;
+    private final ListService listService;
+
+    public UiController(UserService userService, ListService listService) {
+        this.userService = userService;
+        this.listService = listService;
+    }
+
+
 
     // Return an empty response
     @GetMapping("/empty")
@@ -33,14 +44,23 @@ public class UiController {
 
 
     // USERS
+//    @GetMapping("/users")
+//    public String users(@RequestParam(required = false) Long userId,
+//                        Model model) {
+//        if (userId != null) model.addAttribute("userId", userId);
+//
+//        List users = restTemplate.getForObject(BASE_URL + "/users", List.class);
+//        model.addAttribute("users", users);
+//
+//        return "users";
+//    }
+
+
     @GetMapping("/users")
     public String users(@RequestParam(required = false) Long userId,
                         Model model) {
         if (userId != null) model.addAttribute("userId", userId);
-
-        List users = restTemplate.getForObject(BASE_URL + "/users", List.class);
-        model.addAttribute("users", users);
-
+        model.addAttribute("users", userService.getUsers());
         return "users";
     }
 
@@ -64,15 +84,29 @@ public class UiController {
 
 
     // LISTS
+//    @GetMapping("/users/{userId}/lists")
+//    public String lists(@PathVariable Long userId, Model model) {
+//        model.addAttribute("userId", userId);
+//
+//        UserDTO userDTO = restTemplate.getForObject(BASE_URL + "/users/" + userId, UserDTO.class);
+//        model.addAttribute("name", userDTO.getName());
+//        model.addAttribute("email", userDTO.getEmail());
+//
+//        List lists = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists", List.class);
+//        model.addAttribute("lists", lists);
+//
+//        return "lists";
+//    }
+
     @GetMapping("/users/{userId}/lists")
     public String lists(@PathVariable Long userId, Model model) {
         model.addAttribute("userId", userId);
 
-        UserDTO userDTO = restTemplate.getForObject(BASE_URL + "/users/" + userId, UserDTO.class);
+        UserDTO userDTO = userService.getUser(userId);
         model.addAttribute("name", userDTO.getName());
         model.addAttribute("email", userDTO.getEmail());
 
-        List lists = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists", List.class);
+        List lists = listService.getLists(userId);
         model.addAttribute("lists", lists);
 
         return "lists";

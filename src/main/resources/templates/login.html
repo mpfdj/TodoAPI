@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .input-group-text {
+            background-color: transparent;
+            border-right: none;
+        }
+        .form-control {
+            border-left: none;
+        }
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #dee2e6;
+        }
+        .input-group:focus-within {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            border-radius: 0.375rem;
+        }
+        .input-group:focus-within .form-control,
+        .input-group:focus-within .input-group-text {
+            border-color: #86b7fe;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container">
+    <div class="row justify-content-center min-vh-100 align-items-center">
+        <div class="col-md-5 col-lg-4">
+
+            <div class="text-center mb-4">
+                <i class="bi bi-check2-square display-1 text-primary"></i>
+                <h1 class="display-4 fw-bold text-primary">Todo App</h1>
+                <p class="text-secondary">Sign in to manage your tasks</p>
+            </div>
+
+            <div class="card shadow border-0">
+
+                <div class="card-body p-4">
+
+                    <!-- Error Message -->
+                    <div th:if="${error}" class="alert alert-danger py-2" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>Error!</strong> Invalid email or password.
+                    </div>
+
+                    <!-- Success Message - Logout -->
+                    <div th:if="${logout}" class="alert alert-info py-2" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <strong>Success!</strong> You have been logged out.
+                    </div>
+
+                    <!-- Success Message - Registration -->
+                    <div th:if="${registered}" class="alert alert-success py-2" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <strong>Success!</strong> Registration successful! Please login.
+                    </div>
+
+                    <!-- Login Form -->
+                    <form th:action="@{/login}" method="post">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="bi bi-envelope-fill text-secondary"></i>
+                                </span>
+                                <input type="email"
+                                       class="form-control bg-light"
+                                       id="email"
+                                       name="email"
+                                       placeholder="Enter your email"
+                                       required autofocus>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="bi bi-lock-fill text-secondary"></i>
+                                </span>
+                                <input type="password"
+                                       class="form-control bg-light"
+                                       id="password"
+                                       name="password"
+                                       placeholder="Enter your password"
+                                       required>
+                                <button class="btn btn-outline-secondary bg-light" type="button" id="togglePassword">
+                                    <i class="bi bi-eye-slash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
+                            <label class="form-check-label" for="remember-me">
+                                Remember me
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mb-3">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Sign In
+                        </button>
+
+                        <div class="text-center mb-2">
+                            <a href="#" class="text-decoration-none small">
+                                Forgot password?
+                            </a>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="text-center">
+                            <span class="text-secondary">
+                                Don't have an account?
+                            </span>
+                            <a th:href="@{/register}" class="text-decoration-none ms-1">
+                                Create account <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Toggle Password Visibility Script -->
+<script>
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const password = document.getElementById('password');
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+
+        // Toggle the eye icon
+        const icon = this.querySelector('i');
+        icon.classList.toggle('bi-eye');
+        icon.classList.toggle('bi-eye-slash');
+    });
+
+    // Optioneel: Sla email in localStorage als remember me is aangevinkt
+    const rememberCheckbox = document.getElementById('remember-me');
+    const emailInput = document.getElementById('email');
+
+    // Bij laden van pagina, check of er een opgeslagen email is
+    if (localStorage.getItem('rememberedEmail')) {
+        emailInput.value = localStorage.getItem('rememberedEmail');
+        rememberCheckbox.checked = true;
+    }
+
+    // Bij submit, sla email op als remember me is aangevinkt
+    document.querySelector('form').addEventListener('submit', function() {
+        if (rememberCheckbox.checked) {
+            localStorage.setItem('rememberedEmail', emailInput.value);
+        } else {
+            localStorage.removeItem('rememberedEmail');
+        }
+    });
+</script>
+
+</body>
+</html>

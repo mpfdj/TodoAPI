@@ -44,6 +44,13 @@ public class UserService {
         return UserMapper.toDTO(user);
     }
 
+    public Long getUserIdByEmail(String email) {
+        AppUser user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+        return user.getId();
+    }
+
+
     public UserDTO createUser(CreateUserRequestDTO request) {
         AppUser appUser = UserMapper.toEntity(request, passwordEncoder);
         String email = request.getEmail();

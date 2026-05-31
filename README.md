@@ -48,3 +48,6 @@ Swagger UI: http://localhost:8080/swagger-ui.html
 # Generate openapi.yaml
 .\mvnw.cmd verify -DskipTests
 
+
+# Todo:
+session vs token???

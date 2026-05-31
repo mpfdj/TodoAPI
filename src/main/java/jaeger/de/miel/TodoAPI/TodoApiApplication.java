@@ -13,9 +13,9 @@ public class TodoApiApplication {
 		SpringApplication.run(TodoApiApplication.class, args);
 	}
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // default strength = 10
-    }
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder(); // default strength = 10
+//    }
 
 }
