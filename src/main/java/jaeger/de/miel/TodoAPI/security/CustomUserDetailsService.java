@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -27,12 +28,20 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
         String role = appUser.getIsAdministrator() ? "ADMIN" : "USER";
+        List<SimpleGrantedAuthority> roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+
+        Long userId = appUser.getId();
+        String passwordHash = appUser.getPasswordHash();
+        String name = appUser.getName();
+        Boolean isAdmin = appUser.getIsAdministrator();
 
         return new CustomUserDetails(
-                appUser.getEmail(),
-                appUser.getPasswordHash(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role)),
-                appUser.getId()  // ← userId wordt hier toegevoegd
-        );
+                email,
+                passwordHash,
+                roles,
+                userId,
+                email,
+                name,
+                isAdmin);
     }
 }
