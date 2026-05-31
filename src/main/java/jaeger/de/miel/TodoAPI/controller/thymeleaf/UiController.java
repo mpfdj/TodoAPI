@@ -7,6 +7,7 @@ import jaeger.de.miel.TodoAPI.entity.Task;
 import jaeger.de.miel.TodoAPI.service.ListService;
 import jaeger.de.miel.TodoAPI.service.UserService;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -34,8 +35,7 @@ public class UiController {
     }
 
 
-
-    // Return an empty response
+    // Return an empty response to collapse Task edit form
     @GetMapping("/empty")
     @ResponseBody
     public String empty() {
@@ -44,19 +44,8 @@ public class UiController {
 
 
     // USERS
-//    @GetMapping("/users")
-//    public String users(@RequestParam(required = false) Long userId,
-//                        Model model) {
-//        if (userId != null) model.addAttribute("userId", userId);
-//
-//        List users = restTemplate.getForObject(BASE_URL + "/users", List.class);
-//        model.addAttribute("users", users);
-//
-//        return "users";
-//    }
-
-
     @GetMapping("/users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String users(@RequestParam(required = false) Long userId,
                         Model model) {
         if (userId != null) model.addAttribute("userId", userId);
@@ -64,7 +53,9 @@ public class UiController {
         return "users";
     }
 
+
     @PostMapping("/users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String createUser(@RequestParam String email,
                              @RequestParam String name,
                              @RequestParam String password) {
@@ -76,7 +67,9 @@ public class UiController {
         return "redirect:/ui/users";
     }
 
+
     @DeleteMapping("/users/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String deleteUser(@PathVariable Long userId) {
         restTemplate.delete(BASE_URL + "/users/" + userId);
         return "redirect:/ui/users";
@@ -84,21 +77,8 @@ public class UiController {
 
 
     // LISTS
-//    @GetMapping("/users/{userId}/lists")
-//    public String lists(@PathVariable Long userId, Model model) {
-//        model.addAttribute("userId", userId);
-//
-//        UserDTO userDTO = restTemplate.getForObject(BASE_URL + "/users/" + userId, UserDTO.class);
-//        model.addAttribute("name", userDTO.getName());
-//        model.addAttribute("email", userDTO.getEmail());
-//
-//        List lists = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists", List.class);
-//        model.addAttribute("lists", lists);
-//
-//        return "lists";
-//    }
-
     @GetMapping("/users/{userId}/lists")
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String lists(@PathVariable Long userId, Model model) {
         model.addAttribute("userId", userId);
 
@@ -112,7 +92,9 @@ public class UiController {
         return "lists";
     }
 
+
     @PostMapping("/users/{userId}/lists")
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String createList(@PathVariable Long userId, @RequestParam String name, @RequestParam String description) {
         Map<String, String> body = new HashMap<>();
         body.put("name", name);
@@ -123,6 +105,7 @@ public class UiController {
 
 
     @DeleteMapping("/users/{userId}/lists/{listId}")
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String deleteList(@PathVariable Long userId, @PathVariable Long listId) {
         restTemplate.delete(BASE_URL + "/users/" + userId + "/lists/" + listId);
         return "redirect:/ui/users/" + userId + "/lists";
@@ -131,6 +114,7 @@ public class UiController {
 
     // TASKS
     @GetMapping("/users/{userId}/lists/{listId}/tasks")
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String tasks(@PathVariable Long userId, @PathVariable Long listId, Model model) {
         ListDTO listDTO = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists/" + listId, ListDTO.class);
         model.addAttribute("listName", listDTO.getName());
@@ -144,6 +128,7 @@ public class UiController {
     }
 
     @GetMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String task(@PathVariable Long userId,
                        @PathVariable Long listId,
                        @PathVariable Long taskId,
@@ -156,6 +141,7 @@ public class UiController {
     }
 
     @PostMapping("/users/{userId}/lists/{listId}/tasks")
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String createTask(@PathVariable Long userId,
                              @PathVariable Long listId,
                              @RequestParam String title,
@@ -176,6 +162,7 @@ public class UiController {
 
 
     @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String updateTask(@PathVariable Long userId,
                              @PathVariable Long listId,
                              @PathVariable Long taskId,
@@ -215,6 +202,7 @@ public class UiController {
 
 
     @DeleteMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String deleteTask(@PathVariable Long userId,
                              @PathVariable Long listId,
                              @PathVariable Long taskId,
@@ -234,6 +222,7 @@ public class UiController {
 
 
     @GetMapping("/users/{userId}/lists/{listId}/tasks/{taskId}/edit-form")
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String getTaskEditForm(@PathVariable Long userId,
                                   @PathVariable Long listId,
                                   @PathVariable Long taskId,
