@@ -28,6 +28,17 @@ public enum TaskStatus {
         };
     }
 
+    public static TaskStatus toEnum(String value) {
+        String status = value.trim().toLowerCase();
+        return switch (status) {
+            case "archived" -> ARCHIVED;
+            case "done" -> DONE;
+            case "in_progress" -> IN_PROGRESS;
+            case "todo" -> TODO;
+            default -> throw new IllegalStateException("Unexpected value: " + status);
+        };
+    }
+
     @Override
     public String toString() {
         return switch (this) {

@@ -1,10 +1,8 @@
 package jaeger.de.miel.TodoAPI.controller.thymeleaf;
 
-import jaeger.de.miel.TodoAPI.dto.ListDTO;
-import jaeger.de.miel.TodoAPI.dto.TaskDTO;
-import jaeger.de.miel.TodoAPI.dto.UserDTO;
-import jaeger.de.miel.TodoAPI.entity.Task;
+import jaeger.de.miel.TodoAPI.dto.*;
 import jaeger.de.miel.TodoAPI.service.ListService;
+import jaeger.de.miel.TodoAPI.service.TaskService;
 import jaeger.de.miel.TodoAPI.service.UserService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,10 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/ui")
@@ -28,10 +23,12 @@ public class UiController {
 
     private final UserService userService;
     private final ListService listService;
+    private final TaskService taskService;
 
-    public UiController(UserService userService, ListService listService) {
+    public UiController(UserService userService, ListService listService, TaskService taskService) {
         this.userService = userService;
         this.listService = listService;
+        this.taskService = taskService;
     }
 
 
@@ -53,25 +50,27 @@ public class UiController {
         return "users";
     }
 
-
     @PostMapping("/users")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String createUser(@RequestParam String email,
                              @RequestParam String name,
                              @RequestParam String password) {
-        Map<String, String> body = new HashMap<>();
-        body.put("email", email);
-        body.put("name", name);
-        body.put("password", password);
-        restTemplate.postForObject(BASE_URL + "/users", body, Object.class);
+
+        CreateUserRequestDTO user = CreateUserRequestDTO.builder()
+                .email(email)
+                .name(name)
+                .password(password)
+                .build();
+
+        userService.createUser(user);
+
         return "redirect:/ui/users";
     }
-
 
     @DeleteMapping("/users/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String deleteUser(@PathVariable Long userId) {
-        restTemplate.delete(BASE_URL + "/users/" + userId);
+        userService.deleteUser(userId);
         return "redirect:/ui/users";
     }
 
@@ -82,9 +81,9 @@ public class UiController {
     public String lists(@PathVariable Long userId, Model model) {
         model.addAttribute("userId", userId);
 
-        UserDTO userDTO = userService.getUser(userId);
-        model.addAttribute("name", userDTO.getName());
-        model.addAttribute("email", userDTO.getEmail());
+        UserDTO user = userService.getUser(userId);
+        model.addAttribute("name", user.getName());
+        model.addAttribute("email", user.getEmail());
 
         List lists = listService.getLists(userId);
         model.addAttribute("lists", lists);
@@ -92,22 +91,23 @@ public class UiController {
         return "lists";
     }
 
-
     @PostMapping("/users/{userId}/lists")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String createList(@PathVariable Long userId, @RequestParam String name, @RequestParam String description) {
-        Map<String, String> body = new HashMap<>();
-        body.put("name", name);
-        body.put("description", description);
-        restTemplate.postForObject(BASE_URL + "/users/" + userId + "/lists", body, Object.class);
+        CreateListRequestDTO list = CreateListRequestDTO.builder()
+                .name(name)
+                .description(description)
+                .build();
+
+        listService.createList(userId, list);
+
         return "redirect:/ui/users/" + userId + "/lists";
     }
-
 
     @DeleteMapping("/users/{userId}/lists/{listId}")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String deleteList(@PathVariable Long userId, @PathVariable Long listId) {
-        restTemplate.delete(BASE_URL + "/users/" + userId + "/lists/" + listId);
+        listService.deleteList(userId, listId);
         return "redirect:/ui/users/" + userId + "/lists";
     }
 
@@ -116,10 +116,10 @@ public class UiController {
     @GetMapping("/users/{userId}/lists/{listId}/tasks")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String tasks(@PathVariable Long userId, @PathVariable Long listId, Model model) {
-        ListDTO listDTO = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists/" + listId, ListDTO.class);
-        model.addAttribute("listName", listDTO.getName());
+        ListDTO list = listService.getList(userId, listId);
+        List<TaskDTO> tasks = taskService.getTasks(userId, listId);
 
-        List tasks = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks", List.class);
+        model.addAttribute("listName", list.getName());
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
         model.addAttribute("tasks", tasks);
@@ -133,11 +133,27 @@ public class UiController {
                        @PathVariable Long listId,
                        @PathVariable Long taskId,
                        Model model) {
-        TaskDTO task = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId, TaskDTO.class);
+        TaskDTO task = taskService.getTask(userId, listId, taskId);
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
         model.addAttribute("task", task);
         return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
+    }
+
+    @GetMapping("/users/{userId}/lists/{listId}/tasks/{taskId}/edit-form")
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
+    public String getTaskEditForm(@PathVariable Long userId,
+                                  @PathVariable Long listId,
+                                  @PathVariable Long taskId,
+                                  Model model) {
+
+        TaskDTO task = taskService.getTask(userId, listId, taskId);
+
+        model.addAttribute("task", task);
+        model.addAttribute("userId", userId);
+        model.addAttribute("listId", listId);
+
+        return "fragments/task-edit-form :: task-edit-form";
     }
 
     @PostMapping("/users/{userId}/lists/{listId}/tasks")
@@ -148,18 +164,21 @@ public class UiController {
                              @RequestParam(required = false) String description,
                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dueDate,
                              @RequestParam Integer priority) {
-        Map<String, String> body = new HashMap<>();
-        body.put("title", title);
-        body.put("description", description != null ? description : "");
-        body.put("status", "todo");
-        body.put("dueDate", dueDate.toString());
-        body.put("priority", String.valueOf(priority));
+        CreateTaskRequestDTO task = CreateTaskRequestDTO.builder()
+                .title(title)
+                .description(description)
+                .status(TaskStatus.TODO)
+                .dueDate(dueDate)
+                .priority(priority)
+                .build();
 
-        restTemplate.postForObject(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks", body, Object.class);
+
+        System.out.println(task);
+
+        taskService.createTask(userId, listId, task);
 
         return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
     }
-
 
     @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
@@ -174,24 +193,32 @@ public class UiController {
                              @RequestParam(required = false) Integer priority,
                              Model model) {
 
-        Map<String, String> body = new HashMap<>();
-        if (title != null) body.put("title", title);
-        if (description != null) body.put("description", description);
-        if (status != null) body.put("status", status);
-        if (dueDate != null) body.put("dueDate", dueDate.toString());
-        if (priority != null) body.put("priority", String.valueOf(priority));
+        UpdateTaskRequestDTO task = new UpdateTaskRequestDTO();
 
-        restTemplate.put(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId, body, Object.class);
+        if (title != null) task.setTitle(title);
+        if (description != null) task.setDescription(description);
+        if (status != null) task.setStatus(TaskStatus.toEnum(status));
+        if (dueDate != null) task.setDueDate(dueDate);
+        if (priority != null) task.setPriority(priority);
+
+        taskService.updateTask(userId, listId, taskId, task);
+
+
+
+
 
         // Get updated task
-        String getUrl = BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
-        Map<String, Object> updatedTask = restTemplate.getForObject(getUrl, Map.class);
+        TaskDTO updatedTask = taskService.getTask(userId, listId, taskId);
+//        String getUrl = BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
+//        Map<String, Object> updatedTask = restTemplate.getForObject(getUrl, Map.class);
 
         // Add to model
         model.addAttribute("task", updatedTask);
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
 
+
+        // TODO: I think we can delete this...
         if (fragment == null || fragment.isEmpty()) fragment = "default";
 
         return switch (fragment) {
@@ -200,7 +227,6 @@ public class UiController {
         };
     }
 
-
     @DeleteMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String deleteTask(@PathVariable Long userId,
@@ -208,12 +234,13 @@ public class UiController {
                              @PathVariable Long taskId,
                              Model model) {
 
-        restTemplate.delete(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId);
+
+        taskService.deleteTask(userId, listId, taskId);
 
         // Fetch updated tasks
-        Task[] tasks = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks", Task[].class);
+        List<TaskDTO> tasks = taskService.getTasks(userId, listId);
 
-        model.addAttribute("tasks", Arrays.asList(tasks));
+        model.addAttribute("tasks", tasks);
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
 
@@ -221,19 +248,4 @@ public class UiController {
     }
 
 
-    @GetMapping("/users/{userId}/lists/{listId}/tasks/{taskId}/edit-form")
-    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
-    public String getTaskEditForm(@PathVariable Long userId,
-                                  @PathVariable Long listId,
-                                  @PathVariable Long taskId,
-                                  Model model) {
-        TaskDTO task = restTemplate.getForObject(BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId, TaskDTO.class);
-
-
-        model.addAttribute("task", task);
-        model.addAttribute("userId", userId);
-        model.addAttribute("listId", listId);
-
-        return "fragments/task-edit-form :: task-edit-form";
-    }
 }

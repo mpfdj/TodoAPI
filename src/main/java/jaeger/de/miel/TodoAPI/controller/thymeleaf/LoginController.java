@@ -21,9 +21,4 @@ public class LoginController {
         return "login";
     }
 
-//    @GetMapping("/login-error")
-//    public String loginError(Model model) {
-//        model.addAttribute("error", true);
-//        return "login";
-//    }
 }

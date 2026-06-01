@@ -20,7 +20,7 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
@@ -38,6 +38,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http
+//            // Ik geef het CSRF token mee vanuit de html voor de htmx calls
+//            .csrf(csrf -> csrf
+//                    .ignoringRequestMatchers("/ui/**")  // Alleen voor UI endpoints
+//                    .ignoringRequestMatchers("/ui/users/**/lists/**/tasks/**")  // of specifiek voor DELETE
+//            )
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/login", "/register", "/css/**", "/js/**", "/h2-console/**", "/actuator/**").permitAll()
                     .anyRequest().authenticated()
