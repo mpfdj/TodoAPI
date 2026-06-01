@@ -14,6 +14,16 @@
           th:hx-swap="outerHTML"
           class="needs-validation">
 
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+        <!-- Debug: Toon CSRF waarden -->
+        <!--                    <div style="background: #f0f0f0; padding: 10px; margin: 10px;">-->
+        <!--                        <h3>CSRF Debug Info:</h3>-->
+        <!--                        <p>Parameter Name: <strong th:text="${_csrf.parameterName}"></strong></p>-->
+        <!--                        <p>Token: <strong th:text="${_csrf.token}"></strong></p>-->
+        <!--                        <p>Header Name: <strong th:text="${_csrf.headerName}"></strong></p>-->
+        <!--                    </div>-->
+
         <div class="card border-0 bg-light">
             <div class="card-body p-3">
 
