@@ -64,7 +64,7 @@ public class TaskService {
     }
 
 
-    public TaskDTO updateTask(Long taskId, Long userId, Long listId, UpdateTaskRequestDTO request) {
+    public TaskDTO updateTask(Long userId, Long listId, Long taskId, UpdateTaskRequestDTO request) {
 
         Task task = taskRepository.findTaskByIdAndList_IdAndCreator_Id(taskId, listId, userId)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with userId: " + userId + " and listId: " + listId + " and taskId: " + taskId));

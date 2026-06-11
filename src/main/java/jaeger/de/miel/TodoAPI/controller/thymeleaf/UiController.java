@@ -172,9 +172,6 @@ public class UiController {
                 .priority(priority)
                 .build();
 
-
-        System.out.println(task);
-
         taskService.createTask(userId, listId, task);
 
         return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
