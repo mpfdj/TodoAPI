@@ -9,7 +9,7 @@
 </head>
 <div th:fragment="task-edit-form(task, userId, listId)">
 
-    <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id}, fragment='task-item')}"
+    <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id})}"
           th:hx-target="'#task-' + ${task.id}"
           th:hx-swap="outerHTML"
           class="needs-validation">

@@ -182,7 +182,6 @@ public class UiController {
     public String updateTask(@PathVariable Long userId,
                              @PathVariable Long listId,
                              @PathVariable Long taskId,
-                             @RequestParam(required = false) String fragment,
                              @RequestParam(required = false) String title,
                              @RequestParam(required = false) String description,
                              @RequestParam(required = false) String status,
@@ -198,30 +197,18 @@ public class UiController {
         if (dueDate != null) task.setDueDate(dueDate);
         if (priority != null) task.setPriority(priority);
 
+        // Update task
         taskService.updateTask(userId, listId, taskId, task);
-
-
-
-
 
         // Get updated task
         TaskDTO updatedTask = taskService.getTask(userId, listId, taskId);
-//        String getUrl = BASE_URL + "/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
-//        Map<String, Object> updatedTask = restTemplate.getForObject(getUrl, Map.class);
 
         // Add to model
         model.addAttribute("task", updatedTask);
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
 
-
-        // TODO: I think we can delete this...
-        if (fragment == null || fragment.isEmpty()) fragment = "default";
-
-        return switch (fragment) {
-            case "task-item" -> "fragments/task-item :: task-item";
-            default -> "fragments/task-item :: task-item";
-        };
+        return "fragments/task-item :: task-item";
     }
 
     @DeleteMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")

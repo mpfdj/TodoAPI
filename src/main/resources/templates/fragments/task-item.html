@@ -49,7 +49,7 @@
             <!-- Rechter kant: Actions -->
             <div class="d-flex gap-2 align-items-center flex-shrink-0">
                 <!-- HTMX Status Update -->
-                <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id}, fragment='task-item')}"
+                <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id})}"
                       th:hx-target="'#task-' + ${task.id}"
                       th:hx-swap="outerHTML"
                       th:hx-trigger="change"
