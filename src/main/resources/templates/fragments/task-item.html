@@ -87,10 +87,10 @@
                 <button class="btn btn-sm btn-outline-primary"
                         th:id="'edit-btn-' + ${task.id}"
                         th:hx-target="'#task-edit-container-' + ${task.id}"
-                        hx-swap="innerHTML"
+                        th:hx-swap="innerHTML"
 
                         th:data-edit-url="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}/edit-form(userId=${userId}, listId=${listId}, taskId=${task.id})}"
-                        data-state="closed"
+                        th:data-state="closed"
 
                         hx-on:click="
                             const target = document.querySelector(this.getAttribute('hx-target'));
