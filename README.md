@@ -7,6 +7,10 @@ https://www.baeldung.com/spring-boot-h2-database
 https://www.baeldung.com/h2-embedded-db-data-storage  
 
 
+# H2 Web gui
+http://localhost:9093/
+
+
 # Java Bean validation
 https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html
 
