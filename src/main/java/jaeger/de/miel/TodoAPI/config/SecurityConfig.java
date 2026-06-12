@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.session.SessionRegistry;
@@ -19,6 +20,7 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
@@ -36,6 +38,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http
+//            // Ik geef het CSRF token mee vanuit de html voor de htmx calls
+//            .csrf(csrf -> csrf
+//                    .ignoringRequestMatchers("/ui/**")  // Alleen voor UI endpoints
+//                    .ignoringRequestMatchers("/ui/users/**/lists/**/tasks/**")  // of specifiek voor DELETE
+//            )
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/login", "/register", "/css/**", "/js/**", "/h2-console/**", "/actuator/**").permitAll()
                     .anyRequest().authenticated()
