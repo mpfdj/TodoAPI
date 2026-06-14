@@ -7,60 +7,6 @@
 
     <!-- Custom CSS (voor eventuele overschrijvingen) -->
     <link rel="stylesheet" th:href="@{/css/custom.css}"/>
-
-
-
-    <script>
-        function showStatus(button) {
-            // Zoek de parent rij (de tr) van de geklikte knop
-            const row = button.closest('tr');
-            // Lees het data-status attribuut
-            const status = row.getAttribute('data-status');
-            // Toon alert
-            alert('Task status: ' + status);
-        }
-    </script>
-
-
-    <style>
-        .sortable-header {
-            cursor: pointer;
-            user-select: none;
-            transition: background-color 0.2s;
-        }
-
-        .sortable-header:hover {
-            background-color: rgba(0,0,0,0.05);
-        }
-
-        .sort-icon {
-            margin-left: 5px;
-            font-size: 0.8rem;
-            opacity: 0.5;
-        }
-
-        .sort-icon.active {
-            opacity: 1;
-            color: #0d6efd;
-        }
-
-        .task-status {
-            width: 120px;
-        }
-
-        .task-actions {
-            width: 100px;
-            text-align: center;
-        }
-
-        .table tbody tr {
-            transition: background-color 0.2s;
-        }
-
-        .table tbody tr:hover {
-            background-color: rgba(0,0,0,0.02);
-        }
-    </style>
 </head>
 <body>
 
@@ -97,25 +43,31 @@
                 </tr>
                 </thead>
                 <tbody>
-                    <!-- Direct de tr vervangen, geen div wrapper -->
+
                     <th:block th:each="task : ${tasks}">
+
                         <th:block th:replace="~{fragments/task-item :: task-item(task=${task}, userId=${userId}, listId=${listId})}"></th:block>
+
+                        <tr th:id="'task-edit-row-' + ${task.id}" style="display: none;">
+                            <td colspan="6">
+                                <div th:id="'task-edit-container-' + ${task.id}" class="edit-container">
+                                </div>
+                            </td>
+                        </tr>
+
                     </th:block>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Empty State Message -->
-    <div th:if="${tasks.empty}"
-         class="alert alert-info text-center py-5 my-3"
-         role="alert">
+    <div th:if="${tasks.empty}" class="alert alert-info text-center py-5 my-3">
         <i class="bi bi-inbox fs-1 d-block mb-3"></i>
         <h4 class="alert-heading h5">No tasks yet</h4>
         <p class="mb-0">Create your first task using the form above!</p>
     </div>
-
 </div>
+
 
 <!-- Sortable Table JavaScript -->
 <script></script>

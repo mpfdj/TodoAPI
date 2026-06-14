@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Controller
-@RequestMapping("/ui")
 public class UiController {
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -33,7 +32,7 @@ public class UiController {
 
 
     // Return an empty response to collapse Task edit form
-    @GetMapping("/empty")
+    @GetMapping("/ui/empty")
     @ResponseBody
     public String empty() {
         return "";
@@ -41,7 +40,7 @@ public class UiController {
 
 
     // USERS
-    @GetMapping("/users")
+    @GetMapping("/ui/users")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String users(@RequestParam(required = false) Long userId,
                         Model model) {
@@ -50,7 +49,7 @@ public class UiController {
         return "users";
     }
 
-    @PostMapping("/users")
+    @PostMapping("/ui/users")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String createUser(@RequestParam String email,
                              @RequestParam String name,
@@ -67,7 +66,7 @@ public class UiController {
         return "redirect:/ui/users";
     }
 
-    @DeleteMapping("/users/{userId}")
+    @DeleteMapping("/ui/users/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
@@ -76,7 +75,7 @@ public class UiController {
 
 
     // LISTS
-    @GetMapping("/users/{userId}/lists")
+    @GetMapping("/ui/users/{userId}/lists")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String lists(@PathVariable Long userId, Model model) {
         model.addAttribute("userId", userId);
@@ -91,7 +90,7 @@ public class UiController {
         return "lists";
     }
 
-    @PostMapping("/users/{userId}/lists")
+    @PostMapping("/ui/users/{userId}/lists")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String createList(@PathVariable Long userId, @RequestParam String name, @RequestParam String description) {
         CreateListRequestDTO list = CreateListRequestDTO.builder()
@@ -104,7 +103,7 @@ public class UiController {
         return "redirect:/ui/users/" + userId + "/lists";
     }
 
-    @DeleteMapping("/users/{userId}/lists/{listId}")
+    @DeleteMapping("/ui/users/{userId}/lists/{listId}")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String deleteList(@PathVariable Long userId, @PathVariable Long listId) {
         listService.deleteList(userId, listId);
@@ -113,7 +112,7 @@ public class UiController {
 
 
     // TASKS
-    @GetMapping("/users/{userId}/lists/{listId}/tasks")
+    @GetMapping("/ui/users/{userId}/lists/{listId}/tasks")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String tasks(@PathVariable Long userId, @PathVariable Long listId, Model model) {
         ListDTO list = listService.getList(userId, listId);
@@ -127,7 +126,7 @@ public class UiController {
         return "tasks";
     }
 
-    @GetMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
+    @GetMapping("/ui/users/{userId}/lists/{listId}/tasks/{taskId}")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String task(@PathVariable Long userId,
                        @PathVariable Long listId,
@@ -137,10 +136,10 @@ public class UiController {
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
         model.addAttribute("task", task);
-        return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
+        return "redirect:/ui/ui/users/" + userId + "/lists/" + listId + "/tasks/" + taskId;
     }
 
-    @GetMapping("/users/{userId}/lists/{listId}/tasks/{taskId}/edit-form")
+    @GetMapping("/ui/users/{userId}/lists/{listId}/tasks/{taskId}/edit-form")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String getTaskEditForm(@PathVariable Long userId,
                                   @PathVariable Long listId,
@@ -156,7 +155,7 @@ public class UiController {
         return "fragments/task-edit-form :: task-edit-form";
     }
 
-    @PostMapping("/users/{userId}/lists/{listId}/tasks")
+    @PostMapping("/ui/users/{userId}/lists/{listId}/tasks")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String createTask(@PathVariable Long userId,
                              @PathVariable Long listId,
@@ -177,11 +176,12 @@ public class UiController {
         return "redirect:/ui/users/" + userId + "/lists/" + listId + "/tasks";
     }
 
-    @PutMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
+    @PutMapping("/ui/users/{userId}/lists/{listId}/tasks/{taskId}")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String updateTask(@PathVariable Long userId,
                              @PathVariable Long listId,
                              @PathVariable Long taskId,
+                             @RequestParam(required = false) String source,
                              @RequestParam(required = false) String title,
                              @RequestParam(required = false) String description,
                              @RequestParam(required = false) String status,
@@ -208,12 +208,12 @@ public class UiController {
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
 
-//        return "fragments/task-item :: allUpdates";
-        return "fragments/task-status-updates :: bothUpdates";
-
+        if ("task-edit-form".equals(source)) return "fragments/task-item :: task-item";
+        if ("task-item".equals(source)) return "fragments/task-item :: updateStatusAndTitle";
+        return "";
     }
 
-    @DeleteMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
+    @DeleteMapping("/ui/users/{userId}/lists/{listId}/tasks/{taskId}")
     @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
     public String deleteTask(@PathVariable Long userId,
                              @PathVariable Long listId,

@@ -8,12 +8,11 @@
 </head>
 <body>
 
-<th:block th:fragment="task-item(task, userId, listId)"
-          th:id="'task-' + ${task.id}">
+<tr th:fragment="task-item(task, userId, listId)"
+    th:id="'task-' + ${task.id}">
 
     <script>
         function handleClick(element) {
-            // Lees data attributen
             const taskId = element.dataset.taskId;
             const userId = element.dataset.userId;
             const listId = element.dataset.listId;
@@ -26,111 +25,176 @@
             console.log('Title:', taskTitle);
             console.log('Status:', taskStatus);
         }
+
+        // Edit toggle functie
+        function toggleEdit(button) {
+            const taskId = button.getAttribute('data-task-id');
+            const editUrl = button.getAttribute('data-edit-url');
+            const targetRow = document.getElementById('task-edit-row-' + taskId);
+            const icon = button.querySelector('i');
+            const containerId = 'task-edit-container-' + taskId;
+
+            if (button.getAttribute('data-state') === 'open') {
+                if (targetRow) targetRow.style.display = 'none';
+                button.setAttribute('data-state', 'closed');
+                icon.classList.remove('bi-x-circle');
+                icon.classList.add('bi-pencil');
+            } else {
+                if (targetRow) {
+                    targetRow.style.display = 'table-row';
+                    htmx.ajax('GET', editUrl, {
+                        target: '#' + containerId,
+                        swap: 'innerHTML'
+                    });
+                }
+                button.setAttribute('data-state', 'open');
+                icon.classList.remove('bi-pencil');
+                icon.classList.add('bi-x-circle');
+            }
+        }
     </script>
 
-    <!-- Dit is de volledige tabelrij - MET tr wrapper -->
-    <tr>
-        <!-- Status cel - BELANGRIJK: hx-target is de parent td -->
-        <td th:id="'status-container-' + ${task.id}">
-            <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id})}"
-                  th:hx-target="'#status-container-' + ${task.id}"
-                  th:hx-swap="outerHTML"
-                  th:hx-trigger="change"
-                  class="d-inline">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <select name="status" class="form-select form-select-sm" style="width: auto;">
-                    <option value="todo" th:selected="${task.status == 'todo'}">📋 Todo</option>
-                    <option value="in_progress" th:selected="${task.status == 'in_progress'}">⚙️ In Progress</option>
-                    <option value="done" th:selected="${task.status == 'done'}">✅ Done</option>
-                    <option value="archived" th:selected="${task.status == 'archived'}">📦 Archived</option>
-                </select>
-            </form>
-        </td>
+    <script>
+        // Voeg dit toe aan je hoofdpagina (bijvoorbeeld list-detail.html of waar de tabel staat)
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            // Check of het een task update betreft
+            if (event.detail.target && event.detail.target.id && event.detail.target.id.startsWith('task-')) {
+                const taskId = event.detail.target.id.replace('task-', '');
+                console.log('Task updated, closing edit form for task:', taskId);
 
-        <!-- Title cel -->
-        <td th:id="'title-container-' + ${task.id}">
+                // Kleine vertraging om DOM te laten stabiliseren
+                setTimeout(function() {
+                    const editRow = document.getElementById('task-edit-row-' + taskId);
+                    const editBtn = document.getElementById('edit-btn-' + taskId);
+
+                    console.log('Found edit row:', editRow);
+                    console.log('Found edit button:', editBtn);
+
+                    if(editRow) {
+                        editRow.style.display = 'none';
+                    }
+
+                    if(editBtn) {
+                        editBtn.setAttribute('data-state', 'closed');
+                        const icon = editBtn.querySelector('i');
+                        if(icon) {
+                            icon.classList.remove('bi-x-circle');
+                            icon.classList.add('bi-pencil');
+                        }
+                    }
+                }, 100);
+            }
+        });
+    </script>
+
+    <!-- Status cel -->
+    <td th:id="'status-container-' + ${task.id}">
+        <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id}, source='task-item')}"
+              th:hx-target="'#status-container-' + ${task.id}"
+              th:hx-swap="outerHTML"
+              th:hx-trigger="change"
+              class="d-inline">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <select name="status" class="form-select form-select-sm" style="width: auto;">
+                <option value="todo" th:selected="${task.status == 'todo'}">📋 Todo</option>
+                <option value="in_progress" th:selected="${task.status == 'in_progress'}">⚙️ In Progress</option>
+                <option value="done" th:selected="${task.status == 'done'}">✅ Done</option>
+                <option value="archived" th:selected="${task.status == 'archived'}">📦 Archived</option>
+            </select>
+        </form>
+    </td>
+
+    <!-- Title cel -->
+    <td th:id="'title-container-' + ${task.id}">
             <span th:class="(${task.status == 'archived'} ? 'text-secondary text-decoration-line-through fw-bold' : 'fw-bold')"
                   th:text="${task.title}">Task Title</span>
-        </td>
+    </td>
 
-        <!-- Beschrijving cel -->
-        <td>
-            <span class="text-secondary small" th:text="${task.description}"></span>
-        </td>
+    <!-- Beschrijving cel -->
+    <td>
+        <span class="text-secondary small" th:text="${task.description}"></span>
+    </td>
 
-        <!-- Priority cel -->
-        <td>
-            <span class="text-secondary small" th:text="${task.priority}"></span>
-        </td>
+    <!-- Priority cel -->
+    <td>
+        <span class="text-secondary small" th:text="${task.priority}"></span>
+    </td>
 
-        <!-- Due Date cel -->
-        <td>
-            <span class="text-secondary small" th:text="${task.dueDate}"></span>
-        </td>
+    <!-- Due Date cel -->
+    <td>
+        <span class="text-secondary small" th:text="${task.dueDate}"></span>
+    </td>
 
-        <!-- Actions cel -->
-        <td>
-            <div class="d-flex gap-2 align-items-center flex-shrink-0">
-                <button class="btn btn-sm btn-outline-primary"
-                        th:id="'edit-btn-' + ${task.id}"
-                        th:hx-target="'#task-edit-container-' + ${task.id}"
-                        th:hx-swap="innerHTML"
-                        th:data-edit-url="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}/edit-form(userId=${userId}, listId=${listId}, taskId=${task.id})}"
-                        th:data-state="closed"
-                        hx-on:click="
-                            const target = document.querySelector(this.getAttribute('hx-target'));
-                            const icon = this.querySelector('i');
-                            if (this.dataset.state === 'open') {
-                                htmx.ajax('GET', '/ui/empty', { target: target });
-                                this.dataset.state = 'closed';
-                                icon.classList.remove('bi-x-circle');
-                                icon.classList.add('bi-pencil');
-                            } else {
-                                htmx.ajax('GET', this.dataset.editUrl, { target: target })
-                                    .then(() => htmx.process(target));
-                                this.dataset.state = 'open';
-                                icon.classList.remove('bi-pencil');
-                                icon.classList.add('bi-x-circle');
-                            }
-                            event.preventDefault();
-                        ">
-                    <i class="bi bi-pencil"></i> Edit
+    <!-- Actions cel -->
+    <td>
+        <div class="d-flex gap-2 align-items-center flex-shrink-0">
+            <button class="btn btn-sm btn-outline-primary"
+                    th:id="'edit-btn-' + ${task.id}"
+                    th:data-task-id="${task.id}"
+                    th:data-edit-url="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}/edit-form(userId=${userId}, listId=${listId}, taskId=${task.id})}"
+                    th:data-state="closed"
+                    onclick="toggleEdit(this)">
+                <i class="bi bi-pencil"></i> Edit
+            </button>
+
+            <form class="delete-form d-inline"
+                  th:hx-delete="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id})}"
+                  th:hx-target="'#tasks-container'"
+                  th:hx-swap="outerHTML"
+                  th:hx-confirm="'Delete this task?'">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash"></i> Delete
                 </button>
+            </form>
 
-                <form class="delete-form d-inline"
-                      th:hx-delete="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id})}"
-                      th:hx-target="'#tasks-container'"
-                      th:hx-swap="outerHTML"
-                      th:hx-confirm="'Delete this task?'">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                        <i class="bi bi-trash"></i> Delete
-                    </button>
-                </form>
+            <!-- Info button -->
+            <button class="btn btn-sm btn-outline-info"
+                    th:data-task-id="${task.id}"
+                    th:data-user-id="${userId}"
+                    th:data-list-id="${listId}"
+                    th:data-task-title="${task.title}"
+                    th:data-task-status="${task.status}"
+                    onclick="handleClick(this)">
+                <i class="bi bi-info-circle"></i> Info
+            </button>
+        </div>
+    </td>
+</tr>
 
-
-
-                <!-- Data attributen op een element -->
-                <button class="btn btn-sm btn-outline-primary"
-                        th:data-task-id="${task.id}"
-                        th:data-user-id="${userId}"
-                        th:data-list-id="${listId}"
-                        th:data-task-title="${task.title}"
-                        th:data-task-status="${task.status}"
-                        hx-on:click="handleClick(this)">
-                    Click me
-                </button>
-
-
-
-
-            </div>
-        </td>
-    </tr>
+<!-- Alleen de status update - GEEN extra wrapping -->
+<th:block th:fragment="statusUpdate">
+    <td th:id="'status-container-' + ${task.id}">
+        <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id}, source='task-item')}"
+              th:hx-target="'#status-container-' + ${task.id}"
+              th:hx-swap="outerHTML"
+              th:hx-trigger="change"
+              class="d-inline">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <select name="status" class="form-select form-select-sm" style="width: auto;">
+                <option value="todo" th:selected="${task.status == 'todo'}">📋 Todo</option>
+                <option value="in_progress" th:selected="${task.status == 'in_progress'}">⚙️ In Progress</option>
+                <option value="done" th:selected="${task.status == 'done'}">✅ Done</option>
+                <option value="archived" th:selected="${task.status == 'archived'}">📦 Archived</option>
+            </select>
+        </form>
+    </td>
 </th:block>
 
-<!-- Edit Form Container -->
-<div th:id="'task-edit-container-' + ${task.id}" style="display: none;"></div>
+<!-- Alleen de title update (OOB) -->
+<th:block th:fragment="titleUpdate">
+    <td th:id="'title-container-' + ${task.id}"
+        hx-swap-oob="innerHTML">
+        <span th:class="(${task.status == 'archived'} ? 'text-secondary text-decoration-line-through fw-bold' : 'fw-bold')"
+              th:text="${task.title}">Task Title</span>
+    </td>
+</th:block>
+
+<!-- Beide updates samen -->
+<th:block th:fragment="updateStatusAndTitle">
+    <th:block th:replace="~{fragments/task-item :: statusUpdate}"></th:block>
+    <th:block th:replace="~{fragments/task-item :: titleUpdate}"></th:block>
+</th:block>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
