@@ -11,6 +11,23 @@
 <th:block th:fragment="task-item(task, userId, listId)"
           th:id="'task-' + ${task.id}">
 
+    <script>
+        function handleClick(element) {
+            // Lees data attributen
+            const taskId = element.dataset.taskId;
+            const userId = element.dataset.userId;
+            const listId = element.dataset.listId;
+            const taskTitle = element.dataset.taskTitle;
+            const taskStatus = element.dataset.taskStatus;
+
+            console.log('Task ID:', taskId);
+            console.log('User ID:', userId);
+            console.log('List ID:', listId);
+            console.log('Title:', taskTitle);
+            console.log('Status:', taskStatus);
+        }
+    </script>
+
     <!-- Dit is de volledige tabelrij - MET tr wrapper -->
     <tr>
         <!-- Status cel - BELANGRIJK: hx-target is de parent td -->
@@ -90,6 +107,23 @@
                         <i class="bi bi-trash"></i> Delete
                     </button>
                 </form>
+
+
+
+                <!-- Data attributen op een element -->
+                <button class="btn btn-sm btn-outline-primary"
+                        th:data-task-id="${task.id}"
+                        th:data-user-id="${userId}"
+                        th:data-list-id="${listId}"
+                        th:data-task-title="${task.title}"
+                        th:data-task-status="${task.status}"
+                        hx-on:click="handleClick(this)">
+                    Click me
+                </button>
+
+
+
+
             </div>
         </td>
     </tr>
