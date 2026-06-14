@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Alleen de status cel - GEEN extra wrapping -->
+<th:block th:fragment="statusUpdate">
+    <td th:id="'status-container-' + ${task.id}">
+        <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id})}"
+              th:hx-target="'#status-container-' + ${task.id}"
+              th:hx-swap="outerHTML"
+              th:hx-trigger="change"
+              class="d-inline">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <select name="status" class="form-select form-select-sm" style="width: auto;">
+                <option value="todo" th:selected="${task.status == 'todo'}">📋 Todo</option>
+                <option value="in_progress" th:selected="${task.status == 'in_progress'}">⚙️ In Progress</option>
+                <option value="done" th:selected="${task.status == 'done'}">✅ Done</option>
+                <option value="archived" th:selected="${task.status == 'archived'}">📦 Archived</option>
+            </select>
+        </form>
+    </td>
+</th:block>
+
+<!-- Alleen de title update (OOB) -->
+<th:block th:fragment="titleUpdate">
+    <td th:id="'title-container-' + ${task.id}"
+        hx-swap-oob="innerHTML">
+        <span th:class="(${task.status == 'archived'} ? 'text-secondary text-decoration-line-through fw-bold' : 'fw-bold')"
+              th:text="${task.title}">Task Title</span>
+    </td>
+</th:block>
+
+<!-- Beide updates samen -->
+<th:block th:fragment="bothUpdates">
+    <th:block th:replace="~{fragments/task-status-updates :: statusUpdate}"></th:block>
+    <th:block th:replace="~{fragments/task-status-updates :: titleUpdate}"></th:block>
+</th:block>
+
+</body>
+</html>

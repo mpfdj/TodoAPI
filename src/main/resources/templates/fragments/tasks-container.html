@@ -7,7 +7,63 @@
 
     <!-- Custom CSS (voor eventuele overschrijvingen) -->
     <link rel="stylesheet" th:href="@{/css/custom.css}"/>
+
+
+
+    <script>
+        function showStatus(button) {
+            // Zoek de parent rij (de tr) van de geklikte knop
+            const row = button.closest('tr');
+            // Lees het data-status attribuut
+            const status = row.getAttribute('data-status');
+            // Toon alert
+            alert('Task status: ' + status);
+        }
+    </script>
+
+
+    <style>
+        .sortable-header {
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+
+        .sortable-header:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .sort-icon {
+            margin-left: 5px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        .sort-icon.active {
+            opacity: 1;
+            color: #0d6efd;
+        }
+
+        .task-status {
+            width: 120px;
+        }
+
+        .task-actions {
+            width: 100px;
+            text-align: center;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+    </style>
 </head>
+<body>
+
 <div th:fragment="tasks-container(tasks, userId, listId)" id="tasks-container" class="mt-4">
 
     <!-- Header -->
@@ -16,12 +72,37 @@
         <span class="badge bg-secondary rounded-pill" th:text="${#lists.size(tasks)} + ' tasks'"></span>
     </div>
 
-    <!-- Tasks List -->
+    <!-- Sortable Tasks Table -->
     <div th:if="${not tasks.empty}">
-        <div class="list-group">
-            <div th:each="task : ${tasks}" class="list-group-item p-0 border-0 mb-3">
-                <div th:replace="~{fragments/task-item :: task-item(task=${task}, userId=${userId}, listId=${listId})}"></div>
-            </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="tasksTable">
+                <thead class="table-light">
+                <tr>
+                    <th class="sortable-header" data-sort="status" style="width: 100px;">
+                        Status <i class="bi bi-arrow-down-up sort-icon"></i>
+                    </th>
+                    <th class="sortable-header" data-sort="title" style="width: 40%;">
+                        Title <i class="bi bi-arrow-down-up sort-icon"></i>
+                    </th>
+                    <th class="sortable-header" data-sort="description">
+                        Description <i class="bi bi-arrow-down-up sort-icon"></i>
+                    </th>
+                    <th class="sortable-header" data-sort="priority" style="width: 100px;">
+                        Priority <i class="bi bi-arrow-down-up sort-icon"></i>
+                    </th>
+                    <th class="sortable-header" data-sort="dueDate" style="width: 120px;">
+                        Due Date <i class="bi bi-arrow-down-up sort-icon"></i>
+                    </th>
+                    <th class="text-center" style="width: 100px;">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <!-- Direct de tr vervangen, geen div wrapper -->
+                    <th:block th:each="task : ${tasks}">
+                        <th:block th:replace="~{fragments/task-item :: task-item(task=${task}, userId=${userId}, listId=${listId})}"></th:block>
+                    </th:block>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -36,9 +117,14 @@
 
 </div>
 
+<!-- Sortable Table JavaScript -->
+<script></script>
+
 <!-- Bootstrap Icons (optioneel, voor het icoontje) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
 </html>

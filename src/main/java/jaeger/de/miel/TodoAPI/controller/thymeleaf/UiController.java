@@ -208,7 +208,9 @@ public class UiController {
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
 
-        return "fragments/task-item :: task-item";
+//        return "fragments/task-item :: allUpdates";
+        return "fragments/task-status-updates :: bothUpdates";
+
     }
 
     @DeleteMapping("/users/{userId}/lists/{listId}/tasks/{taskId}")
