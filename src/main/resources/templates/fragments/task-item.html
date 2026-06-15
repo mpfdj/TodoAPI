@@ -133,7 +133,7 @@
                     th:data-task-id="${task.id}"
                     th:data-edit-url="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}/edit-form(userId=${userId}, listId=${listId}, taskId=${task.id})}"
                     th:data-state="closed"
-                    onclick="toggleEdit(this)">
+                    th:onclick="toggleEdit(this)">
                 <i class="bi bi-pencil"></i> Edit
             </button>
 
@@ -155,7 +155,7 @@
                     th:data-list-id="${listId}"
                     th:data-task-title="${task.title}"
                     th:data-task-status="${task.status}"
-                    onclick="handleClick(this)">
+                    th:onclick="handleClick(this)">
                 <i class="bi bi-info-circle"></i> Info
             </button>
         </div>
@@ -184,7 +184,7 @@
 <!-- Alleen de title update (OOB) -->
 <th:block th:fragment="titleUpdate">
     <td th:id="'title-container-' + ${task.id}"
-        hx-swap-oob="innerHTML">
+        th:hx-swap-oob="innerHTML">
         <span th:class="(${task.status == 'archived'} ? 'text-secondary text-decoration-line-through fw-bold' : 'fw-bold')"
               th:text="${task.title}">Task Title</span>
     </td>
