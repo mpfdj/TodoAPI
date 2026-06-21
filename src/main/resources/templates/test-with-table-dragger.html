@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Table Dragger Test</title>
+<!--    <link rel="stylesheet" th:href="@{/css/table-dragger.css}" />-->
+    <style>
+        .handle {
+            cursor: grab;
+        }
+        .handle:active {
+            cursor: grabbing;
+        }
+        /* Add visual feedback for debugging */
+        .handle.dragging {
+            background-color: #ffcccc;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<table id="table">
+    <thead>
+    <tr>
+        <th>header1</th>
+        <th>header2</th>
+        <th>header3</th>
+        <th>header4</th>
+        <th>header5</th>
+        <th>header6</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr class='handle'>
+        <td>content1</td>
+        <td>content2</td>
+        <td>content3</td>
+        <td>content4</td>
+        <td>content5</td>
+        <td>content6</td>
+    </tr>
+    <tr class='handle'>
+        <td>contenta</td>
+        <td>contentb</td>
+        <td>contentc</td>
+        <td>contentd</td>
+        <td>contente</td>
+        <td>contentf</td>
+    </tr>
+    <tr class='handle'>
+        <td>contentA</td>
+        <td>contentB</td>
+        <td>contentC</td>
+        <td>contentD</td>
+        <td>contentE</td>
+        <td>contentF</td>
+    </tr>
+    </tbody>
+</table>
+
+<script th:src="@{/js/table-dragger.min.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var el = document.getElementById('table');
+        console.log('Table element found:', el);
+
+        // Check if handle elements exist
+        var handles = document.querySelectorAll('.handle');
+        console.log('Handle elements found:', handles.length);
+        console.log('Handle elements:', handles);
+
+        var TableDragger = tableDragger.default || tableDragger;
+        console.log('TableDragger type:', typeof TableDragger);
+
+        if (typeof TableDragger === 'function') {
+            console.log('Initializing TableDragger...');
+            var dragger = TableDragger(el, {
+                mode: 'row',
+                dragHandler: '.handle',
+                onlyBody: true,
+                animation: 300
+            });
+
+            console.log('Dragger object:', dragger);
+
+            // Add event listeners for debugging
+            dragger.on('drag', function(el, mode) {
+                console.log('Drag event - mode:', mode);
+            });
+
+            dragger.on('drop', function(from, to, el, mode) {
+                console.log('Dropped from', from, 'to', to, 'mode:', mode);
+            });
+
+            dragger.on('shadowMove', function(oldIndex, newIndex, el, mode) {
+                console.log('Shadow move from', oldIndex, 'to', newIndex);
+            });
+
+            console.log('TableDragger initialized successfully!');
+            console.log('Drag handler selector: .handle');
+        } else {
+            console.error('TableDragger is not a function. Type:', typeof TableDragger);
+            console.log('Available:', Object.keys(tableDragger));
+        }
+    });
+</script>
+
+</body>
+</html>

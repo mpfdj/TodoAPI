@@ -30,6 +30,20 @@ public class UiController {
         this.taskService = taskService;
     }
 
+    @GetMapping("/ui/test-td")
+    public String testTableDragger() {
+        return "test-with-table-dragger";
+    }
+
+
+
+
+
+
+
+
+
+
 
     // Return an empty response to collapse Task edit form
     @GetMapping("/ui/empty")
