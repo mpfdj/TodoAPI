@@ -14,6 +14,19 @@
 
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <style>
+        .handle {
+            cursor: grab;
+        }
+        .handle:active {
+            cursor: grabbing;
+        }
+        /* Add visual feedback for debugging */
+        .handle.dragging {
+            background-color: #ffcccc;
+        }
+    </style>
 </head>
 <body class="container py-4">
 
@@ -98,5 +111,52 @@
 
 <!-- Bootstrap JavaScript Bundle (voor interactieve componenten) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:src="@{/js/table-dragger.min.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var el = document.getElementById('tasksTable');
+        console.log('Table element found:', el);
+
+        // Check if handle elements exist
+        var handles = document.querySelectorAll('.handle');
+        console.log('Handle elements found:', handles.length);
+        console.log('Handle elements:', handles);
+
+        var TableDragger = tableDragger.default || tableDragger;
+        console.log('TableDragger type:', typeof TableDragger);
+
+        if (typeof TableDragger === 'function') {
+            console.log('Initializing TableDragger...');
+            var dragger = TableDragger(el, {
+                mode: 'row',
+                dragHandler: '.handleDragAndDrop',
+                onlyBody: true,
+                animation: 300
+            });
+
+            console.log('Dragger object:', dragger);
+
+            // Add event listeners for debugging
+            dragger.on('drag', function(el, mode) {
+                console.log('Drag event - mode:', mode);
+            });
+
+            dragger.on('drop', function(from, to, el, mode) {
+                console.log('Dropped from', from, 'to', to, 'mode:', mode);
+            });
+
+            dragger.on('shadowMove', function(oldIndex, newIndex, el, mode) {
+                console.log('Shadow move from', oldIndex, 'to', newIndex);
+            });
+
+            console.log('TableDragger initialized successfully!');
+            console.log('Drag handler selector: .handle');
+        } else {
+            console.error('TableDragger is not a function. Type:', typeof TableDragger);
+            console.log('Available:', Object.keys(tableDragger));
+        }
+    });
+</script>
 </body>
 </html>
