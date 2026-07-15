@@ -29,7 +29,7 @@ public class TaskMapper {
         return taskDTO;
     }
 
-    public static Task toEntity(Long userId, Long listId, CreateTaskRequestDTO createTaskRequestDTO) {
+    public static Task toEntity(Long userId, Long listId, Integer sortOrder, CreateTaskRequestDTO createTaskRequestDTO) {
         List list = new List();
         list.setId(listId);
 
@@ -48,6 +48,7 @@ public class TaskMapper {
         task.setPriority(createTaskRequestDTO.getPriority());
         task.setCreatedAt(now);
         task.setUpdatedAt(now);
+        task.setSortOrder(sortOrder);
         return task;
     }
 

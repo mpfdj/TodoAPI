@@ -41,6 +41,8 @@ class TaskServiceTest {
     private final Long userId = 1L;
     private final Long listId = 10L;
     private final Long taskId = 100L;
+    private final Integer sortOrder = 1;
+
 
     // ---------------------------------------------------------
     // getTasks
@@ -79,7 +81,7 @@ class TaskServiceTest {
         when(listRepository.findById(listId)).thenReturn(Optional.of(list));
 
         try (MockedStatic<TaskMapper> mapper = Mockito.mockStatic(TaskMapper.class)) {
-            mapper.when(() -> TaskMapper.toEntity(userId, listId, request))
+            mapper.when(() -> TaskMapper.toEntity(userId, listId, sortOrder, request))
                     .thenReturn(taskEntity);
 
             when(taskRepository.save(taskEntity)).thenReturn(taskEntity);

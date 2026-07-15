@@ -76,6 +76,7 @@ class TaskMapperTest {
     public void testToEntity() {
         Long userId = 1L;
         Long listId = 1L;
+        Integer sortOrder = 1;
         LocalDate dueDate = LocalDate.of(2025, 12, 31);
 
         when(createTaskRequestDTOMock.getTitle()).thenReturn("title");
@@ -86,7 +87,7 @@ class TaskMapperTest {
 
         Instant before = Instant.now();
 
-        Task task = TaskMapper.toEntity(userId, listId, createTaskRequestDTOMock);
+        Task task = TaskMapper.toEntity(userId, listId, sortOrder, createTaskRequestDTOMock);
         System.out.println(task);
 
         Instant after = Instant.now();

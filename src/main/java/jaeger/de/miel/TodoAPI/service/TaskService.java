@@ -50,7 +50,8 @@ public class TaskService {
         jaeger.de.miel.TodoAPI.entity.List list = listRepository.findById(listId)
                 .orElseThrow(() -> new ListNotFoundException("ListId not found: " + listId));
 
-        Task task = taskRepository.save(TaskMapper.toEntity(userId, listId, createTaskRequestDTO));
+        Integer nextSortOrder = taskRepository.findNextSortOrder(listId);
+        Task task = taskRepository.save(TaskMapper.toEntity(userId, listId, nextSortOrder, createTaskRequestDTO));
         return TaskMapper.toDTO(task);
     }
 
