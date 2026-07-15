@@ -129,6 +129,7 @@
     <!-- Actions cel -->
     <td>
         <div class="d-flex gap-2 align-items-center flex-shrink-0">
+            <!-- Edit task button -->
             <button class="btn btn-sm btn-outline-primary"
                     th:id="'edit-btn-' + ${task.id}"
                     th:data-task-id="${task.id}"
@@ -138,6 +139,7 @@
                 <i class="bi bi-pencil"></i> Edit
             </button>
 
+            <!-- Delete task button -->
             <form class="delete-form d-inline"
                   th:hx-delete="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id})}"
                   th:hx-target="'#tasks-container'"
