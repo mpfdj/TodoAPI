@@ -114,49 +114,45 @@
 
 <script th:src="@{/js/table-dragger.min.js}"></script>
 <script>
+
+    function initializeTableDragger() {
+        const el = document.getElementById('tasksTable');
+
+        if (!el) {
+            return;
+        }
+
+        const TableDragger = tableDragger.default || tableDragger;
+
+        if (typeof TableDragger !== 'function') {
+            console.error('TableDragger not available');
+            return;
+        }
+
+        TableDragger(el, {
+            mode: 'row',
+            dragHandler: '.handleDragAndDrop',
+            onlyBody: true,
+            animation: 300
+        });
+
+        console.log('TableDragger initialized');
+    }
+
+
     document.addEventListener('DOMContentLoaded', function() {
-        var el = document.getElementById('tasksTable');
-        console.log('Table element found:', el);
+        initializeTableDragger();
+    });
 
-        // Check if handle elements exist
-        var handles = document.querySelectorAll('.handle');
-        console.log('Handle elements found:', handles.length);
-        console.log('Handle elements:', handles);
-
-        var TableDragger = tableDragger.default || tableDragger;
-        console.log('TableDragger type:', typeof TableDragger);
-
-        if (typeof TableDragger === 'function') {
-            console.log('Initializing TableDragger...');
-            var dragger = TableDragger(el, {
-                mode: 'row',
-                dragHandler: '.handleDragAndDrop',
-                onlyBody: true,
-                animation: 300
-            });
-
-            console.log('Dragger object:', dragger);
-
-            // Add event listeners for debugging
-            dragger.on('drag', function(el, mode) {
-                console.log('Drag event - mode:', mode);
-            });
-
-            dragger.on('drop', function(from, to, el, mode) {
-                console.log('Dropped from', from, 'to', to, 'mode:', mode);
-            });
-
-            dragger.on('shadowMove', function(oldIndex, newIndex, el, mode) {
-                console.log('Shadow move from', oldIndex, 'to', newIndex);
-            });
-
-            console.log('TableDragger initialized successfully!');
-            console.log('Drag handler selector: .handle');
-        } else {
-            console.error('TableDragger is not a function. Type:', typeof TableDragger);
-            console.log('Available:', Object.keys(tableDragger));
+    document.body.addEventListener('htmx:afterSettle', function(event) {
+        if (
+            event.detail.target &&
+            event.detail.target.id === 'tasks-container'
+        ) {
+            initializeTableDragger();
         }
     });
+
 </script>
 </body>
 </html>
