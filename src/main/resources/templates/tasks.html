@@ -15,6 +15,10 @@
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 
+    <!-- CSRF Meta Tags -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
     <style>
         .handleDragAndDrop {
             cursor: grab;
@@ -103,8 +107,12 @@
     </div>
 </div>
 
-<!-- Tasks Container - This will be replaced on delete -->
-<div th:replace="~{fragments/tasks-container :: tasks-container(tasks=${tasks}, userId=${userId}, listId=${listId})}"></div>
+<!-- Tasks Container -->
+<div th:id="task-container-wrapper"
+     th:data-user-id="${userId}"
+     th:data-list-id="${listId}">
+    <div th:replace="~{fragments/tasks-container :: tasks-container(tasks=${tasks}, userId=${userId}, listId=${listId})}"></div>
+</div>
 
 <!-- DEBUG -->
 <div th:replace="~{fragments/debug :: debug}"></div>
@@ -112,31 +120,131 @@
 <!-- Bootstrap JavaScript Bundle (voor interactieve componenten) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<script th:src="@{/js/table-dragger.min.js}"></script>
 <script>
+
+    // CSRF helper functions
+    function getCSRFToken() {
+        const metaTag = document.querySelector('meta[name="_csrf"]');
+        return metaTag ? metaTag.content : null;
+    }
+
+    function getCSRFHeader() {
+        const metaTag = document.querySelector('meta[name="_csrf_header"]');
+        return metaTag ? metaTag.content : 'X-CSRF-TOKEN';
+    }
+
+    // Add helper function for showing alerts
+    function showAlert(message, type = 'info') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.role = 'alert';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.querySelector('.container').prepend(alertDiv);
+        setTimeout(() => alertDiv.remove(), 5000);
+    }
+
+    let dragger = null;
 
     function initializeTableDragger() {
         const el = document.getElementById('tasksTable');
 
-        if (!el) {
-            return;
-        }
+        if (!el) return;
 
         const TableDragger = tableDragger.default || tableDragger;
 
-        if (typeof TableDragger !== 'function') {
-            console.error('TableDragger not available');
-            return;
-        }
-
-        TableDragger(el, {
+        dragger = TableDragger(el, {
             mode: 'row',
             dragHandler: '.handleDragAndDrop',
             onlyBody: true,
             animation: 300
         });
 
-        console.log('TableDragger initialized');
+        // dragger.on('drop', (...args) => {
+        //     console.log(args);
+        // });
+
+        dragger.on('drop', function(from, to) {
+
+            const taskRows = Array.from(
+                document.querySelectorAll(
+                    '#tasksTable tbody tr[id^="task-"]:not([id^="task-edit-row-"])'
+                )
+            );
+
+            const sortOrder = taskRows.map((row, index) => ({
+                taskId: row.id.replace('task-', ''),
+                sortOrder: index + 1
+            }));
+
+
+            // Call sortOrder endpoint here...
+            console.log(sortOrder);
+
+
+    const taskContainerData = document.getElementById('task-container-wrapper');
+    const userId = taskContainerData.dataset.userId;
+    const listId = taskContainerData.dataset.listId;
+    console.log('userId:' + userId);
+    console.log('listId:' + listId);
+
+
+            // Prepare headers with CSRF token
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+
+            // Add CSRF token if available
+            const csrfToken = getCSRFToken();
+            const csrfHeader = getCSRFHeader();
+            if (csrfToken) {
+                headers[csrfHeader] = csrfToken;
+            }
+
+
+
+
+
+            // HTMX call to update sort order
+            fetch(`/ui/users/${userId}/lists/${listId}/tasks/sort`, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(sortOrder)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(html => {
+                // Replace the tasks container with updated content
+                document.getElementById('tasks-container').outerHTML = html;
+                // Re-initialize drag functionality
+                initializeTableDragger();
+            })
+            .catch(error => {
+                console.error('Error updating sort order:', error);
+                // Show error message to user
+                showAlert('Failed to update task order. Please try again.', 'danger');
+            });
+
+        });
+
+        // Also move the task-edit-row table row
+        dragger.on('drop', function() {
+            document.querySelectorAll('tr[id^="task-"]').forEach(taskRow => {
+                if (taskRow.id.startsWith('task-edit-row-')) return;
+                const taskId = taskRow.id.replace('task-', '');
+                const editRow = document.getElementById('task-edit-row-' + taskId);
+                if (editRow) {
+                    taskRow.after(editRow);
+                }
+            });
+        });
+
     }
 
 
@@ -145,14 +253,12 @@
     });
 
     document.body.addEventListener('htmx:afterSettle', function(event) {
-        if (
-            event.detail.target &&
-            event.detail.target.id === 'tasks-container'
-        ) {
+        if (event.detail.target && event.detail.target.id === 'tasks-container') {
             initializeTableDragger();
         }
     });
 
 </script>
+<script th:src="@{/js/table-dragger.min.js}"></script>
 </body>
 </html>

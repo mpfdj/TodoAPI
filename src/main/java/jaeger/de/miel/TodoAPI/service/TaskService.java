@@ -2,6 +2,7 @@ package jaeger.de.miel.TodoAPI.service;
 
 import jaeger.de.miel.TodoAPI.dto.CreateTaskRequestDTO;
 import jaeger.de.miel.TodoAPI.dto.TaskDTO;
+import jaeger.de.miel.TodoAPI.dto.TaskSortOrderRequestDTO;
 import jaeger.de.miel.TodoAPI.dto.UpdateTaskRequestDTO;
 import jaeger.de.miel.TodoAPI.entity.AppUser;
 import jaeger.de.miel.TodoAPI.entity.Task;
@@ -43,11 +44,10 @@ public class TaskService {
     }
 
     public TaskDTO createTask(Long userId, Long listId, CreateTaskRequestDTO createTaskRequestDTO) {
-
-        AppUser owner = userRepository.findById(userId)
+        userRepository.findById(userId)
             .orElseThrow(() -> new CreatorNotFoundException("CreatorId not found: " + userId));
 
-        jaeger.de.miel.TodoAPI.entity.List list = listRepository.findById(listId)
+        listRepository.findById(listId)
                 .orElseThrow(() -> new ListNotFoundException("ListId not found: " + listId));
 
         Integer nextSortOrder = taskRepository.findNextSortOrder(listId);
@@ -74,6 +74,21 @@ public class TaskService {
         Task updated = taskRepository.save(entity);
 
         return TaskMapper.toDTO(updated);
+    }
+
+
+    public void updateTaskSortOrder(List<TaskSortOrderRequestDTO> sortOrders) {
+        sortOrders.forEach(sortOrderRequestDTO -> {
+            Task task = taskRepository.findById(sortOrderRequestDTO.getTaskId())
+                    .orElseThrow(() -> new RuntimeException("Task not found with ID: " + sortOrderRequestDTO.getTaskId()));
+            task.setSortOrder(sortOrderRequestDTO.getSortOrder());
+            taskRepository.save(task);
+        });
+    }
+
+
+    public List<Task> getTasksByListId(Long listId) {
+        return taskRepository.findByListIdOrderBySortOrderAsc(listId);
     }
 
 

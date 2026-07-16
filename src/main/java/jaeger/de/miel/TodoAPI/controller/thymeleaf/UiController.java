@@ -1,6 +1,7 @@
 package jaeger.de.miel.TodoAPI.controller.thymeleaf;
 
 import jaeger.de.miel.TodoAPI.dto.*;
+import jaeger.de.miel.TodoAPI.entity.Task;
 import jaeger.de.miel.TodoAPI.service.ListService;
 import jaeger.de.miel.TodoAPI.service.TaskService;
 import jaeger.de.miel.TodoAPI.service.UserService;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class UiController {
@@ -118,10 +121,14 @@ public class UiController {
         ListDTO list = listService.getList(userId, listId);
         List<TaskDTO> tasks = taskService.getTasks(userId, listId);
 
+        List<TaskDTO> sortedTasks = tasks.stream()
+                .sorted(Comparator.comparingInt(TaskDTO::getSortOrder))
+                .toList();
+
         model.addAttribute("listName", list.getName());
         model.addAttribute("userId", userId);
         model.addAttribute("listId", listId);
-        model.addAttribute("tasks", tasks);
+        model.addAttribute("tasks", sortedTasks);
 
         return "tasks";
     }
@@ -233,5 +240,28 @@ public class UiController {
         return "fragments/tasks-container :: tasks-container";
     }
 
+    @PostMapping("/ui/users/{userId}/lists/{listId}/tasks/sort")
+    @PreAuthorize("#userId == authentication.principal.userId or hasRole('ROLE_ADMIN')")
+    public String updateTaskOrder(@PathVariable Long userId,
+                                  @PathVariable Long listId,
+                                  @RequestBody List<TaskSortOrderRequestDTO> sortOrder,
+                                  Model model) {
+
+        // Update the sort order in the database
+        taskService.updateTaskSortOrder(sortOrder);
+
+        // Get updated tasks
+        List<Task> tasks = taskService.getTasksByListId(listId);
+
+        List<Task> sortedTasks = tasks.stream()
+                .sorted(Comparator.comparingInt(Task::getSortOrder))
+                .toList();
+
+        model.addAttribute("tasks", sortedTasks);
+        model.addAttribute("userId", userId);
+        model.addAttribute("listId", listId);
+
+        return "fragments/tasks-container :: tasks-container";
+    }
 
 }

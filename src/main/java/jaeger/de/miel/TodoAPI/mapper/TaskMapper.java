@@ -1,10 +1,12 @@
 package jaeger.de.miel.TodoAPI.mapper;
 
-import jaeger.de.miel.TodoAPI.dto.*;
+import jaeger.de.miel.TodoAPI.dto.CreateTaskRequestDTO;
+import jaeger.de.miel.TodoAPI.dto.TaskDTO;
+import jaeger.de.miel.TodoAPI.dto.TaskStatus;
+import jaeger.de.miel.TodoAPI.dto.UpdateTaskRequestDTO;
 import jaeger.de.miel.TodoAPI.entity.AppUser;
 import jaeger.de.miel.TodoAPI.entity.List;
 import jaeger.de.miel.TodoAPI.entity.Task;
-import jakarta.validation.constraints.FutureOrPresent;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -26,6 +28,7 @@ public class TaskMapper {
         taskDTO.setCreatedAt(task.getCreatedAt());
         taskDTO.setUpdatedAt(task.getUpdatedAt());
         taskDTO.setCompletedAt(task.getCompletedAt());
+        taskDTO.setSortOrder(task.getSortOrder());
         return taskDTO;
     }
 

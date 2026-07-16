@@ -111,9 +111,19 @@
                   th:text="${task.title}">Task Title</span>
     </td>
 
+
+
+
     <!-- Beschrijving cel -->
-    <td>
-        <span class="text-secondary small" th:text="${task.description}"></span>
+<!--    <td>-->
+<!--        <span class="text-secondary small" th:text="${task.description}"></span>-->
+<!--    </td>-->
+
+    <td th:title="${task.description}">
+        <span th:if="${task.description != null and task.description.length() > 80}"
+              th:text="${#strings.substring(task.description, 0, 80)} + '...'"></span>
+        <span th:unless="${task.description != null and task.description.length() > 80}"
+              th:text="${task.description}"></span>
     </td>
 
     <!-- Priority cel -->
