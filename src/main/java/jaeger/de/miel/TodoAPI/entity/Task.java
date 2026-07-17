@@ -65,6 +65,9 @@ public class Task {
     @Column(name = "COMPLETED_AT")
     private Instant completedAt;
 
+    @Column(name = "SORT_ORDER", nullable = false)
+    private Integer sortOrder;
+
 /*
  TODO [Reverse Engineering] create field to map the 'DESCRIPTION' column
  Available actions: Define target Java type | Uncomment as is | Remove column mapping

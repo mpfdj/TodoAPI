@@ -18,4 +18,5 @@ public class TaskDTO {
     private Instant createdAt;
     private Instant updatedAt;
     private Instant completedAt;
+    private Integer sortOrder;
 }

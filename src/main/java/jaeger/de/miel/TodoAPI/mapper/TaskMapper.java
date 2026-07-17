@@ -1,10 +1,12 @@
 package jaeger.de.miel.TodoAPI.mapper;
 
-import jaeger.de.miel.TodoAPI.dto.*;
+import jaeger.de.miel.TodoAPI.dto.CreateTaskRequestDTO;
+import jaeger.de.miel.TodoAPI.dto.TaskDTO;
+import jaeger.de.miel.TodoAPI.dto.TaskStatus;
+import jaeger.de.miel.TodoAPI.dto.UpdateTaskRequestDTO;
 import jaeger.de.miel.TodoAPI.entity.AppUser;
 import jaeger.de.miel.TodoAPI.entity.List;
 import jaeger.de.miel.TodoAPI.entity.Task;
-import jakarta.validation.constraints.FutureOrPresent;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -26,10 +28,11 @@ public class TaskMapper {
         taskDTO.setCreatedAt(task.getCreatedAt());
         taskDTO.setUpdatedAt(task.getUpdatedAt());
         taskDTO.setCompletedAt(task.getCompletedAt());
+        taskDTO.setSortOrder(task.getSortOrder());
         return taskDTO;
     }
 
-    public static Task toEntity(Long userId, Long listId, CreateTaskRequestDTO createTaskRequestDTO) {
+    public static Task toEntity(Long userId, Long listId, Integer sortOrder, CreateTaskRequestDTO createTaskRequestDTO) {
         List list = new List();
         list.setId(listId);
 
@@ -48,6 +51,7 @@ public class TaskMapper {
         task.setPriority(createTaskRequestDTO.getPriority());
         task.setCreatedAt(now);
         task.setUpdatedAt(now);
+        task.setSortOrder(sortOrder);
         return task;
     }
 
