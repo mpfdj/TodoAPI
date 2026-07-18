@@ -9,7 +9,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- Custom CSS (alleen voor specifieke overschrijvingen) -->
+    <!-- Bootstrap Select CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/css/bootstrap-select.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
     <link rel="stylesheet" th:href="@{/css/custom.css}" />
 
     <!-- HTMX -->
@@ -26,9 +29,34 @@
         .handleDragAndDrop:active {
             cursor: grabbing;
         }
-        /* Add visual feedback for debugging */
         .handleDragAndDrop.dragging {
             background-color: #ffcccc;
+        }
+
+        /* Force Bootstrap Select icons to display */
+        .bootstrap-select .dropdown-toggle .filter-option-inner-inner i,
+        .bootstrap-select .dropdown-toggle .filter-option-inner-inner .bi,
+        .bootstrap-select .dropdown-menu .dropdown-item i,
+        .bootstrap-select .dropdown-menu .dropdown-item .bi {
+            display: inline-block !important;
+            margin-right: 8px !important;
+            font-size: 1.1em !important;
+            vertical-align: middle !important;
+        }
+
+        .bootstrap-select .dropdown-toggle .filter-option-inner-inner {
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        .bootstrap-select .dropdown-menu .dropdown-item {
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        .dropdown-toggle .filter-option-inner-inner .bi::before,
+        .dropdown-item .bi::before {
+            display: inline-block !important;
         }
     </style>
 </head>
@@ -40,7 +68,6 @@
         Tasks for List: <span th:text="${listName}" class="text-secondary"></span>
     </h1>
 
-    <!-- Back to Lists -->
     <a th:href="@{/ui/users/{userId}/lists(userId=${userId})}" class="btn btn-outline-secondary">
         ← Back to Lists
     </a>
@@ -108,32 +135,112 @@
 </div>
 
 <!-- Tasks Container -->
-<div th:id="task-container-wrapper"
+<div id="task-container-wrapper"
      th:data-user-id="${userId}"
      th:data-list-id="${listId}">
     <div th:replace="~{fragments/tasks-container :: tasks-container(tasks=${tasks}, userId=${userId}, listId=${listId})}"></div>
 </div>
 
-<!-- DEBUG -->
-<div th:replace="~{fragments/debug :: debug}"></div>
+<!-- ============================================ -->
+<!-- SCRIPTS - Load in correct order              -->
+<!-- ============================================ -->
 
-<!-- Bootstrap JavaScript Bundle (voor interactieve componenten) -->
+<!-- 1. jQuery FIRST -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- 2. Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- 3. Bootstrap Select JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/js/bootstrap-select.min.js"></script>
+
 <script>
+    // ============================================
+    // BOOTSTRAP SELECT INITIALIZATION
+    // ============================================
+    function initBootstrapSelects() {
+        if (typeof $ === 'undefined' || !$.fn.selectpicker) {
+            console.warn('jQuery or Bootstrap Select not available');
+            return;
+        }
 
-    // CSRF helper functions
-    function getCSRFToken() {
-        const metaTag = document.querySelector('meta[name="_csrf"]');
-        return metaTag ? metaTag.content : null;
+        $('select.selectpicker').each(function() {
+            const $select = $(this);
+            if (!$select.data('selectpicker')) {
+                try {
+                    $select.selectpicker({
+                        iconBase: 'bi',
+                        tickIcon: 'bi-check',
+                        liveSearch: false,
+                        size: 5,
+                        style: 'btn-sm btn-outline-secondary'
+                    });
+                } catch (e) {
+                    console.error('Error initializing select:', e);
+                }
+            }
+        });
     }
 
-    function getCSRFHeader() {
-        const metaTag = document.querySelector('meta[name="_csrf_header"]');
-        return metaTag ? metaTag.content : 'X-CSRF-TOKEN';
+    // ============================================
+    // STATUS CHANGE HANDLER
+    // ============================================
+    function handleStatusChange(selectElement, taskId) {
+        const newStatus = selectElement.value;
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+
+        const taskContainer = document.getElementById('task-container-wrapper');
+        const userId = taskContainer?.dataset?.userId;
+        const listId = taskContainer?.dataset?.listId;
+
+        if (!userId || !listId) {
+            console.error('Could not find userId or listId');
+            return;
+        }
+
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+        if (csrfToken) {
+            headers[csrfHeader] = csrfToken;
+        }
+
+        fetch(`/ui/users/${userId}/lists/${listId}/tasks/${taskId}/status`, {
+            method: 'PUT',
+            headers: headers,
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to update status');
+            return response.json();
+        })
+        .then(() => {
+            // Update title styling
+            const titleContainer = document.getElementById('title-container-' + taskId);
+            if (titleContainer) {
+                const titleSpan = titleContainer.querySelector('span');
+                if (titleSpan) {
+                    titleSpan.className = newStatus === 'archived'
+                        ? 'text-secondary text-decoration-line-through fw-bold'
+                        : 'fw-bold';
+                }
+            }
+
+            // Update the select value in Bootstrap Select
+            $(selectElement).selectpicker('val', newStatus);
+            $(selectElement).selectpicker('refresh');
+            $(selectElement).selectpicker('render');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Revert on error
+            const originalValue = selectElement.getAttribute('data-original-value') || 'todo';
+            $(selectElement).selectpicker('val', originalValue);
+            showAlert('Failed to update task status. Please try again.', 'danger');
+        });
     }
 
-    // Add helper function for showing alerts
     function showAlert(message, type = 'info') {
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
@@ -142,123 +249,33 @@
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
-        document.querySelector('.container').prepend(alertDiv);
+        document.querySelector('.container')?.prepend(alertDiv);
         setTimeout(() => alertDiv.remove(), 5000);
     }
 
-    let dragger = null;
-
-    function initializeTableDragger() {
-        const el = document.getElementById('tasksTable');
-
-        if (!el) return;
-
-        const TableDragger = tableDragger.default || tableDragger;
-
-        dragger = TableDragger(el, {
-            mode: 'row',
-            dragHandler: '.handleDragAndDrop',
-            onlyBody: true,
-            animation: 300
-        });
-
-        // dragger.on('drop', (...args) => {
-        //     console.log(args);
-        // });
-
-        dragger.on('drop', function(from, to) {
-
-            const taskRows = Array.from(
-                document.querySelectorAll(
-                    '#tasksTable tbody tr[id^="task-"]:not([id^="task-edit-row-"])'
-                )
-            );
-
-            const sortOrder = taskRows.map((row, index) => ({
-                taskId: row.id.replace('task-', ''),
-                sortOrder: index + 1
-            }));
-
-
-            // Call sortOrder endpoint here...
-            console.log(sortOrder);
-
-
-    const taskContainerData = document.getElementById('task-container-wrapper');
-    const userId = taskContainerData.dataset.userId;
-    const listId = taskContainerData.dataset.listId;
-    console.log('userId:' + userId);
-    console.log('listId:' + listId);
-
-
-            // Prepare headers with CSRF token
-            const headers = {
-                'Content-Type': 'application/json',
-            };
-
-            // Add CSRF token if available
-            const csrfToken = getCSRFToken();
-            const csrfHeader = getCSRFHeader();
-            if (csrfToken) {
-                headers[csrfHeader] = csrfToken;
-            }
-
-
-
-
-
-            // HTMX call to update sort order
-            fetch(`/ui/users/${userId}/lists/${listId}/tasks/sort`, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(sortOrder)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.text();
-            })
-            .then(html => {
-                // Replace the tasks container with updated content
-                document.getElementById('tasks-container').outerHTML = html;
-                // Re-initialize drag functionality
-                initializeTableDragger();
-            })
-            .catch(error => {
-                console.error('Error updating sort order:', error);
-                // Show error message to user
-                showAlert('Failed to update task order. Please try again.', 'danger');
-            });
-
-        });
-
-        // Also move the task-edit-row table row
-        dragger.on('drop', function() {
-            document.querySelectorAll('tr[id^="task-"]').forEach(taskRow => {
-                if (taskRow.id.startsWith('task-edit-row-')) return;
-                const taskId = taskRow.id.replace('task-', '');
-                const editRow = document.getElementById('task-edit-row-' + taskId);
-                if (editRow) {
-                    taskRow.after(editRow);
-                }
-            });
-        });
-
-    }
-
-
+    // ============================================
+    // HTMX EVENT LISTENERS
+    // ============================================
     document.addEventListener('DOMContentLoaded', function() {
-        initializeTableDragger();
+        // Initialize Bootstrap Selects after a delay
+        setTimeout(initBootstrapSelects, 200);
     });
 
-    document.body.addEventListener('htmx:afterSettle', function(event) {
-        if (event.detail.target && event.detail.target.id === 'tasks-container') {
-            initializeTableDragger();
+    // Reinitialize after HTMX swaps
+    document.body.addEventListener('htmx:afterSwap', function(event) {
+        if (event.detail.target) {
+            setTimeout(initBootstrapSelects, 300);
         }
     });
 
+    document.body.addEventListener('htmx:afterSettle', function(event) {
+        if (event.detail.target) {
+            setTimeout(initBootstrapSelects, 200);
+        }
+    });
+
+    console.log('Tasks page loaded successfully!');
 </script>
-<script th:src="@{/js/table-dragger.min.js}"></script>
+
 </body>
 </html>

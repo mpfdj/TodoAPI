@@ -2,11 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <style>
-        /* Status color classes */
-        .status-todo .filter-option-inner-inner { color: #6c757d; }
-        .status-in_progress .filter-option-inner-inner { color: #0d6efd; }
-        .status-done .filter-option-inner-inner { color: #198754; }
-        .status-archived .filter-option-inner-inner { color: #dc3545; }
+        /* Your styles here */
     </style>
 </head>
 <body>
@@ -58,14 +54,25 @@
     </script>
 
     <script>
-        // HTMX event listener for task updates
+        // Voeg dit toe aan je hoofdpagina (bijvoorbeeld list-detail.html of waar de tabel staat)
         document.body.addEventListener('htmx:afterSwap', function(event) {
+            // Check of het een task update betreft
             if (event.detail.target && event.detail.target.id && event.detail.target.id.startsWith('task-')) {
                 const taskId = event.detail.target.id.replace('task-', '');
+                console.log('Task updated, closing edit form for task:', taskId);
+
+                // Kleine vertraging om DOM te laten stabiliseren
                 setTimeout(function() {
                     const editRow = document.getElementById('task-edit-row-' + taskId);
                     const editBtn = document.getElementById('edit-btn-' + taskId);
-                    if(editRow) editRow.style.display = 'none';
+
+                    console.log('Found edit row:', editRow);
+                    console.log('Found edit button:', editBtn);
+
+                    if(editRow) {
+                        editRow.style.display = 'none';
+                    }
+
                     if(editBtn) {
                         editBtn.setAttribute('data-state', 'closed');
                         const icon = editBtn.querySelector('i');
@@ -77,37 +84,23 @@
                 }, 100);
             }
         });
-
-        // Setup status change handler using event delegation
-        if (typeof $ !== 'undefined') {
-            $(document).on('change', 'select.selectpicker.status-select', function() {
-                const selectElement = this;
-                const taskId = selectElement.getAttribute('data-task-id');
-                if (taskId && typeof handleStatusChange !== 'undefined') {
-                    handleStatusChange(selectElement, taskId);
-                }
-            });
-        }
     </script>
 
     <!-- Status cel -->
     <td th:id="'status-container-' + ${task.id}">
-        <div class="d-inline">
+        <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id}, source='task-item')}"
+              th:hx-target="'#status-container-' + ${task.id}"
+              th:hx-swap="outerHTML"
+              th:hx-trigger="change"
+              class="d-inline">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <select name="status"
-                    th:id="'status-select-' + ${task.id}"
-                    th:data-task-id="${task.id}"
-                    class="selectpicker status-select"
-                    th:data-original-value="${task.status}"
-                    data-live-search="false"
-                    data-size="5"
-                    style="width: auto;">
+            <select name="status" th:id="'status-select-' + ${task.id}" class="selectpicker" style="width: auto;" data-live-search="false" data-size="5">
                 <option value="todo" th:selected="${task.status == 'todo'}" data-icon="bi-clipboard">Todo</option>
                 <option value="in_progress" th:selected="${task.status == 'in_progress'}" data-icon="bi-hourglass-split">In Progress</option>
                 <option value="done" th:selected="${task.status == 'done'}" data-icon="bi-check-circle">Done</option>
                 <option value="archived" th:selected="${task.status == 'archived'}" data-icon="bi-archive">Archived</option>
             </select>
-        </div>
+        </form>
     </td>
 
     <!-- Title cel -->
@@ -173,22 +166,19 @@
 <!-- Status update fragment -->
 <th:block th:fragment="statusUpdate">
     <td th:id="'status-container-' + ${task.id}">
-        <div class="d-inline">
+        <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id}, source='task-item')}"
+              th:hx-target="'#status-container-' + ${task.id}"
+              th:hx-swap="outerHTML"
+              th:hx-trigger="change"
+              class="d-inline">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <select name="status"
-                    th:id="'status-select-' + ${task.id}"
-                    th:data-task-id="${task.id}"
-                    class="selectpicker status-select"
-                    th:data-original-value="${task.status}"
-                    data-live-search="false"
-                    data-size="5"
-                    style="width: auto;">
+            <select name="status" th:id="'status-select-' + ${task.id}" class="selectpicker" style="width: auto;" data-live-search="false" data-size="5">
                 <option value="todo" th:selected="${task.status == 'todo'}" data-icon="bi-clipboard">Todo</option>
                 <option value="in_progress" th:selected="${task.status == 'in_progress'}" data-icon="bi-hourglass-split">In Progress</option>
                 <option value="done" th:selected="${task.status == 'done'}" data-icon="bi-check-circle">Done</option>
                 <option value="archived" th:selected="${task.status == 'archived'}" data-icon="bi-archive">Archived</option>
             </select>
-        </div>
+        </form>
     </td>
 </th:block>
 
