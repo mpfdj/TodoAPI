@@ -151,18 +151,20 @@ function initBootstrapSelects() {
 
     $('select.selectpicker').each(function() {
         const $select = $(this);
-        if (!$select.data('selectpicker')) {
-            try {
-                $select.selectpicker({
-                    iconBase: 'bi',
-                    tickIcon: 'bi-check',
-                    liveSearch: false,
-                    size: 5,
-                    style: 'btn-sm btn-outline-secondary'
-                });
-            } catch (e) {
-                console.error('Error initializing select:', e);
-            }
+        // Skip if already initialized by task-item.html to prevent conflicts
+        if ($select.data('bs-select-initialized') || $select.data('selectpicker')) {
+            return;
+        }
+        try {
+            $select.selectpicker({
+                iconBase: 'bi',
+                tickIcon: 'bi-check',
+                liveSearch: false,
+                size: 5,
+                style: 'btn-sm btn-outline-secondary'
+            });
+        } catch (e) {
+            console.error('Error initializing select:', e);
         }
     });
 }
@@ -256,11 +258,6 @@ document.body.addEventListener('htmx:afterSettle', function(event) {
         setTimeout(initBootstrapSelects, 200);
     }
 });
-
-
-
-
-
 
 
 
