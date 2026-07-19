@@ -172,8 +172,6 @@ function initBootstrapSelects() {
 // ============================================
 function handleStatusChange(selectElement, taskId) {
     const newStatus = selectElement.value;
-<!--    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;-->
-<!--    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';-->
 
     const taskContainer = document.getElementById('task-container-wrapper');
     const userId = taskContainer?.dataset?.userId;
@@ -281,13 +279,6 @@ document.body.addEventListener('htmx:afterSettle', function(event) {
 
 
 
-
-
-
-
-
-
-
 let dragger = null;
 
 function initializeTableDragger() {
@@ -326,27 +317,20 @@ function initializeTableDragger() {
         console.log(sortOrder);
 
 
-const taskContainerData = document.getElementById('task-container-wrapper');
-const userId = taskContainerData.dataset.userId;
-const listId = taskContainerData.dataset.listId;
-console.log('userId:' + userId);
-console.log('listId:' + listId);
+        const taskContainerData = document.getElementById('task-container-wrapper');
+        const userId = taskContainerData.dataset.userId;
+        const listId = taskContainerData.dataset.listId;
+        console.log('userId:' + userId);
+        console.log('listId:' + listId);
 
 
-<!--        // Prepare headers with CSRF token-->
-<!--        const headers = {-->
-<!--            'Content-Type': 'application/json',-->
-<!--        };-->
-<!---->
-<!--        // Add CSRF token if available-->
-<!--        const csrfToken = getCSRFToken();-->
-<!--        const csrfHeader = getCSRFHeader();-->
-<!--        if (csrfToken) {-->
-<!--            headers[csrfHeader] = csrfToken;-->
-<!--        }-->
-
-
-
+        // Prepare headers with CSRF token
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+        if (csrfToken) {
+            headers[csrfHeader] = csrfToken;
+        }
 
 
         // HTMX call to update sort order
