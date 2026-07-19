@@ -82,7 +82,14 @@
             if (!selectElement) return;
             const $select = $(selectElement);
 
-            // Check if already initialized
+            // Check if already initialized - use a data attribute to track
+            if ($select.data('bs-select-initialized')) {
+                console.log('Select already initialized, skipping:', $select.attr('id'));
+                return;
+            }
+            $select.data('bs-select-initialized', true);
+
+            // Check if already initialized with Bootstrap Select
             if ($select.data('selectpicker')) {
                 $select.selectpicker('destroy');
             }
