@@ -171,8 +171,13 @@
         });
 
         // Handle change event on select - using jQuery's change event
+        // This is crucial for Bootstrap Select to trigger HTMX
         if (typeof $ !== 'undefined') {
-            $(document).on('change', 'select.selectpicker.status-select', function() {
+            $(document).on('changed.bs.select', 'select.selectpicker.status-select', function(e, clickedIndex, newValue, oldValue) {
+                // Trigger the change event on the original select element
+                // This will trigger HTMX's hx-trigger="change"
+                $(this).trigger('change');
+                
                 // Update the status class on the button
                 syncSelectpickerStatusClass(this);
 
@@ -180,7 +185,6 @@
                 const $button = $(this).closest('.bootstrap-select').find('.dropdown-toggle');
                 $button.removeClass();
                 $button.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
-
             });
         }
 
