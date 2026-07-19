@@ -278,7 +278,6 @@ document.body.addEventListener('htmx:afterSettle', function(event) {
 
 
 
-
 let dragger = null;
 
 function initializeTableDragger() {
@@ -350,6 +349,8 @@ function initializeTableDragger() {
             document.getElementById('tasks-container').outerHTML = html;
             // Re-initialize drag functionality
             initializeTableDragger();
+            // Re-initialize Bootstrap Select dropdowns
+            setTimeout(initBootstrapSelects, 300);
         })
         .catch(error => {
             console.error('Error updating sort order:', error);
@@ -381,6 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.body.addEventListener('htmx:afterSettle', function(event) {
     if (event.detail.target && event.detail.target.id === 'tasks-container') {
         initializeTableDragger();
+        setTimeout(initBootstrapSelects, 300);
     }
 });
 

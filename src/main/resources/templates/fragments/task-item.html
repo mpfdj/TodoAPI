@@ -97,12 +97,8 @@
             // Fix button classes
             const $button = $select.closest('.bootstrap-select').find('.dropdown-toggle');
             console.log($button);
-<!--            $button.removeClass('btn-sm btn-outline-secondary');-->
-<!--            $button.addClass('btn-light');-->
             $button.removeClass();
             $button.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
-
-
 
             // Sync status class
             syncSelectpickerStatusClass(selectElement);
@@ -156,6 +152,13 @@
                     }
                 }, 100);
             }
+
+            // Handle edit container updates (when edit form is loaded)
+            if (event.detail.target && event.detail.target.id && event.detail.target.id.startsWith('task-edit-container-')) {
+                setTimeout(function() {
+                    initAllSelectpickers(event.detail.target);
+                }, 100);
+            }
         });
 
         // Also handle after settle for any other swaps
@@ -175,8 +178,6 @@
 
                 // Also ensure the button has the right classes
                 const $button = $(this).closest('.bootstrap-select').find('.dropdown-toggle');
-<!--                $button.removeClass('btn-sm btn-outline-secondary');-->
-<!--                $button.addClass('btn-light');-->
                 $button.removeClass();
                 $button.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
 
@@ -186,24 +187,16 @@
         // Initialize on page load
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
-                                initAllSelectpickers(document);
-
-<!--                setTimeout(function() {-->
-<!--                    initAllSelectpickers(document);-->
-<!--                }, 200);-->
+                initAllSelectpickers(document);
             });
         } else {
-                    initAllSelectpickers(document);
-
-<!--            setTimeout(function() {-->
-<!--                initAllSelectpickers(document);-->
-<!--            }, 200);-->
+            initAllSelectpickers(document);
         }
 
         console.log('Task item loaded successfully');
     </script>
 
-    <!-- Status cel -->
+    <!-- Status cell -->
     <td th:id="'status-container-' + ${task.id}">
         <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id}, source='task-item')}"
               th:hx-target="'#status-container-' + ${task.id}"
@@ -227,13 +220,13 @@
         </form>
     </td>
 
-    <!-- Title cel -->
+    <!-- Title cell -->
     <td th:id="'title-container-' + ${task.id}">
         <span th:class="(${task.status == 'archived'} ? 'text-secondary text-decoration-line-through fw-bold' : 'fw-bold')"
               th:text="${task.title}">Task Title</span>
     </td>
 
-    <!-- Description cel -->
+    <!-- Description cell -->
     <td th:title="${task.description}">
         <span th:if="${task.description != null and task.description.length() > 80}"
               th:text="${#strings.substring(task.description, 0, 80)} + '...'"></span>
@@ -241,17 +234,17 @@
               th:text="${task.description}"></span>
     </td>
 
-    <!-- Priority cel -->
+    <!-- Priority cell -->
     <td>
         <span class="text-secondary small" th:text="${task.priority}"></span>
     </td>
 
-    <!-- Due Date cel -->
+    <!-- Due Date cell -->
     <td>
         <span class="text-secondary small" th:text="${task.dueDate}"></span>
     </td>
 
-    <!-- Actions cel -->
+    <!-- Actions cell -->
     <td>
         <div class="d-flex gap-2 align-items-center flex-shrink-0">
             <button class="btn btn-sm btn-outline-primary"
