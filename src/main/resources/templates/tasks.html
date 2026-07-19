@@ -23,9 +23,16 @@
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
     <style>
-        .handleDragAndDrop { cursor: grab; }
-        .handleDragAndDrop:active { cursor: grabbing; }
-        .handleDragAndDrop.dragging { background-color: #ffcccc; }
+        .handleDragAndDrop {
+            cursor: grab;
+        }
+        .handleDragAndDrop:active {
+            cursor: grabbing;
+        }
+        /* Add visual feedback for debugging */
+        .handleDragAndDrop.dragging {
+            background-color: #ffcccc;
+        }
     </style>
 </head>
 <body class="container py-4">
@@ -35,6 +42,7 @@
     <h1 class="display-5 fw-bold text-primary">
         Tasks for List: <span th:text="${listName}" class="text-secondary"></span>
     </h1>
+
     <a th:href="@{/ui/users/{userId}/lists(userId=${userId})}" class="btn btn-outline-secondary">
         ← Back to Lists
     </a>
@@ -51,21 +59,36 @@
         <form th:action="@{/ui/users/{userId}/lists/{listId}/tasks(userId=${userId}, listId=${listId})}"
               method="post"
               class="row g-3">
+
             <div class="col-md-4">
                 <label for="title" class="form-label">Task title</label>
-                <input type="text" class="form-control" id="title" name="title"
-                       placeholder="Enter task title" required />
+                <input type="text"
+                       class="form-control"
+                       id="title"
+                       name="title"
+                       placeholder="Enter task title"
+                       required />
             </div>
+
             <div class="col-md-4">
                 <label for="description" class="form-label">Description</label>
-                <input type="text" class="form-control" id="description" name="description"
+                <input type="text"
+                       class="form-control"
+                       id="description"
+                       name="description"
                        placeholder="Description (optional)" />
             </div>
+
             <div class="col-md-2">
                 <label for="dueDate" class="form-label">Due Date</label>
-                <input type="date" class="form-control" id="dueDate" name="dueDate" required
+                <input type="date"
+                       class="form-control"
+                       id="dueDate"
+                       name="dueDate"
+                       required
                        th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" />
             </div>
+
             <div class="col-md-1">
                 <label for="priority" class="form-label">Priority</label>
                 <select class="form-select" id="priority" name="priority" required>
@@ -76,8 +99,11 @@
                     <option value="5">5</option>
                 </select>
             </div>
+
             <div class="col-md-1 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">Add Task</button>
+                <button type="submit" class="btn btn-primary w-100">
+                    Add Task
+                </button>
             </div>
         </form>
     </div>
@@ -94,7 +120,7 @@
 <div th:replace="~{fragments/debug :: debug}"></div>
 
 <!-- ============================================ -->
-<!-- SCRIPTS -->
+<!-- SCRIPTS - Load in correct order              -->
 <!-- ============================================ -->
 
 <!-- 1. jQuery FIRST -->
@@ -107,139 +133,65 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/js/bootstrap-select.min.js"></script>
 
 <script>
-// ============================================
-// GLOBAL CONFIG
-// ============================================
-const CSRF = {
-    token: document.querySelector('meta[name="_csrf"]')?.content,
-    header: document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN'
-};
 
-const TaskContainer = {
-    get wrapper() { return document.getElementById('task-container-wrapper'); },
-    get userId() { return this.wrapper?.dataset?.userId; },
-    get listId() { return this.wrapper?.dataset?.listId; },
-    get table() { return document.getElementById('tasksTable'); }
-};
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+
+
+
 
 // ============================================
-// UTILITY FUNCTIONS
+// BOOTSTRAP SELECT INITIALIZATION
 // ============================================
-const Utils = {
-    // Create and show alert
-    showAlert(message, type = 'info', duration = 5000) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-        alertDiv.role = 'alert';
-        alertDiv.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-        document.querySelector('.container').prepend(alertDiv);
-        setTimeout(() => alertDiv.remove(), duration);
-    },
-
-    // Build fetch headers with CSRF
-    getHeaders(contentType = 'application/json') {
-        const headers = { 'Content-Type': contentType };
-        if (CSRF.token) headers[CSRF.header] = CSRF.token;
-        return headers;
-    },
-
-    // Debounce function
-    debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
+function initBootstrapSelects() {
+    if (typeof $ === 'undefined' || !$.fn.selectpicker) {
+        console.warn('jQuery or Bootstrap Select not available');
+        return;
     }
-};
 
-// ============================================
-// BOOTSTRAP SELECT MANAGER
-// ============================================
-const SelectManager = {
-    // Status color classes mapping
-    statusClasses: {
-        todo: 'status-todo',
-        in_progress: 'status-in_progress',
-        done: 'status-done',
-        archived: 'status-archived'
-    },
-
-    // Initialize a single selectpicker
-    initSelect(selectElement) {
-        if (!selectElement || typeof $ === 'undefined') return;
-        
-        const $select = $(selectElement);
-        
-        // Destroy existing instance if present
-        if ($select.data('selectpicker')) {
-            $select.selectpicker('destroy');
+    $('select.selectpicker').each(function() {
+        const $select = $(this);
+        if (!$select.data('selectpicker')) {
+            try {
+                $select.selectpicker({
+                    iconBase: 'bi',
+                    tickIcon: 'bi-check',
+                    liveSearch: false,
+                    size: 5,
+                    style: 'btn-sm btn-outline-secondary'
+                });
+            } catch (e) {
+                console.error('Error initializing select:', e);
+            }
         }
-
-        // Initialize with options
-        $select.selectpicker({
-            style: 'btn-light',
-            size: false,
-            liveSearch: false
-        });
-
-        // Fix button classes
-        const $button = $select.closest('.bootstrap-select').find('.dropdown-toggle');
-        $button.removeClass();
-        $button.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
-
-        // Sync status class
-        this.syncStatusClass(selectElement);
-
-        // Add change event listener for HTMX
-        $select.on('changed.bs.select', (e, clickedIndex, newValue) => {
-            console.log('Status changed to:', newValue);
-            $select.trigger('change'); // Trigger for HTMX
-            this.syncStatusClass(selectElement);
-        });
-    },
-
-    // Sync status class from select value to button
-    syncStatusClass(selectElement) {
-        if (!selectElement) return;
-        const status = selectElement.value;
-        const $button = $(selectElement).closest('.bootstrap-select').find('.dropdown-toggle');
-        $button.removeClass('status-todo status-in_progress status-done status-archived');
-        if (status && this.statusClasses[status]) {
-            $button.addClass(this.statusClasses[status]);
-        }
-    },
-
-    // Initialize all selectpickers in a container
-    initAll(container = document) {
-        if (typeof $ === 'undefined' || !$.fn.selectpicker) return;
-        $(container).find('select.selectpicker.status-select').each((i, el) => this.initSelect(el));
-    }
-};
+    });
+}
 
 // ============================================
-// STATUS UPDATE HANDLER
+// STATUS CHANGE HANDLER
 // ============================================
-function handleStatusUpdate(selectElement, taskId) {
+function handleStatusChange(selectElement, taskId) {
     const newStatus = selectElement.value;
-    const userId = TaskContainer.userId;
-    const listId = TaskContainer.listId;
+
+    const taskContainer = document.getElementById('task-container-wrapper');
+    const userId = taskContainer?.dataset?.userId;
+    const listId = taskContainer?.dataset?.listId;
 
     if (!userId || !listId) {
-        console.error('Missing userId or listId');
+        console.error('Could not find userId or listId');
         return;
+    }
+
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+    if (csrfToken) {
+        headers[csrfHeader] = csrfToken;
     }
 
     fetch(`/ui/users/${userId}/lists/${listId}/tasks/${taskId}/status`, {
         method: 'PUT',
-        headers: Utils.getHeaders(),
+        headers: headers,
         body: JSON.stringify({ status: newStatus })
     })
     .then(response => {
@@ -248,7 +200,7 @@ function handleStatusUpdate(selectElement, taskId) {
     })
     .then(() => {
         // Update title styling
-        const titleContainer = document.getElementById(`title-container-${taskId}`);
+        const titleContainer = document.getElementById('title-container-' + taskId);
         if (titleContainer) {
             const titleSpan = titleContainer.querySelector('span');
             if (titleSpan) {
@@ -257,133 +209,197 @@ function handleStatusUpdate(selectElement, taskId) {
                     : 'fw-bold';
             }
         }
-        // Update Bootstrap Select value
+
+        // Update the select value in Bootstrap Select
         $(selectElement).selectpicker('val', newStatus);
         $(selectElement).selectpicker('refresh');
+        $(selectElement).selectpicker('render');
     })
     .catch(error => {
-        console.error('Error updating status:', error);
+        console.error('Error:', error);
+        // Revert on error
         const originalValue = selectElement.getAttribute('data-original-value') || 'todo';
         $(selectElement).selectpicker('val', originalValue);
-        Utils.showAlert('Failed to update task status. Please try again.', 'danger');
+        showAlert('Failed to update task status. Please try again.', 'danger');
     });
 }
 
-// ============================================
-// DRAG AND DROP MANAGER
-// ============================================
-let dragger = null;
-
-const DragManager = {
-    init() {
-        const el = TaskContainer.table;
-        if (!el) return;
-
-        const TableDragger = tableDragger.default || tableDragger;
-        dragger = TableDragger(el, {
-            mode: 'row',
-            dragHandler: '.handleDragAndDrop',
-            onlyBody: true,
-            animation: 300
-        });
-
-        this.setupDropHandlers();
-    },
-
-    setupDropHandlers() {
-        if (!dragger) return;
-
-        dragger.on('drop', (from, to) => {
-            const taskRows = Array.from(
-                document.querySelectorAll('#tasksTable tbody tr[id^="task-"]:not([id^="task-edit-row-"])')
-            );
-
-            const sortOrder = taskRows.map((row, index) => ({
-                taskId: row.id.replace('task-', ''),
-                sortOrder: index + 1
-            }));
-
-            console.log('New sort order:', sortOrder);
-
-            const userId = TaskContainer.userId;
-            const listId = TaskContainer.listId;
-
-            fetch(`/ui/users/${userId}/lists/${listId}/tasks/sort`, {
-                method: 'POST',
-                headers: Utils.getHeaders(),
-                body: JSON.stringify(sortOrder)
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.text();
-            })
-            .then(html => {
-                const container = document.getElementById('tasks-container');
-                container.outerHTML = html;
-                
-                const newContainer = document.getElementById('tasks-container');
-                if (newContainer && typeof htmx !== 'undefined') {
-                    htmx.process(newContainer);
-                }
-                
-                this.init(); // Re-initialize drag
-                SelectManager.initAll(); // Re-initialize selects
-            })
-            .catch(error => {
-                console.error('Error updating sort order:', error);
-                Utils.showAlert('Failed to update task order. Please try again.', 'danger');
-            });
-        });
-
-        // Keep edit rows with their task rows
-        dragger.on('drop', () => {
-            document.querySelectorAll('tr[id^="task-"]').forEach(taskRow => {
-                if (taskRow.id.startsWith('task-edit-row-')) return;
-                const taskId = taskRow.id.replace('task-', '');
-                const editRow = document.getElementById(`task-edit-row-${taskId}`);
-                if (editRow) taskRow.after(editRow);
-            });
-        });
-    }
-};
+function showAlert(message, type = 'info') {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.role = 'alert';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    document.querySelector('.container').prepend(alertDiv);
+    setTimeout(() => alertDiv.remove(), 5000);
+}
 
 // ============================================
-// HTMX EVENT HANDLERS
+// HTMX EVENT LISTENERS
 // ============================================
-const HTMXHandlers = {
-    init() {
-        // After swap - reinitialize selects
-        document.body.addEventListener('htmx:afterSwap', (event) => {
-            if (event.detail.target) {
-                setTimeout(() => SelectManager.initAll(event.detail.target), 100);
-            }
-        });
-
-        // After settle - reinitialize selects
-        document.body.addEventListener('htmx:afterSettle', (event) => {
-            if (event.detail.target) {
-                setTimeout(() => SelectManager.initAll(event.detail.target), 100);
-                if (event.detail.target.id === 'tasks-container') {
-                    DragManager.init();
-                }
-            }
-        });
-    }
-};
-
-// ============================================
-// INITIALIZATION
-// ============================================
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize all components
-    SelectManager.initAll();
-    DragManager.init();
-    HTMXHandlers.init();
-    
-    console.log('Tasks page initialized');
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap Selects after a delay
+    setTimeout(initBootstrapSelects, 200);
 });
 
-console.log('Tasks page loaded');
+// Reinitialize after HTMX swaps
+document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target) {
+        setTimeout(initBootstrapSelects, 300);
+    }
+});
+
+document.body.addEventListener('htmx:afterSettle', function(event) {
+    if (event.detail.target) {
+        setTimeout(initBootstrapSelects, 200);
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+let dragger = null;
+
+function initializeTableDragger() {
+    const el = document.getElementById('tasksTable');
+
+    if (!el) return;
+
+    const TableDragger = tableDragger.default || tableDragger;
+
+    dragger = TableDragger(el, {
+        mode: 'row',
+        dragHandler: '.handleDragAndDrop',
+        onlyBody: true,
+        animation: 300
+    });
+
+    // dragger.on('drop', (...args) => {
+    //     console.log(args);
+    // });
+
+    dragger.on('drop', function(from, to) {
+
+        const taskRows = Array.from(
+            document.querySelectorAll(
+                '#tasksTable tbody tr[id^="task-"]:not([id^="task-edit-row-"])'
+            )
+        );
+
+        const sortOrder = taskRows.map((row, index) => ({
+            taskId: row.id.replace('task-', ''),
+            sortOrder: index + 1
+        }));
+
+
+        // Call sortOrder endpoint here...
+        console.log(sortOrder);
+
+
+        const taskContainerData = document.getElementById('task-container-wrapper');
+        const userId = taskContainerData.dataset.userId;
+        const listId = taskContainerData.dataset.listId;
+        console.log('userId:' + userId);
+        console.log('listId:' + listId);
+
+
+        // Prepare headers with CSRF token
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+        if (csrfToken) {
+            headers[csrfHeader] = csrfToken;
+        }
+
+
+        // HTMX call to update sort order
+        fetch(`/ui/users/${userId}/lists/${listId}/tasks/sort`, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(sortOrder)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then(html => {
+            // Replace the tasks container with updated content
+            const container = document.getElementById('tasks-container');
+            container.outerHTML = html;
+            
+            // Get the new container element
+            const newContainer = document.getElementById('tasks-container');
+            
+            // Manually trigger HTMX to process the new content
+            if (typeof htmx !== 'undefined' && newContainer) {
+                htmx.process(newContainer);
+            }
+            
+            // Re-initialize drag functionality
+            initializeTableDragger();
+            // Re-initialize Bootstrap Select dropdowns
+            setTimeout(initBootstrapSelects, 300);
+        })
+        .catch(error => {
+            console.error('Error updating sort order:', error);
+            // Show error message to user
+            showAlert('Failed to update task order. Please try again.', 'danger');
+        });
+
+    });
+
+    // Also move the task-edit-row table row
+    dragger.on('drop', function() {
+        document.querySelectorAll('tr[id^="task-"]').forEach(taskRow => {
+            if (taskRow.id.startsWith('task-edit-row-')) return;
+            const taskId = taskRow.id.replace('task-', '');
+            const editRow = document.getElementById('task-edit-row-' + taskId);
+            if (editRow) {
+                taskRow.after(editRow);
+            }
+        });
+    });
+
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeTableDragger();
+});
+
+document.body.addEventListener('htmx:afterSettle', function(event) {
+    if (event.detail.target && event.detail.target.id === 'tasks-container') {
+        initializeTableDragger();
+        setTimeout(initBootstrapSelects, 300);
+    }
+});
+
+console.log('Tasks page loaded successfully!');
 </script>
 <script th:src="@{/js/table-dragger.min.js}"></script>
 </body>
