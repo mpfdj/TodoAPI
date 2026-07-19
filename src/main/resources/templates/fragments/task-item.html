@@ -139,59 +139,6 @@
         window.syncSelectpickerStatusClass = syncSelectpickerStatusClass;
 
 // ============================================
-// HTMX EVENT HANDLERS
-// ============================================
-
-        document.body.addEventListener('htmx:afterSwap', function(event) {
-            const target = event.detail.target;
-            if (!target || !target.id) return;
-
-            // Reinitialize selectpicker after status container update
-            if (target.id.startsWith('status-container-')) {
-                setTimeout(function() {
-                    const selectElement = target.querySelector('select.selectpicker');
-                    if (selectElement) {
-                        initSelectpicker(selectElement);
-                    }
-                }, 50);
-            }
-
-            // Close edit form after task update
-            if (target.id.startsWith('task-')) {
-                const taskId = target.id.replace('task-', '');
-                setTimeout(function() {
-                    const editRow = document.getElementById('task-edit-row-' + taskId);
-                    const editBtn = document.getElementById('edit-btn-' + taskId);
-                    if (editRow) editRow.style.display = 'none';
-                    if (editBtn) {
-                        editBtn.setAttribute('data-state', 'closed');
-                        const icon = editBtn.querySelector('i');
-                        if (icon) {
-                            icon.classList.remove('bi-x-circle');
-                            icon.classList.add('bi-pencil');
-                        }
-                    }
-                }, 100);
-            }
-
-            // Reinitialize selects after edit container update
-            if (target.id.startsWith('task-edit-container-')) {
-                setTimeout(function() {
-                    initAllSelectpickers(target);
-                }, 100);
-            }
-        });
-
-        // Reinitialize selects after HTMX settle
-        document.body.addEventListener('htmx:afterSettle', function(event) {
-            if (event.detail.target) {
-                setTimeout(function() {
-                    initAllSelectpickers(event.detail.target);
-                }, 100);
-            }
-        });
-
-// ============================================
 // INITIALIZATION
 // ============================================
 
