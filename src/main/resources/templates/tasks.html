@@ -141,35 +141,6 @@
 
 
 // ============================================
-// BOOTSTRAP SELECT INITIALIZATION
-// ============================================
-function initBootstrapSelects() {
-    if (typeof $ === 'undefined' || !$.fn.selectpicker) {
-        console.warn('jQuery or Bootstrap Select not available');
-        return;
-    }
-
-    $('select.selectpicker').each(function() {
-        const $select = $(this);
-        // Skip if already initialized by task-item.html to prevent conflicts
-        if ($select.data('bs-select-initialized') || $select.data('selectpicker')) {
-            return;
-        }
-        try {
-            $select.selectpicker({
-                iconBase: 'bi',
-                tickIcon: 'bi-check',
-                liveSearch: false,
-                size: 5,
-                style: 'btn-sm btn-outline-secondary'
-            });
-        } catch (e) {
-            console.error('Error initializing select:', e);
-        }
-    });
-}
-
-// ============================================
 // STATUS CHANGE HANDLER
 // ============================================
 function handleStatusChange(selectElement, taskId) {
@@ -243,21 +214,29 @@ function showAlert(message, type = 'info') {
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Bootstrap Selects after a delay
-    setTimeout(initBootstrapSelects, 200);
+    // Use the global function from task-item.html if available, otherwise fall back
+    if (typeof initAllSelectpickers === 'function') {
+        setTimeout(initAllSelectpickers, 200);
+    }
 });
 
 // Reinitialize after HTMX swaps
 document.body.addEventListener('htmx:afterSwap', function(event) {
     if (event.detail.target) {
-        setTimeout(initBootstrapSelects, 300);
+        if (typeof initAllSelectpickers === 'function') {
+            setTimeout(initAllSelectpickers, 300);
+        }
     }
 });
 
 document.body.addEventListener('htmx:afterSettle', function(event) {
     if (event.detail.target) {
-        setTimeout(initBootstrapSelects, 200);
+        if (typeof initAllSelectpickers === 'function') {
+            setTimeout(initAllSelectpickers, 200);
+        }
     }
 });
+
 
 
 
@@ -360,7 +339,9 @@ function initializeTableDragger() {
             // Re-initialize drag functionality
             initializeTableDragger();
             // Re-initialize Bootstrap Select dropdowns
-            setTimeout(initBootstrapSelects, 300);
+            if (typeof initAllSelectpickers === 'function') {
+                setTimeout(initAllSelectpickers, 300);
+            }
         })
         .catch(error => {
             console.error('Error updating sort order:', error);
@@ -392,7 +373,9 @@ document.addEventListener('DOMContentLoaded', function() {
 document.body.addEventListener('htmx:afterSettle', function(event) {
     if (event.detail.target && event.detail.target.id === 'tasks-container') {
         initializeTableDragger();
-        setTimeout(initBootstrapSelects, 300);
+        if (typeof initAllSelectpickers === 'function') {
+            setTimeout(initAllSelectpickers, 300);
+        }
     }
 });
 
