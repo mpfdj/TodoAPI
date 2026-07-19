@@ -70,14 +70,20 @@
         };
 
         // ============================================
-        // BOOTSTRAP SELECT INITIALIZATION FOR THIS ITEM
+        // BOOTSTRAP SELECT MANAGER (local to task-item)
         // ============================================
-        function initTaskItemSelects() {
-            if (typeof $ === 'undefined' || !$.fn.selectpicker) return;
+        const TaskSelectManager = {
+            statusClasses: {
+                todo: 'status-todo',
+                in_progress: 'status-in_progress',
+                done: 'status-done',
+                archived: 'status-archived'
+            },
 
-            const statusSelect = document.querySelector(`#status-select-${'${task.id}'}`.replace('${task.id}', ''));
-            if (statusSelect) {
-                const $select = $(statusSelect);
+            initSelect(selectElement) {
+                if (!selectElement || typeof $ === 'undefined') return;
+                
+                const $select = $(selectElement);
                 
                 // Destroy existing instance
                 if ($select.data('selectpicker')) {
@@ -97,20 +103,34 @@
                 $button.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
 
                 // Sync status class
-                const status = statusSelect.value;
-                $button.removeClass('status-todo status-in_progress status-done status-archived');
-                if (status) $button.addClass(`status-${status}`);
+                this.syncStatusClass(selectElement);
 
-                // Add change listener for HTMX
+                // Add change event listener for HTMX
+                // Use event delegation pattern that survives HTMX swaps
                 $select.on('changed.bs.select', function() {
-                    $select.trigger('change');
-                    const newStatus = this.value;
-                    const $btn = $(this).closest('.bootstrap-select').find('.dropdown-toggle');
-                    $btn.removeClass('status-todo status-in_progress status-done status-archived');
-                    if (newStatus) $btn.addClass(`status-${newStatus}`);
+                    // Trigger change for HTMX
+                    $(this).trigger('change');
+                    // Sync status class
+                    TaskSelectManager.syncStatusClass(this);
                 });
+            },
+
+            syncStatusClass(selectElement) {
+                if (!selectElement) return;
+                const status = selectElement.value;
+                const $button = $(selectElement).closest('.bootstrap-select').find('.dropdown-toggle');
+                $button.removeClass('status-todo status-in_progress status-done status-archived');
+                if (status && this.statusClasses[status]) {
+                    $button.addClass(this.statusClasses[status]);
+                }
+            },
+
+            initAll(container) {
+                if (typeof $ === 'undefined' || !$.fn.selectpicker) return;
+                const target = container || document;
+                $(target).find('select.selectpicker.status-select').each((i, el) => this.initSelect(el));
             }
-        }
+        };
 
         // ============================================
         // HTMX EVENT HANDLERS FOR THIS ITEM
@@ -121,14 +141,16 @@
                 const target = event.detail.target;
                 if (!target || !target.id) return;
 
-                if (target.id.startsWith('status-container-')) {
-                    setTimeout(() => {
-                        const select = target.querySelector('select.selectpicker');
-                        if (select) initTaskItemSelects();
-                    }, 50);
+                // Reinitialize selects after any swap that might affect them
+                if (target.id.startsWith('status-container-') || 
+                    target.id.startsWith('task-') || 
+                    target.id.startsWith('task-edit-container-') ||
+                    target.id === 'tasks-container') {
+                    setTimeout(() => TaskSelectManager.initAll(target), 100);
                 }
 
-                if (target.id.startsWith('task-')) {
+                // Handle task row updates (close edit form)
+                if (target.id && target.id.startsWith('task-')) {
                     const taskId = target.id.replace('task-', '');
                     setTimeout(() => {
                         const editRow = document.getElementById(`task-edit-row-${taskId}`);
@@ -144,16 +166,12 @@
                         }
                     }, 100);
                 }
-
-                if (target.id.startsWith('task-edit-container-')) {
-                    setTimeout(initTaskItemSelects, 100);
-                }
             });
 
             // Handle after settle
             document.body.addEventListener('htmx:afterSettle', (event) => {
                 if (event.detail.target) {
-                    setTimeout(initTaskItemSelects, 100);
+                    setTimeout(() => TaskSelectManager.initAll(event.detail.target), 100);
                 }
             });
         }
@@ -163,11 +181,11 @@
         // ============================================
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
-                initTaskItemSelects();
+                TaskSelectManager.initAll();
                 setupTaskItemHTMX();
             });
         } else {
-            initTaskItemSelects();
+            TaskSelectManager.initAll();
             setupTaskItemHTMX();
         }
     </script>
