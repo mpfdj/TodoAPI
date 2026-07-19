@@ -25,6 +25,10 @@
     class='handleDragAndDrop'>
 
     <script>
+// ============================================
+// TASK ITEM FUNCTIONS
+// ============================================
+
         function handleClick(element) {
             const taskId = element.dataset.taskId;
             const userId = element.dataset.userId;
@@ -32,11 +36,7 @@
             const taskTitle = element.dataset.taskTitle;
             const taskStatus = element.dataset.taskStatus;
 
-            console.log('Task ID:', taskId);
-            console.log('User ID:', userId);
-            console.log('List ID:', listId);
-            console.log('Title:', taskTitle);
-            console.log('Status:', taskStatus);
+            console.log('Task Info:', { taskId, userId, listId, title: taskTitle, status: taskStatus });
         }
 
         function toggleEdit(button) {
@@ -45,8 +45,9 @@
             const targetRow = document.getElementById('task-edit-row-' + taskId);
             const icon = button.querySelector('i');
             const containerId = 'task-edit-container-' + taskId;
+            const isOpen = button.getAttribute('data-state') === 'open';
 
-            if (button.getAttribute('data-state') === 'open') {
+            if (isOpen) {
                 if (targetRow) targetRow.style.display = 'none';
                 button.setAttribute('data-state', 'closed');
                 icon.classList.remove('bi-x-circle');
@@ -65,7 +66,11 @@
             }
         }
 
-        // Function to sync status class from select to button
+// ============================================
+// BOOTSTRAP SELECT MANAGEMENT
+// ============================================
+
+        // Sync status color class from select value to dropdown button
         function syncSelectpickerStatusClass(selectElement) {
             if (!selectElement) return;
             const status = selectElement.value;
@@ -74,22 +79,20 @@
             if (status) {
                 $button.addClass('status-' + status);
             }
-            console.log('Status class synced:', status, 'Button classes:', $button.attr('class'));
         }
 
-        // Function to initialize a single selectpicker
+        // Initialize a single Bootstrap Select dropdown
         function initSelectpicker(selectElement) {
             if (!selectElement) return;
             const $select = $(selectElement);
 
-            // Check if already initialized - use a data attribute to track
+            // Skip if already initialized
             if ($select.data('bs-select-initialized')) {
-                console.log('Select already initialized, skipping:', $select.attr('id'));
                 return;
             }
             $select.data('bs-select-initialized', true);
 
-            // Check if already initialized with Bootstrap Select
+            // Destroy existing instance if present
             if ($select.data('selectpicker')) {
                 $select.selectpicker('destroy');
             }
@@ -103,70 +106,67 @@
 
             // Fix button classes
             const $button = $select.closest('.bootstrap-select').find('.dropdown-toggle');
-            console.log($button);
             $button.removeClass();
             $button.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
 
             // Sync status class
             syncSelectpickerStatusClass(selectElement);
 
-            // Add change event listener directly to this select element
-            // This ensures HTMX hx-trigger="change" works
+            // Add change event listener for HTMX integration
             $select.on('changed.bs.select', function(e, clickedIndex, newValue, oldValue) {
-                console.log('Bootstrap Select changed:', newValue);
-                // Manually trigger change event for HTMX
+                // Trigger change event for HTMX hx-trigger="change"
                 $select.trigger('change');
                 // Sync status class
                 syncSelectpickerStatusClass(this);
-                // Ensure button has right classes
+                // Ensure button has correct classes
                 const $btn = $(this).closest('.bootstrap-select').find('.dropdown-toggle');
                 $btn.removeClass();
                 $btn.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
             });
-
-            console.log('Selectpicker initialized:', $select.attr('id'));
         }
 
-        // Function to initialize all selectpickers in a container
+        // Initialize all Bootstrap Select dropdowns in a container
         function initAllSelectpickers(container) {
             if (typeof $ === 'undefined' || !$.fn.selectpicker) return;
-
             const target = container || document;
             $(target).find('select.selectpicker.status-select').each(function() {
                 initSelectpicker(this);
             });
         }
 
-        // Make functions globally available
+        // Make functions globally available for external use
         window.initAllSelectpickers = initAllSelectpickers;
         window.syncSelectpickerStatusClass = syncSelectpickerStatusClass;
-    </script>
 
-    <script>
-        // HTMX event listener for task updates
+// ============================================
+// HTMX EVENT HANDLERS
+// ============================================
+
         document.body.addEventListener('htmx:afterSwap', function(event) {
-            // Handle status container updates
-            if (event.detail.target && event.detail.target.id && event.detail.target.id.startsWith('status-container-')) {
-                // Reinitialize the selectpicker in the updated container
+            const target = event.detail.target;
+            if (!target || !target.id) return;
+
+            // Reinitialize selectpicker after status container update
+            if (target.id.startsWith('status-container-')) {
                 setTimeout(function() {
-                    const selectElement = event.detail.target.querySelector('select.selectpicker');
+                    const selectElement = target.querySelector('select.selectpicker');
                     if (selectElement) {
                         initSelectpicker(selectElement);
                     }
                 }, 50);
             }
 
-            // Handle task updates (close edit form)
-            if (event.detail.target && event.detail.target.id && event.detail.target.id.startsWith('task-')) {
-                const taskId = event.detail.target.id.replace('task-', '');
+            // Close edit form after task update
+            if (target.id.startsWith('task-')) {
+                const taskId = target.id.replace('task-', '');
                 setTimeout(function() {
                     const editRow = document.getElementById('task-edit-row-' + taskId);
                     const editBtn = document.getElementById('edit-btn-' + taskId);
-                    if(editRow) editRow.style.display = 'none';
-                    if(editBtn) {
+                    if (editRow) editRow.style.display = 'none';
+                    if (editBtn) {
                         editBtn.setAttribute('data-state', 'closed');
                         const icon = editBtn.querySelector('i');
-                        if(icon) {
+                        if (icon) {
                             icon.classList.remove('bi-x-circle');
                             icon.classList.add('bi-pencil');
                         }
@@ -174,15 +174,15 @@
                 }, 100);
             }
 
-            // Handle edit container updates (when edit form is loaded)
-            if (event.detail.target && event.detail.target.id && event.detail.target.id.startsWith('task-edit-container-')) {
+            // Reinitialize selects after edit container update
+            if (target.id.startsWith('task-edit-container-')) {
                 setTimeout(function() {
-                    initAllSelectpickers(event.detail.target);
+                    initAllSelectpickers(target);
                 }, 100);
             }
         });
 
-        // Also handle after settle for any other swaps
+        // Reinitialize selects after HTMX settle
         document.body.addEventListener('htmx:afterSettle', function(event) {
             if (event.detail.target) {
                 setTimeout(function() {
@@ -191,7 +191,10 @@
             }
         });
 
-        // Initialize on page load
+// ============================================
+// INITIALIZATION
+// ============================================
+
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
                 initAllSelectpickers(document);
@@ -199,8 +202,6 @@
         } else {
             initAllSelectpickers(document);
         }
-
-        console.log('Task item loaded successfully');
     </script>
 
     <!-- Status cell -->
