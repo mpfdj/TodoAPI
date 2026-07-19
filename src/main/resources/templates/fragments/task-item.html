@@ -74,24 +74,18 @@
             if (status) {
                 $button.addClass('status-' + status);
             }
+            console.log('Status class synced:', status, 'Button classes:', $button.attr('class'));
         }
 
         // Function to initialize a single selectpicker
         function initSelectpicker(selectElement) {
             if (!selectElement) return;
-            
             const $select = $(selectElement);
 
-            // Check if already initialized with Bootstrap Select
+            // Check if already initialized
             if ($select.data('selectpicker')) {
                 $select.selectpicker('destroy');
             }
-
-            // Mark as initialized using data attribute
-            if ($select.data('initialized')) {
-                return;
-            }
-            $select.data('initialized', true);
 
             // Initialize with custom style
             $select.selectpicker({
@@ -102,6 +96,7 @@
 
             // Fix button classes
             const $button = $select.closest('.bootstrap-select').find('.dropdown-toggle');
+            console.log($button);
             $button.removeClass();
             $button.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
 
@@ -111,6 +106,7 @@
             // Add change event listener directly to this select element
             // This ensures HTMX hx-trigger="change" works
             $select.on('changed.bs.select', function(e, clickedIndex, newValue, oldValue) {
+                console.log('Bootstrap Select changed:', newValue);
                 // Manually trigger change event for HTMX
                 $select.trigger('change');
                 // Sync status class
@@ -120,6 +116,8 @@
                 $btn.removeClass();
                 $btn.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
             });
+
+            console.log('Selectpicker initialized:', $select.attr('id'));
         }
 
         // Function to initialize all selectpickers in a container
