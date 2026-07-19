@@ -2,11 +2,20 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <style>
-        /* Status color classes */
-        .status-todo .filter-option-inner-inner { color: #6c757d; }
-        .status-in_progress .filter-option-inner-inner { color: #0d6efd; }
-        .status-done .filter-option-inner-inner { color: #198754; }
-        .status-archived .filter-option-inner-inner { color: #dc3545; }
+        /* Status color classes for Selectpicker button */
+        .btn.dropdown-toggle.status-todo { color: #6c757d !important; border-color: #6c757d !important; }
+        .btn.dropdown-toggle.status-in_progress { color: #0d6efd !important; border-color: #0d6efd !important; }
+        .btn.dropdown-toggle.status-done { color: #198754 !important; border-color: #198754 !important; }
+        .btn.dropdown-toggle.status-archived { color: #dc3545 !important; border-color: #dc3545 !important; }
+
+        /* Override Bootstrap Select default styles */
+        .bootstrap-select .dropdown-toggle.btn-light {
+            background-color: #f8f9fa !important;
+            border: 1px solid #dee2e6 !important;
+        }
+        .bootstrap-select .dropdown-toggle.btn-light:hover {
+            background-color: #e9ecef !important;
+        }
     </style>
 </head>
 <body>
@@ -55,11 +64,82 @@
                 icon.classList.add('bi-x-circle');
             }
         }
+
+        // Function to sync status class from select to button
+        function syncSelectpickerStatusClass(selectElement) {
+            if (!selectElement) return;
+            const status = selectElement.value;
+            const $button = $(selectElement).closest('.bootstrap-select').find('.dropdown-toggle');
+            $button.removeClass('status-todo status-in_progress status-done status-archived');
+            if (status) {
+                $button.addClass('status-' + status);
+            }
+            console.log('Status class synced:', status, 'Button classes:', $button.attr('class'));
+        }
+
+        // Function to initialize a single selectpicker
+        function initSelectpicker(selectElement) {
+            if (!selectElement) return;
+            const $select = $(selectElement);
+
+            // Check if already initialized
+            if ($select.data('selectpicker')) {
+                $select.selectpicker('destroy');
+            }
+
+            // Initialize with custom style
+            $select.selectpicker({
+                style: 'btn-light',
+                size: false,
+                liveSearch: false
+            });
+
+            // Fix button classes
+            const $button = $select.closest('.bootstrap-select').find('.dropdown-toggle');
+            console.log($button);
+<!--            $button.removeClass('btn-sm btn-outline-secondary');-->
+<!--            $button.addClass('btn-light');-->
+            $button.removeClass();
+            $button.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
+
+
+
+            // Sync status class
+            syncSelectpickerStatusClass(selectElement);
+
+            console.log('Selectpicker initialized:', $select.attr('id'));
+        }
+
+        // Function to initialize all selectpickers in a container
+        function initAllSelectpickers(container) {
+            if (typeof $ === 'undefined' || !$.fn.selectpicker) return;
+
+            const target = container || document;
+            $(target).find('select.selectpicker.status-select').each(function() {
+                initSelectpicker(this);
+            });
+        }
+
+        // Make functions globally available
+        window.initAllSelectpickers = initAllSelectpickers;
+        window.syncSelectpickerStatusClass = syncSelectpickerStatusClass;
     </script>
 
     <script>
         // HTMX event listener for task updates
         document.body.addEventListener('htmx:afterSwap', function(event) {
+            // Handle status container updates
+            if (event.detail.target && event.detail.target.id && event.detail.target.id.startsWith('status-container-')) {
+                // Reinitialize the selectpicker in the updated container
+                setTimeout(function() {
+                    const selectElement = event.detail.target.querySelector('select.selectpicker');
+                    if (selectElement) {
+                        initSelectpicker(selectElement);
+                    }
+                }, 50);
+            }
+
+            // Handle task updates (close edit form)
             if (event.detail.target && event.detail.target.id && event.detail.target.id.startsWith('task-')) {
                 const taskId = event.detail.target.id.replace('task-', '');
                 setTimeout(function() {
@@ -78,16 +158,49 @@
             }
         });
 
-        // Setup status change handler using event delegation
+        // Also handle after settle for any other swaps
+        document.body.addEventListener('htmx:afterSettle', function(event) {
+            if (event.detail.target) {
+                setTimeout(function() {
+                    initAllSelectpickers(event.detail.target);
+                }, 100);
+            }
+        });
+
+        // Handle change event on select - using jQuery's change event
         if (typeof $ !== 'undefined') {
             $(document).on('change', 'select.selectpicker.status-select', function() {
-                const selectElement = this;
-                const taskId = selectElement.getAttribute('data-task-id');
-                if (taskId && typeof handleStatusChange !== 'undefined') {
-                    handleStatusChange(selectElement, taskId);
-                }
+                // Update the status class on the button
+                syncSelectpickerStatusClass(this);
+
+                // Also ensure the button has the right classes
+                const $button = $(this).closest('.bootstrap-select').find('.dropdown-toggle');
+<!--                $button.removeClass('btn-sm btn-outline-secondary');-->
+<!--                $button.addClass('btn-light');-->
+                $button.removeClass();
+                $button.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
+
             });
         }
+
+        // Initialize on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                                initAllSelectpickers(document);
+
+<!--                setTimeout(function() {-->
+<!--                    initAllSelectpickers(document);-->
+<!--                }, 200);-->
+            });
+        } else {
+                    initAllSelectpickers(document);
+
+<!--            setTimeout(function() {-->
+<!--                initAllSelectpickers(document);-->
+<!--            }, 200);-->
+        }
+
+        console.log('Task item loaded successfully');
     </script>
 
     <!-- Status cel -->
@@ -113,10 +226,6 @@
             </select>
         </form>
     </td>
-
-
-
-
 
     <!-- Title cel -->
     <td th:id="'title-container-' + ${task.id}">
@@ -196,12 +305,9 @@
                     data-size="5"
                     style="width: auto;">
                 <option value="todo" th:selected="${task.status == 'todo'}" data-icon="bi-clipboard">Todo</option>
-                <option value="in_progress" th:selected="${task.status == 'in_progress'}"
-                        data-icon="bi-hourglass-split">In Progress
-                </option>
+                <option value="in_progress" th:selected="${task.status == 'in_progress'}" data-icon="bi-hourglass-split">In Progress</option>
                 <option value="done" th:selected="${task.status == 'done'}" data-icon="bi-check-circle">Done</option>
-                <option value="archived" th:selected="${task.status == 'archived'}" data-icon="bi-archive">Archived
-                </option>
+                <option value="archived" th:selected="${task.status == 'archived'}" data-icon="bi-archive">Archived</option>
             </select>
         </form>
     </td>
