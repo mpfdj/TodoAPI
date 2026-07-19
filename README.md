@@ -67,5 +67,9 @@ https://chat.mistral.ai/code
 
 
 # Last working version
+Revision number: 8785a35c50c1d5be6b23a9461488bf4bd5aab2fe
+Commit message: Fix Maximum call stack size exceeded - Added bs-select-initialized data flag to prevent duplicate initialization of selectpicker event listeners
+
+
 Revision number: 4cd5f92d50f92335f3a098ad5dad65372dbcd1e0
-Fix HTMX endpoint not being called after drag-and-drop - Added htmx.process() to re-process HTMX attributes after container replacement and moved event listeners to initSelectpicker()
+Commit message: Fix HTMX endpoint not being called after drag-and-drop - Added htmx.process() to re-process HTMX attributes after container replacement and moved event listeners to initSelectpicker()
