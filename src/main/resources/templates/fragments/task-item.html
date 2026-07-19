@@ -103,6 +103,20 @@
             // Sync status class
             syncSelectpickerStatusClass(selectElement);
 
+            // Add change event listener directly to this select element
+            // This ensures HTMX hx-trigger="change" works
+            $select.on('changed.bs.select', function(e, clickedIndex, newValue, oldValue) {
+                console.log('Bootstrap Select changed:', newValue);
+                // Manually trigger change event for HTMX
+                $select.trigger('change');
+                // Sync status class
+                syncSelectpickerStatusClass(this);
+                // Ensure button has right classes
+                const $btn = $(this).closest('.bootstrap-select').find('.dropdown-toggle');
+                $btn.removeClass();
+                $btn.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
+            });
+
             console.log('Selectpicker initialized:', $select.attr('id'));
         }
 
@@ -169,24 +183,6 @@
                 }, 100);
             }
         });
-
-        // Handle change event on select - using jQuery's change event
-        // This is crucial for Bootstrap Select to trigger HTMX
-        if (typeof $ !== 'undefined') {
-            $(document).on('changed.bs.select', 'select.selectpicker.status-select', function(e, clickedIndex, newValue, oldValue) {
-                // Trigger the change event on the original select element
-                // This will trigger HTMX's hx-trigger="change"
-                $(this).trigger('change');
-                
-                // Update the status class on the button
-                syncSelectpickerStatusClass(this);
-
-                // Also ensure the button has the right classes
-                const $button = $(this).closest('.bootstrap-select').find('.dropdown-toggle');
-                $button.removeClass();
-                $button.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
-            });
-        }
 
         // Initialize on page load
         if (document.readyState === 'loading') {

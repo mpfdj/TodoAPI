@@ -278,6 +278,9 @@ document.body.addEventListener('htmx:afterSettle', function(event) {
 
 
 
+
+
+
 let dragger = null;
 
 function initializeTableDragger() {
@@ -346,7 +349,17 @@ function initializeTableDragger() {
         })
         .then(html => {
             // Replace the tasks container with updated content
-            document.getElementById('tasks-container').outerHTML = html;
+            const container = document.getElementById('tasks-container');
+            container.outerHTML = html;
+            
+            // Get the new container element
+            const newContainer = document.getElementById('tasks-container');
+            
+            // Manually trigger HTMX to process the new content
+            if (typeof htmx !== 'undefined' && newContainer) {
+                htmx.process(newContainer);
+            }
+            
             // Re-initialize drag functionality
             initializeTableDragger();
             // Re-initialize Bootstrap Select dropdowns
