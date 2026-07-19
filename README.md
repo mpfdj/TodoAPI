@@ -64,3 +64,8 @@ https://github.com/sindu12jun/table-dragger
 
 # Mistral (AI with github.com integration)
 https://chat.mistral.ai/code
+
+
+# Last working version
+Revision number: 4cd5f92d50f92335f3a098ad5dad65372dbcd1e0
+Fix HTMX endpoint not being called after drag-and-drop - Added htmx.process() to re-process HTMX attributes after container replacement and moved event listeners to initSelectpicker()
