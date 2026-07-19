@@ -60,3 +60,7 @@ session vs token???
 # table-dragger
 https://www.jsdelivr.com/?query=table-dragger
 https://github.com/sindu12jun/table-dragger
+
+
+# Mistral (AI with github.com integration)
+https://chat.mistral.ai/code
