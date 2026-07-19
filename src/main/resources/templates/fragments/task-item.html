@@ -76,18 +76,9 @@
             }
         }
 
-        // Track initialized selects to avoid duplicate listeners
-        const initializedSelects = new Set();
-
         // Function to initialize a single selectpicker
         function initSelectpicker(selectElement) {
             if (!selectElement) return;
-            
-            // Skip if already initialized
-            if (initializedSelects.has(selectElement)) {
-                return;
-            }
-            initializedSelects.add(selectElement);
             
             const $select = $(selectElement);
 
@@ -95,6 +86,12 @@
             if ($select.data('selectpicker')) {
                 $select.selectpicker('destroy');
             }
+
+            // Mark as initialized using data attribute
+            if ($select.data('initialized')) {
+                return;
+            }
+            $select.data('initialized', true);
 
             // Initialize with custom style
             $select.selectpicker({
