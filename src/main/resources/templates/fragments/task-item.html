@@ -86,7 +86,7 @@
             if (!selectElement) return;
             const $select = $(selectElement);
 
-            // Skip if already initialized
+            // Skip if already initialized to prevent duplicate event listeners
             if ($select.data('bs-select-initialized')) {
                 return;
             }
