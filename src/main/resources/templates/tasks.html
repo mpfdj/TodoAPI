@@ -210,6 +210,27 @@ function showAlert(message, type = 'info') {
 }
 
 // ============================================
+// EDIT FORM HANDLING
+// ============================================
+function closeEditRow(taskId) {
+    const editRow = document.getElementById('task-edit-row-' + taskId);
+    const editBtn = document.getElementById('edit-btn-' + taskId);
+
+    if(editRow) {
+        editRow.style.display = 'none';
+    }
+
+    if(editBtn) {
+        editBtn.setAttribute('data-state', 'closed');
+        const icon = editBtn.querySelector('i');
+        if(icon) {
+            icon.classList.remove('bi-x-circle');
+            icon.classList.add('bi-pencil');
+        }
+    }
+}
+
+// ============================================
 // HTMX EVENT LISTENERS
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
@@ -222,10 +243,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Reinitialize after HTMX swaps
 document.body.addEventListener('htmx:afterSwap', function(event) {
-    if (event.detail.target) {
-        if (typeof initAllSelectpickers === 'function') {
-            setTimeout(initAllSelectpickers, 300);
-        }
+    const target = event.detail.target;
+    if (!target || !target.id) return;
+    
+    // Reinitialize Bootstrap Select dropdowns
+    if (typeof initAllSelectpickers === 'function') {
+        setTimeout(initAllSelectpickers, 300);
+    }
+    
+    // Close edit form after task update (from task-edit-form)
+    if (target.id && target.id.startsWith('task-')) {
+        const taskId = target.id.replace('task-', '');
+        setTimeout(function() {
+            closeEditRow(taskId);
+        }, 100);
     }
 });
 
@@ -236,8 +267,6 @@ document.body.addEventListener('htmx:afterSettle', function(event) {
         }
     }
 });
-
-
 
 
 
