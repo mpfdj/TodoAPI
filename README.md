@@ -67,6 +67,9 @@ https://chat.mistral.ai/code
 
 
 # Last working version
+Revision number: 59c271af2cc531e5477c613b5c38f98fc2cc6c33
+Commit message: Add closeEditRow function to tasks.html and handle task update swaps - The hx-on::after-swap in task-edit-form.html was not working, so added global closeEditRow function and htmx:afterSwap handler in tasks.html to close edit form after task updates,
+
 Revision number: 8785a35c50c1d5be6b23a9461488bf4bd5aab2fe
 Commit message: Fix Maximum call stack size exceeded - Added bs-select-initialized data flag to prevent duplicate initialization of selectpicker event listeners
 
