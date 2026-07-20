@@ -112,13 +112,10 @@
             // Sync status class
             syncSelectpickerStatusClass(selectElement);
 
-            // Add change event listener for HTMX integration
-            $select.on('changed.bs.select', function(e, clickedIndex, newValue, oldValue) {
-                // Trigger change event for HTMX hx-trigger="change"
-                $select.trigger('change');
-                // Sync status class
+            // Bootstrap Select's changed.bs.select event will fire when user selects
+            // We need to sync the status class when that happens
+            $select.on('changed.bs.select', function() {
                 syncSelectpickerStatusClass(this);
-                // Ensure button has correct classes
                 const $btn = $(this).closest('.bootstrap-select').find('.dropdown-toggle');
                 $btn.removeClass();
                 $btn.addClass('btn dropdown-toggle btn-sm btn-outline-secondary');
@@ -156,7 +153,7 @@
         <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id}, source='task-item')}"
               th:hx-target="'#status-container-' + ${task.id}"
               th:hx-swap="outerHTML"
-              th:hx-trigger="change"
+              th:hx-trigger="changed.bs.select"
               class="d-inline">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <select name="status"
@@ -241,7 +238,7 @@
         <form th:hx-put="@{/ui/users/{userId}/lists/{listId}/tasks/{taskId}(userId=${userId}, listId=${listId}, taskId=${task.id}, source='task-item')}"
               th:hx-target="'#status-container-' + ${task.id}"
               th:hx-swap="outerHTML"
-              th:hx-trigger="change"
+              th:hx-trigger="changed.bs.select"
               class="d-inline">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <select name="status"
